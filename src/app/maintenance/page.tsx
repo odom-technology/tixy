@@ -56,7 +56,7 @@ export default async function MaintenancePage() {
       <ArcadePanel variant='cabinet' className='w-full max-w-2xl p-8 text-center sm:p-12'>
         <p className='arcade-kicker'>tixy.lol</p>
         <h1 className='arcade-display mt-5 text-2xl text-strong uppercase sm:text-3xl'>
-          The Arcade is temporarily closed.
+          tixy is temporarily closed.
         </h1>
         <p className='mx-auto mt-5 max-w-xl text-base text-body sm:text-lg'>
           Please check back when maintenance is complete.
@@ -81,8 +81,8 @@ export default async function MaintenancePage() {
           </dl>
         ) : null}
         <div className='mt-8 flex flex-wrap items-center justify-center gap-3'>
-          <ArcadeLinkButton href='/contact' tone='primary' size='sm'>
-            Contact support
+          <ArcadeLinkButton href='/feedback' tone='primary' size='sm'>
+            Send feedback
           </ArcadeLinkButton>
           {status.canBypass ? (
             <>

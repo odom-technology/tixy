@@ -9,12 +9,10 @@ import { FeedbackClient } from './_feedback-client';
 
 type FeedbackPageContentProps = {
   initialCategory?: FeedbackCategory;
-  contactMode?: boolean;
 };
 
 export async function FeedbackPageContent({
   initialCategory,
-  contactMode = false,
 }: FeedbackPageContentProps) {
   let identity;
   try {
@@ -32,6 +30,7 @@ export async function FeedbackPageContent({
 
   return (
     <FeedbackClient
+      key={initialCategory ?? 'other'}
       account={
         account
           ? {
@@ -42,7 +41,6 @@ export async function FeedbackPageContent({
       }
       initialEntries={entries}
       initialCategory={initialCategory}
-      contactMode={contactMode}
     />
   );
 }

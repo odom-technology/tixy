@@ -1,7 +1,7 @@
 # Security policy
 
 Report vulnerabilities through **Security → Report a vulnerability** in this
-repository. If unavailable, use the private form at <https://tixy.lol/contact>.
+repository. If unavailable, use the private form at <https://tixy.lol/feedback>.
 
 Do not publish credentials, personal data, exploitable details, or database
 exports in issues or PRs. Reproduce issues with synthetic local accounts; include

@@ -16,9 +16,7 @@ const PUBLIC_PAGE_PATHS = new Set([
   '/maintenance',
   '/signin',
   '/recover',
-  '/contact',
   '/feedback',
-  '/feedback/new',
 ]);
 const PUBLIC_API_PATHS = new Set([
   '/api/account/me',
@@ -108,7 +106,7 @@ export async function proxy(request: NextRequest) {
 
   if (pathname.startsWith('/api/')) {
     return NextResponse.json(
-      { error: 'Arcade is currently in maintenance mode.' },
+      { error: 'tixy is currently in maintenance mode.' },
       {
         status: 503,
         headers: {

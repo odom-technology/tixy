@@ -948,7 +948,7 @@ function ActivityTab({
                 Recent game requests and bug reports from this account.
               </p>
             </div>
-            <Link href='/feedback/new' className='arcade-link text-sm'>
+            <Link href='/feedback?category=game_request' className='arcade-link text-sm'>
               New note
             </Link>
           </div>

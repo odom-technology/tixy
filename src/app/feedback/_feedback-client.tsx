@@ -7,21 +7,11 @@ import { MessageSquare, Send } from 'lucide-react';
 import {
   ArcadeButton,
   ArcadeChip,
-  ArcadeLinkButton,
   ArcadeNotice,
 } from '@/features/arcade/components/ui/arcade-ui';
 import { AppPageFrame } from '@/features/arcade/components/shell/page-frame';
-
-type FeedbackCategory =
-  | 'bug'
-  | 'game_request'
-  | 'account'
-  | 'layout'
-  | 'performance'
-  | 'privacy'
-  | 'purchase'
-  | 'ads'
-  | 'other';
+import { feedbackCategories as categories } from '@/features/arcade/lib/feedback-categories';
+import type { FeedbackCategory } from '@/server/feedback';
 
 type FeedbackEntry = {
   id: string;
@@ -41,27 +31,7 @@ type FeedbackClientProps = {
   } | null;
   initialEntries: FeedbackEntry[];
   initialCategory?: FeedbackCategory;
-  contactMode?: boolean;
 };
-
-const categories: Array<{
-  value: FeedbackCategory;
-  label: string;
-  hint: string;
-  prompt: string;
-  placeholder: string;
-  pageLabel?: string;
-}> = [
-  { value: 'other', label: 'General question', hint: 'Ask us anything about Arcade or Odom Tech.', prompt: 'What would you like to ask?', placeholder: 'Tell us what you need help with or would like to know.' },
-  { value: 'bug', label: 'Bug report', hint: 'Tell us what happened so we can reproduce it.', prompt: 'What went wrong?', placeholder: 'What did you expect? What happened instead? Include steps to reproduce it.', pageLabel: 'Page or game where it happened' },
-  { value: 'game_request', label: 'Game request', hint: 'Suggest a game or an improvement to an existing one.', prompt: 'What would you like to see?', placeholder: 'Describe the game or feature and why it would be fun.' },
-  { value: 'performance', label: 'Slow or broken page', hint: 'Help us track down slow loading, lag, or errors.', prompt: 'What felt slow or failed?', placeholder: 'Which device and browser were you using? What happened?', pageLabel: 'Page or game affected' },
-  { value: 'layout', label: 'Design feedback', hint: 'Share what is confusing or could be easier to use.', prompt: 'What could we improve?', placeholder: 'What were you trying to do, and what made it difficult?', pageLabel: 'Page you are referring to' },
-  { value: 'account', label: 'Account help', hint: 'Tell us about sign in, profile, or account access issues.', prompt: 'How can we help with your account?', placeholder: 'Describe the issue. Do not include your password or recovery code.' },
-  { value: 'purchase', label: 'Purchase help', hint: 'Ask about a charge, purchase, or digital item.', prompt: 'What happened with your purchase?', placeholder: 'Include the approximate date and item. Do not include card numbers or payment details.' },
-  { value: 'privacy', label: 'Privacy request', hint: 'Ask about your data or request a privacy action.', prompt: 'What privacy help do you need?', placeholder: 'Describe your request. We may ask you to verify account ownership before acting.' },
-  { value: 'ads', label: 'Ad issue', hint: 'Report an ad that is confusing, inappropriate, or broken.', prompt: 'What was wrong with the ad?', placeholder: 'Describe the ad and where you saw it. Do not include sensitive personal information.', pageLabel: 'Page where you saw the ad' },
-];
 
 const categoryLabels = new Map(
   categories.map((category) => [category.value, category.label]),
@@ -81,8 +51,7 @@ function formatDate(timestamp: number) {
 export function FeedbackClient({
   account,
   initialEntries,
-  initialCategory = 'game_request',
-  contactMode = false,
+  initialCategory = 'other',
 }: FeedbackClientProps) {
   const [category, setCategory] = useState<FeedbackCategory>(initialCategory);
   const [rating, setRating] = useState('');
@@ -139,17 +108,17 @@ export function FeedbackClient({
 
   return (
     <AppPageFrame
-      eyebrow={contactMode ? 'Support' : 'Feedback'}
+      eyebrow='Support'
       title={
         <span className='flex items-center gap-3'>
           <MessageSquare size={28} />
-          {contactMode ? 'Contact' : 'Floor Notes'}
+          Feedback
         </span>
       }
-      subtitle={contactMode ? 'Send a message to the Arcade team. Choose a reason so we can help faster.' : 'Send game requests, design notes, and account issues to the team.'}
+      subtitle='Ask a question, get help, report a problem, or suggest a game. Choose a reason to tailor your message.'
       contentClassName='space-y-6'
     >
-        <div className={contactMode ? 'mx-auto max-w-3xl' : 'grid gap-5 lg:grid-cols-[1fr_0.8fr]'}>
+        <div className={account ? 'grid items-start gap-5 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]' : 'mx-auto max-w-3xl'}>
           <section className={panelClass}>
             <form onSubmit={submit} className='space-y-4'>
               <label className='block'>
@@ -244,7 +213,7 @@ export function FeedbackClient({
                   disabled={busy}
                 >
                   <Send size={16} />
-                  {busy ? 'Submitting...' : 'Submit'}
+                  {busy ? 'Sending...' : 'Send message'}
                 </ArcadeButton>
               </div>
               {notice ? <div role='status'><ArcadeNotice tone='success'>{notice}</ArcadeNotice></div> : null}
@@ -252,15 +221,14 @@ export function FeedbackClient({
             </form>
           </section>
 
-          {!contactMode ? <aside className={panelClass}>
-            <h2 className='text-lg font-semibold'>
-              {account ? 'Recent notes' : 'Player card'}
-            </h2>
-            {account ? (
+          {account ? (
+            <aside className={panelClass}>
+              <h2 className='text-lg font-semibold'>Your recent messages</h2>
+              <p className='mt-1 text-sm text-faint'>Your latest 10 messages and their status.</p>
               <div className='mt-4 space-y-3'>
                 {entries.length === 0 ? (
                   <p className='arcade-card-inset px-4 py-6 text-center text-sm text-faint'>
-                    No feedback submitted yet.
+                    You haven’t sent any messages yet.
                   </p>
                 ) : (
                   entries.map((entry) => (
@@ -286,14 +254,8 @@ export function FeedbackClient({
                   ))
                 )}
               </div>
-            ) : (
-              <div className='mt-4 space-y-3 text-sm text-faint'>
-                <ArcadeLinkButton href='/signin?next=/feedback/new' tone='primary'>
-                  Sign in
-                </ArcadeLinkButton>
-              </div>
-            )}
-          </aside> : null}
+            </aside>
+          ) : null}
         </div>
     </AppPageFrame>
   );

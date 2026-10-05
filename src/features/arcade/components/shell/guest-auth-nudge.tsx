@@ -39,7 +39,6 @@ const ACCOUNT_FLOW_PREFIXES = [
   '/friends',
   '/privacy',
   '/terms',
-  '/contact',
   '/feedback',
 ];
 

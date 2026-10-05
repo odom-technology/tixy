@@ -284,7 +284,7 @@ export function ArcadeDashboardContent({
         <span className='arc-hero-bulbs' aria-hidden />
         <div className='relative grid items-center gap-4 py-7 sm:gap-6 sm:py-12 md:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] md:gap-8 md:py-0 md:min-h-[clamp(18rem,32vw,24rem)]'>
           <div className='order-1 min-w-0'>
-            <p className='arcade-kicker'>Arcade</p>
+            <p className='arcade-kicker'>tixy</p>
             <h1 className='arcade-display mt-3 text-4xl text-strong uppercase sm:text-5xl xl:text-6xl'>
               Pick your cabinet
             </h1>
@@ -308,7 +308,7 @@ export function ArcadeDashboardContent({
           <div className='order-2 flex justify-center self-end md:justify-end'>
             <Image
               src='/brand/aodom-hero.webp'
-              alt='Arcade cabinet'
+              alt='tixy cabinet'
               width={1280}
               height={853}
               priority
@@ -327,7 +327,7 @@ export function ArcadeDashboardContent({
       </ArcReveal>
 
       {availability.sections.games ? (
-        <ArcReveal as='section' index={1} aria-label='Your arcade today'>
+        <ArcReveal as='section' index={1} aria-label='Your tixy today'>
           <TodayLobby />
         </ArcReveal>
       ) : null}
@@ -595,7 +595,7 @@ export function ArcadeDashboardContent({
 
           <ArcadeNotice>
             Missing a game you&rsquo;d like to see?{' '}
-            <Link href='/feedback/new' className='arcade-link'>
+            <Link href='/feedback?category=game_request' className='arcade-link'>
               Request a game
             </Link>
             .

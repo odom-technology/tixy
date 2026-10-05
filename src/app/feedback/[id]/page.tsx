@@ -19,7 +19,7 @@ type FeedbackDetailPageProps = {
 export const dynamic = 'force-dynamic';
 
 export const metadata = {
-  title: 'Feedback detail | Arcade',
+  title: 'Feedback detail | tixy',
 };
 
 function formatDate(timestamp: number) {
