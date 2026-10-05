@@ -10,9 +10,18 @@ const LEGAL_LINKS = [
 
 export function LegalFooter() {
   return (
-    <footer className='border-t border-soft bg-background px-3 py-5 text-xs text-faint sm:px-4 lg:px-6'>
+    <footer data-legal-footer className='border-t border-soft bg-background px-3 py-5 text-xs text-faint sm:px-4 lg:px-6'>
       <div className='mx-auto flex w-full max-w-[100rem] flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
-        <p>An ODOM Tech product</p>
+        <p>
+          An{' '}
+          <a
+            href='https://odomtech.com'
+            className='rounded-sm underline underline-offset-2 transition-colors hover:bg-raised hover:text-strong focus-visible:bg-raised focus-visible:text-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring'
+          >
+            ODOM Tech
+          </a>{' '}
+          product
+        </p>
         <nav aria-label='Legal and support' className='flex flex-wrap items-center gap-3'>
           {LEGAL_LINKS.map((link) => (
             link.href === '/privacy' ? (

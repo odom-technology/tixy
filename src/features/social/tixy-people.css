@@ -560,7 +560,7 @@ a.tp-row-main:focus-visible { outline: 3px solid var(--tixy-ticket); outline-off
 .tp-launcher {
   position: fixed;
   right: 20px;
-  bottom: 20px;
+  bottom: var(--tp-footer-clearance, 20px);
   z-index: 60;
   display: none;
   align-items: center;
@@ -595,12 +595,13 @@ a.tp-row-main:focus-visible { outline: 3px solid var(--tixy-ticket); outline-off
 .tp-dock {
   position: fixed;
   right: 20px;
-  bottom: 20px;
+  bottom: var(--tp-footer-clearance, 20px);
   z-index: 60;
   display: none;
   flex-direction: column;
   width: 400px;
-  height: min(640px, calc(100vh - 6rem));
+  height: min(640px, calc(100vh - var(--tp-footer-clearance, 20px) - 5rem));
+  height: min(640px, calc(100dvh - var(--tp-footer-clearance, 20px) - 5rem));
   overflow: hidden;
   border-radius: var(--tixy-radius-panel-lg);
   background: var(--tixy-paper);
