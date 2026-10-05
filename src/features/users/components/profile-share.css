@@ -1,0 +1,49 @@
+/* The share sheet (profile-share.tsx): the card, four buttons, the embed. */
+
+.ps {
+  display: grid;
+  gap: 14px;
+  color: var(--tixy-ink);
+  font-family: var(--tixy-font-text);
+}
+.ps-card {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--tixy-radius-panel-sm);
+  background: var(--tixy-paper-3);
+  aspect-ratio: 1200 / 630;
+}
+.ps-note { margin: 0; font-size: 15px; color: var(--tixy-ink-2); }
+.ps-note a { color: var(--tixy-ink); font-weight: 700; }
+.ps-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.ps-embed {
+  display: grid;
+  gap: 8px;
+  padding: 14px;
+  border-radius: var(--tixy-radius-panel-sm);
+  background: var(--tixy-paper-2);
+}
+.ps-embed h3 { margin: 0; font-size: 16px; font-weight: 800; }
+.ps-embed > p { margin: 0; font-size: 14px; color: var(--tixy-ink-2); }
+.ps-snippet {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 4px 8px;
+}
+.ps-snippet label { grid-column: 1 / -1; font-size: 14px; font-weight: 700; }
+.ps-snippet textarea {
+  width: 100%;
+  min-height: 3.2rem;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: var(--tixy-radius-button-sm);
+  background: var(--tixy-paper);
+  color: var(--tixy-ink-2);
+  font: 13px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+  resize: none;
+}
+.ps-snippet textarea:focus-visible { outline: 3px solid var(--tixy-ticket); outline-offset: 1px; }
+.ps-status { margin: 0; min-height: 1.25em; font-size: 14px; color: var(--tixy-ink-2); }
+.ps-status:empty { min-height: 0; }

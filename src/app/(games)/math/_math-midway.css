@@ -1,0 +1,710 @@
+/* ──────────────────────────────────────────────────────────────────────
+   MENTAL MATH SPRINT — Midway scoped panel. Namespaced under .math-midway so
+   it can't leak into other games or shells. A big lacquered-wood readout shows
+   the problem; below it a cream KEYCAP numeric keypad (0-9, clear, enter) fills
+   the stage. Hard bevels + offset drop shadows; NOTHING GLOWS. Combo/streak
+   feedback is an enamel chip that PULSES brightness (no outer glow) and
+   escalates: warm amber → hot teal (flame) → blazing red enamel + an ember
+   seam painted along the readout's bottom edge. Problems pop in with a 220ms
+   settle spring; entered digits land with weight; each correct answer floats a
+   "+1" off the entry line. The final 10s pulse the timebar/clock (urgency is
+   feedback, not idle motion). Ambient decoration is STATIC painted math glyphs
+   inside the readout. Under prefers-reduced-motion all transforms/animations
+   collapse to static states and the urgency pulses stop.
+   ────────────────────────────────────────────────────────────────────── */
+
+.math-midway .math-stage {
+  width: 100%;
+  max-width: 30rem;
+  margin-inline: auto;
+}
+
+/* ── HUD stat chips (Score / Time / Best): inset ink wells with mono numbers ── */
+.math-midway .math-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(6px, 2vw, 12px);
+  max-width: 30rem;
+}
+.math-midway .math-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 5px 10px 6px;
+  border-radius: 10px;
+  background: #120d08;
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.55),
+    inset 0 0 0 2px #0f0a06;
+}
+.math-midway .math-stat-label {
+  font-family: var(--font-mono-arcade, ui-monospace, monospace);
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #b89b6a;
+}
+.math-midway .math-stat-value {
+  font-family: var(--font-mono-arcade, ui-monospace, monospace);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  font-size: clamp(15px, 4vw, 19px);
+  line-height: 1.15;
+  color: #f6eddc;
+}
+/* Final-10s urgency: the clock chip turns danger-red and pulses brightness. */
+.math-midway .math-stat[data-low='true'] .math-stat-value {
+  color: color-mix(in srgb, var(--mk-wrong, #c73538) 65%, #fff);
+  animation: math-urgent-pulse 900ms ease-in-out infinite;
+}
+
+/* ── The problem readout: a recessed dark cabinet screen on a wood cabinet ── */
+.math-midway .math-readout {
+  position: relative;
+  border-radius: var(--radius-well);
+  padding: clamp(16px, 5%, 30px) clamp(14px, 4%, 26px);
+  background: var(--mk-panel-bg, radial-gradient(120% 140% at 50% 18%, #1f2a22 0%, #0f1512 100%));
+  box-shadow:
+    inset 0 0 0 2px var(--mk-panel-border, #0f0a06),
+    inset 0 3px 10px rgba(0, 0, 0, 0.65),
+    0 1px 0 var(--bevel-hi),
+    0 6px 0 var(--shadow-color),
+    0 12px 24px #00000055,
+    0 0 18px var(--mk-panel-glow, transparent);
+  text-align: center;
+  overflow: hidden;
+}
+
+/* Countdown bar — an inset enamel track that drains over the 60s. */
+.math-midway .math-timebar {
+  position: relative;
+  height: 12px;
+  border-radius: 999px;
+  margin-bottom: clamp(12px, 3.5%, 20px);
+  background: #120d08;
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.7),
+    inset 0 0 0 2px #0f0a06;
+  overflow: hidden;
+}
+.math-midway .math-timebar-fill {
+  position: absolute;
+  inset: 0;
+  transform-origin: left center;
+  border-radius: 999px;
+  background: var(--mk-timer-fill, linear-gradient(180deg, #f7bd5e 0%, #f2a33c 55%, #c47c1f 100%));
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.32),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.32);
+  /* width is driven by an inline style; transition keeps the drain smooth.
+     No glow — just the painted bar shrinking. */
+  transition: width 240ms linear;
+}
+/* Low-time warning: the bar turns to danger-red enamel (still no glow) and
+   pulses its paint brightness — urgency feedback, disabled by reduced motion. */
+.math-midway .math-timebar-fill[data-low='true'] {
+  background: var(--mk-wrong-fill, linear-gradient(180deg, #e2666a 0%, #c73538 55%, #7e2225 100%));
+  animation: math-urgent-pulse 900ms ease-in-out infinite;
+}
+@keyframes math-urgent-pulse {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.35); }
+}
+
+/* ── Ambient decor: STATIC painted math glyphs + the streak ember seam ── */
+.math-midway .math-decor {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.math-midway .math-decor-glyph {
+  position: absolute;
+  font-family: var(--font-mono-arcade, ui-monospace, monospace);
+  font-weight: 800;
+  line-height: 1;
+  user-select: none;
+  color: color-mix(in srgb, var(--mk-problem-text, #f6eddc) 6%, transparent);
+}
+.math-midway .math-decor-glyph-a {
+  top: -14px;
+  left: -8px;
+  font-size: clamp(72px, 22vw, 124px);
+  transform: rotate(-9deg);
+}
+.math-midway .math-decor-glyph-b {
+  bottom: -20px;
+  right: 2px;
+  font-size: clamp(58px, 18vw, 104px);
+  transform: rotate(11deg);
+}
+.math-midway .math-decor-glyph-c {
+  top: 32%;
+  right: -6px;
+  font-size: clamp(38px, 12vw, 68px);
+  transform: rotate(-14deg);
+}
+/* Ember seam along the readout's bottom edge — appears on hot/blazing streaks.
+   Painted (hard-edged gradient stripe), derived from the resolved theme. */
+.math-midway .math-decor::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 4px;
+  opacity: 0;
+  background: linear-gradient(90deg, transparent, var(--mk-correct, #2fb8a6), transparent);
+  transition: opacity 220ms ease;
+}
+.math-midway .math-readout[data-heat='hot'] .math-decor::after {
+  opacity: 0.75;
+}
+.math-midway .math-readout[data-heat='blaze'] .math-decor::after {
+  opacity: 0.95;
+  height: 5px;
+  background: linear-gradient(
+    90deg,
+    transparent 2%,
+    var(--mk-accent, #f2a33c) 30%,
+    var(--mk-wrong, #c73538) 50%,
+    var(--mk-accent, #f2a33c) 70%,
+    transparent 98%
+  );
+}
+/* Readout content sits above the decor layer. (Combo chip / score float are
+   absolutely positioned and carry their own z-index.) */
+.math-midway .math-readout .math-timebar,
+.math-midway .math-readout .math-readout-label,
+.math-midway .math-readout .math-problem,
+.math-midway .math-readout .math-entry {
+  position: relative;
+  z-index: 1;
+}
+
+.math-midway .math-readout-label {
+  font-family: var(--font-mono-arcade, ui-monospace, monospace);
+  font-size: clamp(9px, 2.4vw, 12px);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #b89b6a;
+}
+
+/* The problem itself — large tabular enamel-cream numerals. */
+.math-midway .math-problem {
+  font-family: var(--font-mono-arcade, ui-monospace, monospace);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  font-size: clamp(30px, 9.5vw, 54px);
+  line-height: 1.05;
+  margin-top: 6px;
+  color: var(--mk-problem-text, #f6eddc);
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.55);
+}
+/* Each new problem pops in with the Midway settle spring (keyed remount). */
+.math-midway .math-problem-line {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(8px, 2.4vw, 14px);
+  animation: math-problem-in 220ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes math-problem-in {
+  0% {
+    opacity: 0;
+    transform: translateY(12px) scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+/* The operator rides an enamel keycap chip between the operands. Each op
+   gets its own SEMANTIC enamel (same convention as the clear=red / enter=teal
+   action keys) so +, − and × are instantly tellable apart at a glance:
+   + teal · − red · × amber. Overridable per-op via --mk-op-* vars. */
+.math-midway .math-op {
+  display: inline-grid;
+  place-items: center;
+  font-size: 0.68em;
+  width: 1.5em;
+  height: 1.5em;
+  border-radius: 0.28em;
+  color: #2a1a06;
+  text-shadow: none;
+  background: var(--mk-op-mul, radial-gradient(ellipse at 38% 28%, #f7bd5e 0%, #f2a33c 55%, #9a621a 100%));
+  box-shadow:
+    inset 0 2px 1px rgba(255, 255, 255, 0.45),
+    inset 0 -3px 4px rgba(0, 0, 0, 0.35),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.3),
+    0 2px 0 rgba(0, 0, 0, 0.4);
+}
+.math-midway .math-op[data-op='+'] {
+  color: #e7fffb;
+  background: var(--mk-op-add, radial-gradient(ellipse at 38% 28%, #46cdbb 0%, #2fb8a6 56%, #1b7466 100%));
+}
+.math-midway .math-op[data-op='-'] {
+  color: #fdeceb;
+  background: var(--mk-op-sub, radial-gradient(ellipse at 38% 28%, #d34b4e 0%, #c73538 56%, #7e2225 100%));
+}
+.math-midway .math-equals {
+  font-size: 0.72em;
+  color: color-mix(in srgb, var(--mk-problem-text, #f6eddc) 42%, transparent);
+  text-shadow: none;
+}
+
+/* The player's running entry, shown as an amber sub-readout under the problem. */
+.math-midway .math-entry {
+  margin-top: clamp(8px, 2.5%, 16px);
+  min-height: 1.6em;
+  font-family: var(--font-mono-arcade, ui-monospace, monospace);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  font-size: clamp(20px, 6vw, 30px);
+  line-height: 1.2;
+  letter-spacing: 0.04em;
+  color: var(--mk-accent, #f2a33c);
+}
+.math-midway .math-entry[data-empty='true'] {
+  color: #6f5d3c;
+}
+/* Entered digits land with weight — a quick overshoot pop on the new digit. */
+.math-midway .math-entry-digit {
+  display: inline-block;
+  animation: math-digit-in 120ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes math-digit-in {
+  0% {
+    opacity: 0.35;
+    transform: translateY(4px) scale(1.4);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+/* Steady entry caret — a painted amber underscore (no blink loop). */
+.math-midway .math-caret {
+  display: inline-block;
+  width: 0.55em;
+  height: 0.14em;
+  margin-left: 5px;
+  border-radius: 1px;
+  vertical-align: baseline;
+  background: color-mix(in srgb, var(--mk-accent, #f2a33c) 60%, transparent);
+}
+
+/* Per-answer score float: "+1" lifts off the entry line on every correct. */
+.math-midway .math-float {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  bottom: clamp(18px, 12%, 42px);
+  pointer-events: none;
+  font-family: var(--font-mono-arcade, ui-monospace, monospace);
+  font-weight: 800;
+  font-size: clamp(16px, 4.5vw, 22px);
+  color: var(--mk-correct, #2fb8a6);
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.55);
+  opacity: 0;
+  animation: math-float-rise 600ms ease-out forwards;
+}
+@keyframes math-float-rise {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 6px) scale(0.8);
+  }
+  20% {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1.08);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -36px) scale(1);
+  }
+}
+
+/* Brief enamel flash on the readout when an answer resolves. Shadow lists are
+   length-matched to the resting readout shadow so the flash interpolates
+   smoothly instead of stepping. */
+.math-midway .math-readout[data-feedback='correct'] {
+  animation: math-readout-correct 320ms ease-out;
+}
+.math-midway .math-readout[data-feedback='wrong'] {
+  animation: math-readout-wrong 320ms ease-out;
+}
+@keyframes math-readout-correct {
+  0% {
+    box-shadow:
+      inset 0 0 0 4px var(--mk-correct, #2fb8a6),
+      inset 0 3px 10px rgba(0, 0, 0, 0.65),
+      0 1px 0 var(--bevel-hi),
+      0 6px 0 var(--shadow-color),
+      0 12px 24px #00000055,
+      0 0 18px var(--mk-panel-glow, transparent);
+  }
+  100% {
+    box-shadow:
+      inset 0 0 0 2px var(--mk-panel-border, #0f0a06),
+      inset 0 3px 10px rgba(0, 0, 0, 0.65),
+      0 1px 0 var(--bevel-hi),
+      0 6px 0 var(--shadow-color),
+      0 12px 24px #00000055,
+      0 0 18px var(--mk-panel-glow, transparent);
+  }
+}
+@keyframes math-readout-wrong {
+  0% {
+    transform: translateX(0);
+    box-shadow:
+      inset 0 0 0 4px var(--mk-wrong, #c73538),
+      inset 0 3px 10px rgba(0, 0, 0, 0.65),
+      0 1px 0 var(--bevel-hi),
+      0 6px 0 var(--shadow-color),
+      0 12px 24px #00000055,
+      0 0 18px var(--mk-panel-glow, transparent);
+  }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+  100% {
+    transform: translateX(0);
+    box-shadow:
+      inset 0 0 0 2px var(--mk-panel-border, #0f0a06),
+      inset 0 3px 10px rgba(0, 0, 0, 0.65),
+      0 1px 0 var(--bevel-hi),
+      0 6px 0 var(--shadow-color),
+      0 12px 24px #00000055,
+      0 0 18px var(--mk-panel-glow, transparent);
+  }
+}
+
+/* ── Combo / streak enamel chip — brightness PULSE, never a glow ── */
+.math-midway .math-combo {
+  position: absolute;
+  top: clamp(8px, 3%, 16px);
+  right: clamp(8px, 3%, 16px);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-family: var(--font-mono-arcade, ui-monospace, monospace);
+  font-weight: 800;
+  font-size: clamp(11px, 3vw, 15px);
+  letter-spacing: 0.04em;
+  color: #2a1a06;
+  background: var(--mk-accent-fill, radial-gradient(ellipse at 38% 28%, #f7bd5e 0%, #f2a33c 55%, #9a621a 100%));
+  box-shadow:
+    inset 0 2px 1px rgba(255, 255, 255, 0.5),
+    inset 0 -3px 4px rgba(0, 0, 0, 0.4),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.3),
+    0 2px 0 rgba(0, 0, 0, 0.4);
+  filter: brightness(0.78);
+}
+.math-midway .math-combo {
+  z-index: 2;
+}
+.math-midway .math-combo[data-pulse='true'] {
+  animation: math-combo-pulse 360ms ease-out;
+}
+/* Hotter enamel (teal-prize) once the streak is meaningful. */
+.math-midway .math-combo[data-hot='true'] {
+  color: #062a23;
+  background: var(--mk-correct-fill, radial-gradient(ellipse at 38% 28%, #46cdbb 0%, #2fb8a6 55%, #1b7466 100%));
+}
+/* Blazing (streak ≥ 10): danger-red enamel, harder pulse, ember seam below. */
+.math-midway .math-combo[data-tier='blaze'] {
+  color: #fdeceb;
+  background: radial-gradient(
+    ellipse at 38% 28%,
+    color-mix(in srgb, var(--mk-wrong, #c73538) 45%, var(--mk-accent, #f2a33c)) 0%,
+    var(--mk-wrong, #c73538) 58%,
+    color-mix(in srgb, var(--mk-wrong, #c73538) 55%, #000) 100%
+  );
+}
+.math-midway .math-combo[data-tier='blaze'][data-pulse='true'] {
+  animation: math-combo-pulse-blaze 400ms ease-out;
+}
+@keyframes math-combo-pulse {
+  0% { filter: brightness(0.78); transform: scale(1); }
+  35% { filter: brightness(1.4); transform: scale(1.12); }
+  100% { filter: brightness(0.92); transform: scale(1); }
+}
+@keyframes math-combo-pulse-blaze {
+  0% { filter: brightness(0.8); transform: scale(1) rotate(0deg); }
+  35% { filter: brightness(1.55); transform: scale(1.2) rotate(-3deg); }
+  70% { transform: scale(1.05) rotate(2deg); }
+  100% { filter: brightness(0.95); transform: scale(1) rotate(0deg); }
+}
+
+/* ── The numeric keypad: cream keycaps with real travel. Sized and spaced
+   like a pocket calculator: a narrow centered plate with tight, even gaps
+   so keys sit shoulder to shoulder instead of floating in wide columns. ── */
+.math-midway .math-keypad {
+  margin-top: clamp(8px, 2.5%, 16px);
+  margin-inline: auto;
+  width: 100%;
+  max-width: min(340px, 94%);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(6px, 1.6%, 10px);
+  padding: clamp(8px, 2.2%, 14px);
+  border-radius: var(--radius-well);
+  background: linear-gradient(180deg, #f6eddc 0%, #e4d6bb 100%);
+  box-shadow:
+    inset 0 2px 0 #fffdf6,
+    inset 0 -4px 0 #c9b89966,
+    inset 0 0 0 2px var(--ink, #1c160d),
+    0 1px 0 var(--bevel-hi),
+    0 6px 0 var(--shadow-color),
+    0 10px 22px #00000055;
+  touch-action: none;
+}
+
+/* A single cream keycap — beveled, with offset drop (no blur halo). */
+.math-midway .math-key {
+  appearance: none;
+  border: none;
+  margin: 0;
+  cursor: pointer;
+  touch-action: manipulation;
+  outline: none;
+  user-select: none;
+  -webkit-user-select: none;
+  display: grid;
+  place-items: center;
+  /* Calculator-key shape: fill the (narrow) column, fixed height. Height is
+     viewport-capped so the readout + all four keypad rows fit without
+     clipping — the (games) layout is overflow-hidden, so anything past the
+     fold (incl. the Enter key) would be unreachable. */
+  width: 100%;
+  height: clamp(44px, 6.5vh, 62px);
+  border-radius: clamp(8px, 2.2%, 14px);
+  font-family: var(--font-mono-arcade, ui-monospace, monospace);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  font-size: clamp(20px, 6vw, 30px);
+  color: #2a1f10;
+  /* cream keycap face */
+  background: linear-gradient(180deg, #fdf6e7 0%, #ecdcbd 100%);
+  box-shadow:
+    inset 0 3px 0 rgba(255, 255, 255, 0.75),
+    inset 0 -5px 6px rgba(120, 92, 46, 0.32),
+    inset 0 0 0 2px rgba(0, 0, 0, 0.16),
+    0 4px 0 #b89b6a,
+    0 6px 8px rgba(0, 0, 0, 0.32);
+  transition:
+    transform 70ms ease,
+    box-shadow 70ms ease,
+    filter 70ms ease;
+}
+
+/* Action keys take the wider semantic enamel paints (clear=red, enter=teal). */
+.math-midway .math-key[data-action='clear'] {
+  color: #fdeceb;
+  background: var(--mk-wrong-key, radial-gradient(ellipse at 42% 26%, #d34b4e 0%, #c73538 56%, #7e2225 100%));
+  box-shadow:
+    inset 0 3px 0 rgba(255, 255, 255, 0.32),
+    inset 0 -5px 6px rgba(0, 0, 0, 0.4),
+    inset 0 0 0 2px rgba(0, 0, 0, 0.26),
+    0 4px 0 #5e1a1c,
+    0 6px 8px rgba(0, 0, 0, 0.34);
+}
+.math-midway .math-key[data-action='enter'] {
+  color: #e7fffb;
+  background: var(--mk-correct-key, radial-gradient(ellipse at 42% 26%, #46cdbb 0%, #2fb8a6 56%, #1b7466 100%));
+  box-shadow:
+    inset 0 3px 0 rgba(255, 255, 255, 0.34),
+    inset 0 -5px 6px rgba(0, 0, 0, 0.4),
+    inset 0 0 0 2px rgba(0, 0, 0, 0.26),
+    0 4px 0 #14564c,
+    0 6px 8px rgba(0, 0, 0, 0.34);
+}
+
+/* Hover: a subtle face brighten only when the pad is live (Midway 1.07). */
+.math-midway .math-keypad:not([data-disabled]) .math-key:hover {
+  filter: brightness(1.07);
+}
+
+/* Armed: with digits entered, the enter key brightens — "ready to land". */
+.math-midway .math-keypad[data-armed='true'] .math-key[data-action='enter'] {
+  filter: brightness(1.14);
+}
+
+/* Pressed: real key travel — the cap sinks onto its shorter offset shadow. */
+.math-midway .math-key:active,
+.math-midway .math-key[data-pressed='true'] {
+  transform: translateY(3px);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.6),
+    inset 0 -3px 5px rgba(120, 92, 46, 0.3),
+    inset 0 0 0 2px rgba(0, 0, 0, 0.18),
+    0 1px 0 #b89b6a,
+    0 2px 4px rgba(0, 0, 0, 0.3);
+}
+.math-midway .math-key[data-action='clear']:active,
+.math-midway .math-key[data-action='clear'][data-pressed='true'] {
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.28),
+    inset 0 -3px 5px rgba(0, 0, 0, 0.36),
+    inset 0 0 0 2px rgba(0, 0, 0, 0.28),
+    0 1px 0 #5e1a1c,
+    0 2px 4px rgba(0, 0, 0, 0.3);
+}
+.math-midway .math-key[data-action='enter']:active,
+.math-midway .math-key[data-action='enter'][data-pressed='true'] {
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -3px 5px rgba(0, 0, 0, 0.36),
+    inset 0 0 0 2px rgba(0, 0, 0, 0.28),
+    0 1px 0 #14564c,
+    0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Keyboard focus ring — visible, on-theme, no glow. */
+.math-midway .math-key:focus-visible {
+  box-shadow:
+    inset 0 0 0 3px var(--ink, #1c160d),
+    inset 0 3px 0 rgba(255, 255, 255, 0.6),
+    0 4px 0 #b89b6a,
+    0 6px 8px rgba(0, 0, 0, 0.32);
+}
+
+.math-midway .math-keypad[data-disabled] .math-key {
+  cursor: default;
+}
+
+/* ── Overlay (idle / gameover / error) covering the whole stage ── */
+.math-midway .math-overlay {
+  z-index: 4;
+}
+
+/* Info chips on the idle card — inset ink pills with cream mono text. */
+.math-midway .math-overlay-chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.math-midway .math-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px 4px;
+  border-radius: 999px;
+  font-family: var(--font-mono-arcade, ui-monospace, monospace);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #f6eddc;
+  background: rgba(0, 0, 0, 0.4);
+  box-shadow: inset 0 0 0 1.5px rgba(246, 237, 220, 0.28);
+}
+/* "New best" — teal enamel prize chip, pops once on mount. */
+.math-midway .math-chip-best {
+  color: #062a23;
+  background: var(--mk-correct-fill, radial-gradient(ellipse at 38% 28%, #46cdbb 0%, #2fb8a6 55%, #1b7466 100%));
+  box-shadow:
+    inset 0 2px 1px rgba(255, 255, 255, 0.5),
+    inset 0 -3px 4px rgba(0, 0, 0, 0.4),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.3),
+    0 2px 0 rgba(0, 0, 0, 0.4);
+  animation: math-combo-pulse 360ms ease-out;
+}
+
+/* Game-over tally — big amber payout number (counted up by the client). */
+.math-midway .math-final-score {
+  font-family: var(--font-mono-arcade, ui-monospace, monospace);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  font-size: clamp(44px, 12vw, 72px);
+  line-height: 1.05;
+  color: var(--mk-accent, #f2a33c);
+  text-shadow: 0 3px 0 rgba(0, 0, 0, 0.55);
+}
+
+/* Overlay CTA — a wide cream keycap with real travel (Start / Play again). */
+.math-midway .math-cta {
+  appearance: none;
+  border: none;
+  margin: 0;
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  padding: 10px 28px 12px;
+  border-radius: 12px;
+  font-family: var(--font-mono-arcade, ui-monospace, monospace);
+  font-weight: 800;
+  font-size: clamp(15px, 4vw, 18px);
+  letter-spacing: 0.02em;
+  color: #2a1f10;
+  background: linear-gradient(180deg, #fdf6e7 0%, #ecdcbd 100%);
+  box-shadow:
+    inset 0 3px 0 rgba(255, 255, 255, 0.75),
+    inset 0 -5px 6px rgba(120, 92, 46, 0.32),
+    inset 0 0 0 2px rgba(0, 0, 0, 0.16),
+    0 4px 0 #b89b6a,
+    0 6px 8px rgba(0, 0, 0, 0.32);
+  transition:
+    transform 70ms ease,
+    box-shadow 70ms ease,
+    filter 70ms ease;
+}
+.math-midway .math-cta:hover {
+  filter: brightness(1.07);
+}
+.math-midway .math-cta:active {
+  transform: translateY(3px);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.6),
+    inset 0 -3px 5px rgba(120, 92, 46, 0.3),
+    inset 0 0 0 2px rgba(0, 0, 0, 0.18),
+    0 1px 0 #b89b6a,
+    0 2px 4px rgba(0, 0, 0, 0.3);
+}
+.math-midway .math-cta:disabled {
+  cursor: default;
+  filter: saturate(0.6) brightness(0.92);
+}
+.math-midway .math-cta:focus-visible {
+  outline: none;
+  box-shadow:
+    inset 0 0 0 3px var(--ink, #1c160d),
+    inset 0 3px 0 rgba(255, 255, 255, 0.6),
+    0 4px 0 #b89b6a,
+    0 6px 8px rgba(0, 0, 0, 0.32);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Drop all decorative motion: no key travel animation, no combo pulse, no
+     readout shake/flash, no problem/digit pops, no score float, no urgency
+     pulses. The keycap still depresses statically via :active and the timebar
+     still resizes (linear, not animated). */
+  .math-midway .math-key,
+  .math-midway .math-timebar-fill,
+  .math-midway .math-cta,
+  .math-midway .math-decor::after {
+    transition: none;
+  }
+  .math-midway .math-combo[data-pulse='true'],
+  .math-midway .math-readout[data-feedback='correct'],
+  .math-midway .math-readout[data-feedback='wrong'],
+  .math-midway .math-problem-line,
+  .math-midway .math-entry-digit,
+  .math-midway .math-timebar-fill[data-low='true'],
+  .math-midway .math-stat[data-low='true'] .math-stat-value,
+  .math-midway .math-chip-best {
+    animation: none;
+  }
+  .math-midway .math-combo[data-pulse='true'] {
+    filter: brightness(1.1);
+  }
+  /* The score float fades in place instead of rising. !important because
+     the global reduced-motion rule zeroes every other animation. */
+  .math-midway .math-float {
+    transform: translate(-50%, 0);
+    animation: arc-reduced-fade 700ms linear forwards !important;
+  }
+}

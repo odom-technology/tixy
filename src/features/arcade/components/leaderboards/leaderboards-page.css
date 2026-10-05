@@ -1,0 +1,619 @@
+/* The leaderboards page (leaderboards-view.tsx). The six tixy colours, Gabarito
+   for words, Big Shoulders for numbers only. Panels are told apart by tone;
+   the only lines are hairlines between rows in one list. Things move when
+   pressed and not otherwise. The board itself is leaderboard-board.css. */
+
+.lb {
+  width: min(100%, 76rem);
+  margin-inline: auto;
+  padding: clamp(1rem, 1.8vw, 1.5rem) 1rem clamp(2rem, 4vw, 3rem);
+  color: var(--tixy-ink);
+  font-family: var(--tixy-font-text);
+}
+
+.lb-title {
+  margin: 4px 0 18px;
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.lb-num {
+  font-family: var(--tixy-font-num);
+  font-weight: var(--tixy-weight-num);
+  letter-spacing: var(--tixy-tracking-num);
+}
+
+.lb-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 18px;
+}
+@media (min-width: 60rem) {
+  .lb-layout {
+    grid-template-columns: 17.5rem minmax(0, 1fr);
+    align-items: start;
+    gap: 28px;
+  }
+}
+
+/* ── The game's screen in an ink bezel ──────────────────────────────── */
+.lb-screen {
+  position: relative;
+  display: block;
+  flex: none;
+  aspect-ratio: 1.6;
+  border: 3px solid var(--tixy-cabinet);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--tixy-screen);
+}
+.lb-screen[data-size='lg'] {
+  width: 84px;
+  border-width: var(--tixy-bezel);
+  border-radius: 10px;
+}
+@media (min-width: 40rem) {
+  .lb-screen[data-size='lg'] {
+    width: 132px;
+  }
+}
+.lb-screen > img,
+.lb-screen > [data-game-screen] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.lb-screen-overview {
+  display: grid;
+  place-items: center;
+  background: var(--tixy-ink);
+  color: var(--tixy-ticket);
+}
+
+/* ── The picker: a strip on phones, a list beside the board from 960 px ── */
+.lb-picker {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+.lb-search {
+  position: relative;
+  display: block;
+}
+.lb-search svg {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--tixy-ink-3);
+  pointer-events: none;
+}
+.lb-search input {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 14px 0 42px;
+  border: 0;
+  border-radius: var(--tixy-radius-button);
+  background: var(--tixy-paper-2);
+  color: var(--tixy-ink);
+  font: 400 16px/1 var(--tixy-font-text);
+}
+.lb-search input::placeholder {
+  color: var(--tixy-ink-3);
+}
+.lb-search input::-webkit-search-cancel-button {
+  display: none;
+}
+.lb-search input:focus-visible {
+  outline: 3px solid var(--tixy-ticket);
+  outline-offset: 1px;
+}
+
+.lb-strip {
+  /* Holds the screen-reader copies of the counts inside the scroller. */
+  position: relative;
+  display: flex;
+  gap: 14px;
+  margin-inline: -1rem;
+  padding: 0 1rem 6px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  scroll-padding-inline: 1rem;
+  scrollbar-width: none;
+}
+.lb-strip::-webkit-scrollbar {
+  display: none;
+}
+.lb-group {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  flex: none;
+}
+.lb-group-name {
+  padding-left: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--tixy-ink-3);
+  white-space: nowrap;
+}
+.lb-group-name .lb-num {
+  margin-left: 4px;
+}
+.lb-group ul {
+  display: flex;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.lb-pick {
+  display: grid;
+  gap: 6px;
+  width: 104px;
+  padding: 6px;
+  border-radius: 14px;
+  color: inherit;
+  text-decoration: none;
+  scroll-snap-align: start;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    transform var(--tixy-press-out) ease-out,
+    background-color var(--tixy-panel-fast);
+}
+.lb-pick-name {
+  overflow: hidden;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.lb-pick:hover {
+  background: var(--tixy-paper-2);
+}
+.lb-pick[aria-current='page'] {
+  background: var(--tixy-ink);
+  color: var(--tixy-paper);
+}
+.lb-pick[aria-current='page'] .lb-screen {
+  border-color: var(--tixy-paper);
+}
+.lb-none {
+  margin: 0;
+  padding: 6px;
+  align-self: end;
+  color: var(--tixy-ink-2);
+  font-size: 15px;
+  white-space: nowrap;
+}
+
+@media (min-width: 60rem) {
+  .lb-picker {
+    position: sticky;
+    top: 16px;
+    max-height: calc(100dvh - 32px);
+    padding: 12px;
+    border-radius: var(--tixy-radius-panel-lg);
+    background: var(--tixy-paper-2);
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+  .lb-search input {
+    background: var(--tixy-paper);
+  }
+  .lb-strip {
+    display: grid;
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+    overflow: visible;
+  }
+  .lb-group:first-child .lb-group-name {
+    display: none;
+  }
+  .lb-group ul {
+    flex-direction: column;
+    gap: 2px;
+  }
+  .lb-pick {
+    grid-template-columns: 56px minmax(0, 1fr);
+    align-items: center;
+    gap: 12px;
+    width: auto;
+    padding: 5px 10px 5px 5px;
+    border-radius: 10px;
+  }
+  .lb-pick-name {
+    font-size: 15px;
+  }
+  .lb-pick:hover {
+    background: var(--tixy-paper-3);
+  }
+  .lb-pick[aria-current='page'] {
+    background: var(--tixy-ink);
+  }
+  .lb-none {
+    white-space: normal;
+  }
+}
+
+/* ── The pane: one board, or the overview ──────────────────────────── */
+.lb-pane {
+  min-width: 0;
+  /* Holds the page's height while a board loads, so nothing below jumps. */
+  min-height: 40rem;
+}
+.lb-head {
+  max-width: 44rem;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+.lb-head-name {
+  margin: 0;
+  font-size: clamp(1.75rem, 3.4vw, 2.5rem);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  overflow-wrap: anywhere;
+}
+.lb-head-actions {
+  display: flex;
+  gap: 8px;
+}
+.lb-board {
+  max-width: 44rem;
+}
+.lb-board .arc-board-body {
+  min-height: 28rem;
+  align-content: start;
+}
+.lb-board .arc-board-skeleton > span {
+  height: 56px;
+}
+.lb-board-note {
+  margin: 0 0 12px;
+  color: var(--tixy-ink-2);
+  font-size: 15px;
+}
+.lb-board-note a {
+  color: var(--tixy-ink);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ── The overview ──────────────────────────────────────────────────── */
+.lb-overview {
+  display: grid;
+  gap: 32px;
+}
+.lb-h2 {
+  margin: 0 0 12px;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+
+.lb-stand {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 6px;
+  border-radius: var(--tixy-radius-panel-lg);
+  background: var(--tixy-paper-2);
+  list-style: none;
+}
+.lb-stand-tile {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  min-height: 56px;
+  padding: 6px 12px 6px 6px;
+  border-radius: 12px;
+  color: inherit;
+  text-decoration: none;
+  transition:
+    transform var(--tixy-press-out) ease-out,
+    background-color var(--tixy-panel-fast);
+}
+.lb-stand-name {
+  overflow: hidden;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.lb-stand-rank {
+  display: grid;
+  justify-items: end;
+  min-width: 3.5rem;
+  min-height: 40px;
+  align-content: center;
+}
+.lb-stand-rank .lb-num {
+  font-size: 30px;
+  line-height: 1;
+}
+.lb-stand-rank small {
+  font-size: 12px;
+  color: var(--tixy-ink-2);
+}
+.lb-stand-none {
+  min-height: 40px;
+  display: grid;
+  align-content: center;
+  font-size: 14px;
+  color: var(--tixy-ink-3);
+  white-space: nowrap;
+}
+.lb-stand-tile:hover {
+  background: var(--tixy-paper-3);
+}
+@media (min-width: 40rem) {
+  .lb-stand {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 8px;
+  }
+}
+
+/* ── This week's paid boards ───────────────────────────────────────── */
+.lb-h3 {
+  margin: 0 0 10px;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+}
+.lb-week-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 18px;
+  margin: 0 0 12px;
+}
+.lb-week-left {
+  font-size: 15px;
+  color: var(--tixy-ink-2);
+  white-space: nowrap;
+}
+.lb-week-left .lb-num {
+  font-size: 20px;
+  color: var(--tixy-ink);
+}
+.lb-week-prizes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 18px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.lb-week-prizes > li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.lb-week-prizes .arc-ticket-stub {
+  font-size: 18px;
+}
+.lb-week-place {
+  font-weight: 700;
+}
+.lb-week-plus {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--tixy-ink-2);
+}
+.lb-week-medal {
+  flex: none;
+  display: block;
+}
+/* On a phone the three prizes keep one line: the medal speaks for itself. */
+@media (max-width: 39.99rem) {
+  .lb-week-prizes {
+    column-gap: 12px;
+  }
+  .lb-week-plus > span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+.lb-week-cards {
+  display: grid;
+  gap: 10px;
+}
+@media (min-width: 52rem) {
+  .lb-week-cards {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+.lb-week-card {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  padding: 8px 14px 12px;
+  border-radius: var(--tixy-radius-panel-lg);
+  background: var(--tixy-paper-2);
+}
+.lb-week-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-inline: -6px;
+}
+.lb-week-game {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  min-height: 48px;
+  padding: 4px 8px 4px 4px;
+  border-radius: 12px;
+  color: inherit;
+  text-decoration: none;
+  transition:
+    transform var(--tixy-press-out) ease-out,
+    background-color var(--tixy-panel-fast);
+}
+.lb-week-game .lb-screen {
+  width: 56px;
+}
+.lb-week-game:hover {
+  background: var(--tixy-paper-3);
+}
+.lb-week-game-name {
+  overflow: hidden;
+  font-size: 17px;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.lb-week-rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.lb-week-rows > li + li {
+  border-top: 1px solid rgb(31 26 22 / 0.12);
+}
+.lb-week-rows > li:has(+ li[data-you]),
+.lb-week-rows > li[data-you] + li {
+  border-top-color: transparent;
+}
+.lb-week-row {
+  display: grid;
+  grid-template-columns: 2rem minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 8px;
+  min-height: 40px;
+}
+.lb-week-row[data-you] {
+  margin-inline: -8px;
+  padding-inline: 8px;
+  border-radius: 10px;
+  background: var(--tixy-ticket);
+}
+.lb-week-rank {
+  font-size: 20px;
+  line-height: 1;
+  color: var(--tixy-ink-2);
+  text-align: center;
+}
+.lb-week-row[data-you] .lb-week-rank {
+  color: var(--tixy-ink);
+}
+.lb-week-name {
+  overflow: hidden;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.lb-week-score {
+  font-size: 22px;
+  line-height: 1;
+  white-space: nowrap;
+}
+.lb-week-won .arc-ticket-stub {
+  font-size: 16px;
+}
+.lb-week-won {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.lb-week-mine {
+  margin-top: 2px;
+}
+.lb-week-empty {
+  margin: 4px 0 0;
+  font-size: 15px;
+  color: var(--tixy-ink-2);
+}
+.lb-week-last {
+  margin-top: 20px;
+}
+.lb-week-last-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+@media (min-width: 52rem) {
+  .lb-week-last-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+.lb-week-last-list > li {
+  padding: 10px 14px;
+  border-radius: var(--tixy-radius-panel-lg);
+  background: var(--tixy-paper-2);
+}
+.lb-week-last-game {
+  display: block;
+  margin-bottom: 2px;
+  font-weight: 800;
+}
+
+/* On a picked game's board. */
+.lb-week-pane {
+  display: grid;
+  gap: 10px;
+  margin: 0 0 16px;
+  padding: 12px 16px 14px;
+  border-radius: var(--tixy-radius-panel-lg);
+  background: var(--tixy-paper-2);
+}
+.lb-week-pane .lb-week-top {
+  margin: 0;
+}
+.lb-week-pane-title {
+  font-size: 18px;
+  font-weight: 800;
+}
+.lb-week-pane .lb-week-card {
+  padding: 0;
+  background: none;
+}
+
+/* ── Press and focus ───────────────────────────────────────────────── */
+.lb-pick:active,
+.lb-stand-tile:active,
+.lb-week-game:active {
+  transform: scale(var(--tixy-press-scale));
+  transition-duration: var(--tixy-press-in);
+}
+.lb-pick:focus-visible,
+.lb-stand-tile:focus-visible,
+.lb-week-game:focus-visible {
+  outline: 3px solid var(--tixy-ticket);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lb-pick,
+  .lb-stand-tile,
+  .lb-week-game {
+    transition: none;
+  }
+}

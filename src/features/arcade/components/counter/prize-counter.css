@@ -1,0 +1,351 @@
+/* The prize counter (PLAN.md design rules; mockup.html's counter). The
+   counter is the rail's dark wood with a flat glass top: a lighter band and
+   one hairline at its front edge, no blur. Prices are ticket stubs, the only
+   stub shapes on the page. Motion only on a pointer or a purchase; the
+   reduced-motion catch-all in globals.css takes every animation to its end. */
+
+.pc-page {
+  --pc-rail: var(--tixy-rail, #2b2119);
+  --pc-glass: rgb(244 235 220 / 0.07);
+  --pc-glass-edge: rgb(244 235 220 / 0.18);
+  display: grid;
+  gap: 20px;
+  width: min(100%, 76rem);
+  min-width: 0;
+  margin: 0 auto;
+  padding: 8px 16px 40px;
+  color: var(--tixy-ink);
+  font-family: var(--tixy-font-text);
+}
+
+.pc-num {
+  color: var(--tixy-ticket);
+}
+
+/* ── the head ──────────────────────────────────────────────────────────── */
+
+.pc-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 18px;
+  border-radius: 22px;
+  background: var(--pc-rail);
+  color: var(--tixy-paper);
+  padding: 24px 24px 22px;
+  overflow: hidden;
+}
+@media (min-width: 64rem) {
+  .pc-head {
+    grid-template-columns: minmax(0, 1fr) 300px 130px;
+    align-items: end;
+    padding: 28px 28px 0;
+  }
+}
+.pc-head-copy { align-self: start; padding-bottom: 24px; }
+.pc-head h1 {
+  margin: 0;
+  font-size: clamp(30px, 4vw, 40px);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+}
+.pc-head p {
+  max-width: 34rem;
+  margin: 10px 0 0;
+  font-size: 17px;
+  line-height: 1.45;
+  color: var(--tixy-on-ink-2);
+}
+.pc-head p .arc-digits { font-size: 1.15em; }
+.pc-head .pc-btn { margin-top: 14px; }
+.pc-host { display: none; }
+@media (min-width: 64rem) {
+  .pc-host { display: block; justify-self: center; margin-bottom: -6px; }
+}
+
+.pc-pinned {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  gap: 14px;
+  align-items: center;
+  border-radius: 14px;
+  background: var(--pc-glass);
+  padding: 12px;
+}
+@media (min-width: 64rem) { .pc-pinned { margin-bottom: 24px; } }
+.pc-pinned-art { display: block; border-radius: 8px; overflow: hidden; }
+.pc-pinned-copy { display: grid; gap: 4px; justify-items: start; min-width: 0; }
+.pc-pinned-label { font-size: 13px; color: var(--tixy-on-ink-3); }
+
+/* ── notes ─────────────────────────────────────────────────────────────── */
+
+.pc-note {
+  margin: 0;
+  border-radius: 14px;
+  background: var(--tixy-paper-2);
+  padding: 12px 16px;
+  font-size: 15px;
+}
+.pc-note[data-tone='error'] { color: var(--tixy-red); font-weight: 700; }
+
+/* ── the case and the shelves ──────────────────────────────────────────── */
+
+.pc-case,
+.pc-shelf {
+  border-radius: 22px;
+  background: var(--pc-rail);
+  color: var(--tixy-paper);
+  padding: 18px 18px 0;
+  overflow: hidden;
+}
+.pc-case h2,
+.pc-packs h2 {
+  margin: 0 0 12px;
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+}
+.pc-shelf-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+  font-size: 15px;
+  color: var(--tixy-on-ink-2);
+}
+
+.pc-glass {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  border-radius: 14px 14px 0 0;
+  background: var(--pc-glass);
+  box-shadow: inset 0 1px 0 var(--pc-glass-edge);
+  padding: 14px 14px 18px;
+}
+@media (min-width: 40rem) { .pc-glass { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 64rem) { .pc-glass { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+
+/* ── a prize ───────────────────────────────────────────────────────────── */
+
+.pc-prize {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  min-width: 0;
+  border-radius: 12px;
+  padding: 6px;
+  margin: -6px;
+}
+.pc-prize[data-pinned] { box-shadow: 0 0 0 2px var(--tixy-ticket); }
+.pc-prize-art {
+  position: relative;
+  display: block;
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgb(244 235 220 / 0.06);
+  cursor: pointer;
+  transition: transform 240ms var(--tixy-ease-spring);
+}
+.pc-prize-art:focus-visible { outline: 3px solid var(--tixy-ticket); outline-offset: 3px; }
+.pc-prize:hover .pc-prize-art { transform: translateY(-5px); }
+.pc-prize[data-owned] .pc-prize-art { opacity: 0.8; }
+.pc-prize-name {
+  max-width: 100%;
+  font-size: 16px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pc-prize-kind {
+  display: grid;
+  max-width: 100%;
+  margin-bottom: 10px;
+  font-size: 14px;
+  color: var(--tixy-on-ink-3);
+}
+.pc-prize-kind > span {
+  grid-area: 1 / 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: opacity 140ms, transform 220ms var(--tixy-ease-spring);
+}
+.pc-prize-kind > span:last-child { opacity: 0; transform: translateY(5px); color: var(--tixy-paper); }
+.pc-prize[data-can] .pc-prize-kind > span:last-child { color: var(--tixy-ticket); }
+.pc-prize:is(:hover, :focus-within) .pc-prize-kind > span:first-child { opacity: 0; transform: translateY(-5px); }
+.pc-prize:is(:hover, :focus-within) .pc-prize-kind > span:last-child { opacity: 1; transform: none; }
+@media (hover: none) {
+  .pc-prize-kind > span { grid-area: auto; }
+  .pc-prize-kind > span:last-child { opacity: 1; transform: none; }
+}
+.pc-prize-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+  width: 100%;
+  margin-top: auto;
+}
+.pc-prize .arc-ticket-stub { transition: transform 260ms var(--tixy-ease-spring); }
+.pc-prize:hover .arc-ticket-stub { transform: rotate(-6deg) scale(1.08); }
+.pc-prize[data-just='bought'] .arc-ticket-stub { animation: pc-stamp 420ms var(--tixy-ease-spring) both; }
+@keyframes pc-stamp {
+  0% { transform: scale(1.5) rotate(-12deg); opacity: 0; }
+  100% { transform: none; opacity: 1; }
+}
+.pc-prize-actions { display: flex; align-items: center; gap: 6px; margin-left: auto; }
+
+/* ── buttons: one shape, 10 px radius ──────────────────────────────────── */
+
+.pc-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: var(--tixy-radius-button, 10px);
+  background: var(--tixy-ink);
+  color: var(--tixy-paper);
+  font: 700 0.9375rem/1 var(--tixy-font-text);
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 90ms ease-out, filter 120ms ease-out;
+}
+.pc-btn:hover { filter: brightness(1.15); }
+.pc-btn:active { transform: translateY(1px) scale(0.96); transition-duration: 40ms; }
+.pc-btn:focus-visible { outline: 3px solid var(--tixy-ticket); outline-offset: 3px; }
+.pc-btn:disabled { cursor: default; opacity: 0.45; filter: none; transform: none; }
+.pc-btn[data-tone='paper'] { background: var(--tixy-paper); color: var(--tixy-ink); }
+.pc-btn[data-tone='ticket'] { background: var(--tixy-ticket); color: var(--tixy-on-ticket); }
+.pc-btn[data-tone='quiet'] { background: var(--tixy-paper-3); color: var(--tixy-ink); }
+.pc-btn[data-tone='paper']:hover,
+.pc-btn[data-tone='ticket']:hover,
+.pc-btn[data-tone='quiet']:hover { filter: brightness(0.95); }
+
+.pc-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: var(--tixy-radius-button, 10px);
+  background: rgb(244 235 220 / 0.14);
+  color: var(--tixy-paper);
+  cursor: pointer;
+  transition: transform 90ms ease-out, background-color 120ms;
+}
+.pc-icon svg { width: 17px; height: 17px; stroke-width: 2; }
+.pc-icon[aria-pressed='true'] { background: var(--tixy-ticket); color: var(--tixy-on-ticket); }
+.pc-icon:active { transform: translateY(1px) scale(0.96); }
+.pc-icon:focus-visible { outline: 3px solid var(--tixy-ticket); outline-offset: 3px; }
+
+/* ── the filter row ────────────────────────────────────────────────────── */
+
+.pc-filter {
+  position: relative;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+.pc-filter button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: var(--tixy-radius-button, 10px);
+  background: var(--tixy-paper-2);
+  color: var(--tixy-ink);
+  font: 700 0.9375rem/1 var(--tixy-font-text);
+  white-space: nowrap;
+  cursor: pointer;
+}
+.pc-filter button .arc-digits { color: var(--tixy-ink-2); }
+.pc-filter button[aria-pressed='true'] { background: var(--tixy-ink); color: var(--tixy-paper); }
+.pc-filter button[aria-pressed='true'] .arc-digits { color: var(--tixy-ticket); }
+.pc-filter button:focus-visible { outline: 3px solid var(--tixy-ticket); outline-offset: 2px; }
+
+/* ── ticket packs ──────────────────────────────────────────────────────── */
+
+.pc-packs {
+  border-radius: 22px;
+  background: var(--tixy-paper-2);
+  padding: 20px;
+}
+.pc-packs > p { margin: -6px 0 14px; color: var(--tixy-ink-2); font-size: 15px; }
+.pc-pack-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+@media (min-width: 48rem) { .pc-pack-row { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.pc-pack {
+  display: grid;
+  gap: 10px;
+  justify-items: start;
+  align-content: start;
+  border-radius: 14px;
+  background: var(--tixy-paper);
+  padding: 14px;
+}
+.pc-pack .pc-btn { justify-self: stretch; margin-top: 4px; }
+.pc-pack-name { font-weight: 700; font-size: 15px; }
+.pc-pack-price { font-size: 15px; color: var(--tixy-ink-2); }
+.pc-ad {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 20px;
+}
+.pc-ad .pc-ad-copy > p { margin: 0; color: var(--tixy-ink-2); font-size: 15px; }
+.pc-ad h2 { margin-bottom: 4px; }
+
+/* ── the prize up close ────────────────────────────────────────────────── */
+
+.pc-detail { display: grid; gap: 12px; }
+.pc-detail-art { border-radius: 12px; overflow: hidden; }
+.pc-detail-art > div { height: auto !important; aspect-ratio: 1.6; }
+.pc-detail-kind { margin: 0; font-size: 16px; }
+.pc-detail-note { margin: 0; font-size: 15px; color: var(--tixy-ink-2); }
+.pc-detail-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.pc-prize-art > div,
+.pc-pinned-art > div { height: auto !important; aspect-ratio: 1.6; }
+.pc-page > * { min-width: 0; }
+
+/* ── the prize in place, on a pointer (preview/prize-hover.tsx) ────────── */
+
+.pc-prize-hover {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: var(--tixy-ink);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms ease-out;
+}
+.pc-prize-hover img { object-fit: cover; }
+.pc-prize-hover[data-fit='contain'] img { object-fit: contain; }
+.pc-prize-hover .pp-id { background: var(--tixy-paper-2); }
+.pc-prize:hover .pc-prize-hover[data-ready],
+.pc-prize-art:focus-visible .pc-prize-hover[data-ready] { opacity: 1; }
+@media (hover: none) {
+  .pc-prize-hover { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pc-prize-hover { transition: none; }
+}

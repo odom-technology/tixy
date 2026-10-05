@@ -1,0 +1,9 @@
+/* Skee-ball: the power trail over the stage. Everything else the player
+   reads is on the cabinet itself (the score display and the ring values). */
+.skee-ball-midway .sb-trail {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}

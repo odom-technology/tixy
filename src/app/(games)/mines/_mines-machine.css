@@ -1,0 +1,249 @@
+/* Mines: a field of covered squares. A square flips to an amber gem or a
+   mine; the flip is a CSS transition, so it is continuous at any refresh
+   rate and jumps under reduced motion. The next payout is printed above the
+   field and rolls as it changes. Colours come from the tixy tokens: amber
+   is tickets (the gem, what it pays); red is only the mine you struck, the
+   others show in ink. MACHINES_LOOK.md. */
+
+.arc-shell[data-game='mines'] .arc-machine-frame:not([data-wide]) {
+  /* The smallest screen whose tiles stay 44 px: 5 tiles and 4 gaps under
+     the 6.5rem readout. Any taller and the mine count falls off a phone. */
+  --machine-screen-min: 24rem;
+}
+
+.mines-stage {
+  gap: 0.5rem;
+}
+
+.mines-pays {
+  display: flex;
+  flex: none;
+  align-items: stretch;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 4rem;
+}
+
+.mines-pay {
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-template-areas:
+    'label label'
+    'mult  win';
+  align-items: baseline;
+  column-gap: 0.625rem;
+  padding: 0.375rem 0.875rem 0.5rem;
+  border-radius: var(--tixy-radius-panel-sm);
+  background: var(--tixy-screen-2);
+  color: var(--tixy-paper);
+}
+
+.mines-pay-label {
+  grid-area: label;
+  font-size: 0.9375rem;
+  line-height: 1.1;
+  color: var(--tixy-on-ink-2);
+}
+
+.mines-pay-mult {
+  grid-area: mult;
+  font-size: 1.625rem;
+  line-height: 1.05;
+  font-variant-numeric: tabular-nums;
+}
+
+/* What it pays in tickets: amber, like every ticket count. */
+.mines-pay-win {
+  grid-area: win;
+  font-size: 1.25rem;
+  line-height: 1.05;
+  font-variant-numeric: tabular-nums;
+  color: var(--tixy-ticket);
+}
+
+/* "at least" before a cash-out whose rounding can go either way. */
+.mines-pay-least {
+  font-family: var(--tixy-font-text);
+  font-size: 0.9375rem;
+  font-weight: var(--tixy-weight-button);
+  color: var(--tixy-on-ink-2);
+}
+
+/* The same words on the cash-out lever, in the lever's own colour. */
+.mines-lever-least {
+  font-family: var(--tixy-font-text);
+  font-size: 0.75em;
+  font-weight: var(--tixy-weight-button);
+}
+
+/* The next gem is the one thing you decide on: a lighter plate. */
+.mines-pay[data-kind='next'] {
+  background: #4a3e35;
+}
+
+/* A mine goes quiet: the ink plate and what the bet was. */
+.mines-pay[data-kind='lost'] .mines-pay-mult {
+  color: var(--tixy-on-ink-2);
+  font-size: 2rem;
+}
+
+/* A cash-out is the win moment: a red plate with an amber stub for the
+   tickets, bigger than the readouts it replaces. It springs in. */
+.mines-pay[data-kind='won'] {
+  background: var(--tixy-red);
+  color: var(--tixy-paper);
+  align-items: center;
+}
+.mines-pay[data-kind='won'] .mines-pay-label {
+  color: var(--tixy-paper);
+}
+.mines-pay[data-kind='won'] .mines-pay-mult {
+  font-size: 2rem;
+}
+.mines-pay-stub {
+  grid-area: win;
+  padding: 0.125rem 0.625rem;
+  border-radius: 6px;
+  background: var(--tixy-ticket);
+  color: var(--tixy-ink);
+  font-size: 2rem;
+  line-height: 1.05;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .mines-pay[data-kind='won'] {
+    animation: mines-plate 320ms cubic-bezier(0.2, 1.5, 0.4, 1);
+  }
+}
+
+@keyframes mines-plate {
+  from {
+    transform: scale(0.9);
+  }
+}
+
+.mines-board {
+  /* the largest square that fits the screen under the readout */
+  flex: none;
+  width: min(100%, 30rem, 100cqh - 7.25rem);
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: clamp(6px, 1.8vw, 10px);
+}
+
+.mines-tile {
+  position: relative;
+  aspect-ratio: 1;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  color: var(--tixy-paper);
+  perspective: 520px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.mines-tile:disabled {
+  cursor: default;
+}
+.mines-tile:focus-visible {
+  outline: 3px solid var(--tixy-ticket);
+  outline-offset: 2px;
+}
+
+.mines-flipper {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transition:
+    transform 340ms var(--tixy-ease-spring) var(--flip-delay, 0ms),
+    filter var(--tixy-panel-fast) ease-out;
+}
+.mines-tile[data-state='safe'] .mines-flipper,
+.mines-tile[data-state='mine'] .mines-flipper {
+  transform: rotateY(180deg);
+}
+
+.mines-cover,
+.mines-face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* A covered square: a step up from the screen, with a hard lower edge, so
+   amber gems are the brightest thing on the field. */
+.mines-cover {
+  background: #4a3e35;
+  box-shadow: inset 0 -5px 0 #2f2620;
+}
+.mines-tile:not(:disabled):hover .mines-flipper {
+  filter: brightness(1.12);
+}
+
+/* A press sinks the square 1 px and shrinks it to 96%: 40 ms in, 90 ms out. */
+.mines-tile:not([data-state='safe']):not([data-state='mine']) .mines-flipper {
+  transition:
+    transform var(--tixy-press-out) ease-out var(--flip-delay, 0ms),
+    filter var(--tixy-panel-fast) ease-out;
+}
+.mines-tile:not(:disabled):active .mines-flipper,
+.mines-tile[data-pending] .mines-flipper {
+  transform: translateY(1px) scale(var(--tixy-press-scale));
+  transition-duration: var(--tixy-press-in);
+}
+
+/* Squares that are not in play (before a round, after one) sit back. */
+.mines-tile[data-idle] .mines-cover {
+  background: var(--tixy-screen-2);
+  box-shadow: inset 0 -5px 0 #2a221c;
+}
+
+.mines-face {
+  transform: rotateY(180deg);
+}
+
+/* A gem: an amber tile with an ink gem, like a ticket won. */
+.mines-tile[data-state='safe'] .mines-face {
+  background: var(--tixy-ticket);
+  color: var(--tixy-ink);
+  box-shadow: inset 0 -5px 0 #c47c1f;
+}
+
+/* The mines you didn't hit show quietly when the round ends: ink with a
+   dim mine. Only the one you struck is red. */
+.mines-tile[data-state='mine'] .mines-face {
+  background: var(--tixy-ink);
+  color: var(--tixy-on-ink-3);
+}
+.mines-tile[data-hit] .mines-face {
+  background: var(--tixy-red);
+  color: var(--tixy-paper);
+  box-shadow: inset 0 -5px 0 #7d2117;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .mines-tile[data-hit] .mines-face {
+    animation: mines-hit 260ms var(--tixy-ease-settle);
+  }
+}
+
+@keyframes mines-hit {
+  30% {
+    transform: rotateY(180deg) scale(1.12);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mines-flipper,
+  .mines-tile:not([data-state='safe']):not([data-state='mine']) .mines-flipper {
+    transition: none;
+  }
+}

@@ -1,0 +1,208 @@
+/* The season track (season-track.tsx). Tones on paper 2: a card you can act
+   on is paper, a locked one paper 3, a claimed one drops into the panel.
+   Amber is the rail you have filled and the tickets on it. The only motion is
+   the settle on a card just claimed and the fill catching up after a claim. */
+
+.st {
+  position: relative;
+  --st-w: 120px;
+  --st-w-prize: 176px;
+  --st-card-h: 184px;
+}
+
+.st-scroll {
+  display: flex;
+  margin: 0;
+  padding: 4px 0 2px;
+  list-style: none;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  scroll-padding-inline: 8px;
+  /* Paged by the buttons, a swipe or the keyboard; the bar only drew a stray line. */
+  scrollbar-width: none;
+}
+.st-scroll::-webkit-scrollbar { display: none; }
+.st-scroll:focus-visible { outline: 3px solid var(--tixy-ticket, #f2a33c); outline-offset: 2px; }
+
+.st-stop {
+  /* Holds the number face's screen-reader copies (absolutely placed), so
+     they stay inside the scroll row instead of widening a phone's page. */
+  position: relative;
+  flex: none;
+  width: var(--st-w);
+  scroll-snap-align: start;
+  display: grid;
+  grid-template-rows: var(--st-card-h) 44px;
+  color: var(--tixy-ink, #1f1a16);
+}
+.st-stop[data-prize] { width: var(--st-w-prize); }
+
+/* ── the card ─────────────────────────────────────────────────────────── */
+
+.st-card {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) 36px;
+  margin: 0 4px;
+  padding: 14px 10px 10px;
+  border-radius: var(--tixy-radius-panel-sm, 14px);
+  background: var(--tixy-paper, #f4ebdc);
+}
+.st-stop[data-state='locked'] .st-card { background: var(--tixy-paper-3, #ded0b7); }
+.st-stop[data-state='claimed'] .st-card { background: transparent; color: var(--tixy-ink-2, #54483d); }
+.st-stop[data-fresh] .st-card { animation: sq-settle 420ms var(--tixy-ease-spring, ease-out) both; }
+
+.st-pays {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 0;
+}
+
+.st-prize {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+}
+.st-prize-art {
+  display: inline-flex;
+  width: 84px;
+  height: 84px;
+  overflow: hidden;
+  border-radius: var(--tixy-radius-button, 10px);
+}
+/* A namecard is four times as wide as it is tall. */
+.st-prize-art[data-wide] { width: 100%; max-width: 148px; height: 37px; border-radius: 6px; }
+.st-prize-art img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.st-prize-art > * { width: 100%; height: 100%; }
+.st-stop[data-double] .st-prize-art { width: 64px; height: 64px; }
+.st-stop[data-state='claimed'] .st-prize-art { opacity: 0.55; }
+.st-stop[data-state='locked'] .st-prize-art { opacity: 0.85; }
+.st-prize-name {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.st-foot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.st-foot > button { width: 100%; }
+.st-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.875rem;
+  color: var(--tixy-ink-2, #54483d);
+  white-space: nowrap;
+}
+.st-note .arc-digits { font-size: 1.3rem; line-height: 1; color: var(--tixy-ink, #1f1a16); }
+
+/* ── the rail ─────────────────────────────────────────────────────────── */
+
+.st-rail {
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+.st-rail::before {
+  content: '';
+  position: absolute;
+  inset: 50% 0 auto;
+  height: 10px;
+  margin-top: -5px;
+  background: var(--tixy-paper-3, #ded0b7);
+}
+/* Tier 1's left half is the climb from 0, so the rail starts at its edge. */
+.st-stop:last-child .st-rail::before { right: 50%; }
+
+.st-fill {
+  position: absolute;
+  top: 50%;
+  width: 50%;
+  height: 10px;
+  margin-top: -5px;
+  background: var(--tixy-ticket, #f2a33c);
+  transform-origin: left center;
+  transition: transform 520ms var(--tixy-ease-settle, ease-out);
+}
+.st-fill[data-half='left'] { left: 0; }
+.st-fill[data-half='right'] { left: 50%; }
+.st-stop:last-child .st-fill[data-half='right'] { display: none; }
+
+.st-node {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  min-width: 38px;
+  height: 38px;
+  padding: 0 6px;
+  border-radius: 19px;
+  background: var(--tixy-paper-3, #ded0b7);
+  color: var(--tixy-ink-2, #54483d);
+  font-size: 1.25rem;
+}
+.st-node .arc-digits { line-height: 1; }
+.st-node[data-reached] { background: var(--tixy-ticket, #f2a33c); color: var(--tixy-on-ticket, #1f1a16); }
+
+/* Where you are: an ink dot at the end of the fill. */
+.st-head {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  width: 18px;
+  height: 18px;
+  margin: -9px 0 0 -9px;
+  border-radius: 50%;
+  background: var(--tixy-ink, #1f1a16);
+  box-shadow: 0 0 0 3px var(--tixy-paper-2, #eadfcb);
+  transition: left 520ms var(--tixy-ease-settle, ease-out);
+}
+
+/* ── paging ───────────────────────────────────────────────────────────── */
+
+.st-page {
+  position: absolute;
+  top: calc(4px + var(--st-card-h) / 2);
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  margin-top: -20px;
+  border: 0;
+  border-radius: var(--tixy-radius-button, 10px);
+  background: var(--tixy-ink, #1f1a16);
+  color: var(--tixy-paper, #f4ebdc);
+  cursor: pointer;
+  box-shadow: var(--tixy-shadow-lift);
+  transition: transform var(--tixy-press-out, 90ms) ease-out;
+}
+.st-page[data-dir='back'] { left: -12px; }
+.st-page[data-dir='on'] { right: -12px; }
+.st-page:active { transform: translateY(1px) scale(var(--tixy-press-scale, 0.96)); }
+.st-page:disabled { display: none; }
+.st-page:focus-visible { outline: 3px solid var(--tixy-ticket, #f2a33c); outline-offset: 2px; }
+
+/* Phones and narrow windows swipe the track. */
+@media (pointer: coarse) {
+  .st-page { display: none; }
+  .st-foot > button { min-height: 44px; }
+  .st-card { grid-template-rows: minmax(0, 1fr) 44px; }
+}
+
+@media (max-width: 47.99rem) {
+  .st-page { display: none; }
+  .st { --st-w: 104px; --st-w-prize: 148px; --st-card-h: 172px; }
+  .st-prize-art { width: 72px; height: 72px; }
+  .st-prize-art[data-wide] { max-width: 124px; height: 31px; }
+}

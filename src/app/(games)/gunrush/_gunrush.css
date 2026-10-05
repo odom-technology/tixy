@@ -1,0 +1,171 @@
+/* ──────────────────────────────────────────────────────────────────────
+   GUNRUSH — Midway scoped panel. Namespaced under .gunrush-midway so it can't
+   leak into other games or shells. The game itself is canvas-rendered (a night
+   boardwalk lane, glowing gate arches, a squad of tin gunners); this file only
+   frames the stage, layers the HUD chips and the start/over/error overlay, and
+   honors prefers-reduced-motion. Hard bevels + offset drop shadows; NOTHING
+   GLOWS.
+   ────────────────────────────────────────────────────────────────────── */
+
+.gunrush-midway .gunrush-stage {
+  /* Recessed cabinet framing around the canvas — a hard ink edge + offset drop
+     shadow, no blur halo. The canvas paints its own boardwalk on top. */
+  border-radius: var(--radius-well);
+  box-shadow:
+    0 1px 0 var(--bevel-hi),
+    0 8px 0 var(--shadow-color),
+    0 16px 30px #00000055;
+}
+
+/* The canvas sits flush in the stage; its own border-2/rounded-well handles the
+   inner edge. Keep it block-level with no inline whitespace gap. */
+.gunrush-midway .gunrush-stage canvas {
+  display: block;
+}
+
+/* ── Overlay (idle / gameover / error) covering the whole stage ── */
+.gunrush-midway .gunrush-overlay {
+  z-index: 5;
+}
+
+/* ── Squad strength badge (top left) — the number the run is about ── */
+.gunrush-midway .gunrush-squad {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 3;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4px 12px 5px;
+  color: #f6eddc;
+  background: #14424a;
+  border: 2px solid #0f0a06;
+  border-radius: 4px;
+  box-shadow: 0 2px 0 var(--shadow-color);
+}
+
+.gunrush-midway .gunrush-squad-count {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+  /* Re-keyed on every count change so the number punches on each gate. */
+  animation: gunrush-punch 260ms ease-out;
+}
+
+.gunrush-midway .gunrush-squad-label {
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  opacity: 0.72;
+}
+
+@keyframes gunrush-punch {
+  0% {
+    transform: scale(1.45);
+  }
+  60% {
+    transform: scale(0.94);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* ── Arsenal readout (top right) ── */
+.gunrush-midway .gunrush-arsenal {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 3;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  color: #f6eddc;
+  background: #4a2a52;
+  border: 2px solid #0f0a06;
+  border-radius: 4px;
+  box-shadow: 0 2px 0 var(--shadow-color);
+}
+
+.gunrush-midway .gunrush-arsenal-tier {
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.gunrush-midway .gunrush-arsenal-name {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  opacity: 0.85;
+}
+
+/* ── Active multiplier chips (bottom left) ── */
+.gunrush-midway .gunrush-chips {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  z-index: 3;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.gunrush-midway .gunrush-chip {
+  padding: 2px 8px;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #f6eddc;
+  background: #7e5a22;
+  border: 2px solid #0f0a06;
+  border-radius: 4px;
+  box-shadow: 0 2px 0 var(--shadow-color);
+}
+
+/* ── Horde banner (top centre, during an arena fight) ── */
+.gunrush-midway .gunrush-wave-banner {
+  position: absolute;
+  top: 52px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  pointer-events: none;
+  padding: 3px 14px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+  color: #f6eddc;
+  background: #7e2225;
+  border: 2px solid #0f0a06;
+  border-radius: 4px;
+  box-shadow: 0 2px 0 var(--shadow-color);
+  animation: gunrush-banner-pulse 900ms ease-in-out infinite;
+}
+
+@keyframes gunrush-banner-pulse {
+  0%,
+  100% {
+    transform: translateX(-50%) scale(1);
+  }
+  50% {
+    transform: translateX(-50%) scale(1.05);
+  }
+}
+
+/* Floating combat text is a shared callout plate (.arc-floater). */
+
+/* ── Reduced motion: hold every HUD element still. The canvas honors the same
+      preference internally (no bob, no flicker, no particles). ── */
+@media (prefers-reduced-motion: reduce) {
+  .gunrush-midway .gunrush-squad-count,
+  .gunrush-midway .gunrush-wave-banner {
+    animation: none;
+  }
+}

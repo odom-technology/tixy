@@ -1,0 +1,35 @@
+/* ──────────────────────────────────────────────────────────────────────
+   GUMBALL DROP — Midway scoped panel. Namespaced under .bubble-midway (the slug
+   stays bubble-shooter) so it can't leak into other games or shells. The game
+   itself is canvas-rendered (a lacquered gumball jar with the dropper at the
+   top); this file only frames the stage, layers the start/over overlay, and
+   honors prefers-reduced-motion. Hard bevels + offset drop shadows; NOTHING GLOWS
+   in the chrome (the canvas paints its own fill-line warning).
+   ────────────────────────────────────────────────────────────────────── */
+
+.bubble-midway .bubble-stage {
+  /* Recessed cabinet framing around the canvas — a hard ink edge + offset drop
+     shadow, no blur halo. The canvas paints the jar + gumballs on top. */
+  border-radius: var(--radius-well);
+  box-shadow:
+    0 1px 0 var(--bevel-hi),
+    0 8px 0 var(--shadow-color),
+    0 16px 30px #00000055;
+}
+
+/* The canvas sits flush in the stage; its own border-2/rounded-well handles the
+   inner edge. Keep it block-level with no inline whitespace gap. */
+.bubble-midway .bubble-stage canvas {
+  display: block;
+}
+
+/* ── Overlay (idle / gameover / error) covering the whole stage ── */
+.bubble-midway .bubble-overlay {
+  z-index: 4;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bubble-midway .bubble-overlay {
+    transition: none;
+  }
+}

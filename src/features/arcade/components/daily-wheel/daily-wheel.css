@@ -1,0 +1,125 @@
+/* The daily wheel's cabinet (daily-wheel.tsx). The rotor and the flapper
+   are their own layers, turned by transform only. */
+
+.dw-cabinet {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 460 / 420;
+  border-radius: 22px;
+  background: var(--tixy-ink);
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  overflow: hidden;
+}
+.dw-back,
+.dw-front {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.dw-rotor {
+  position: absolute;
+  will-change: transform;
+  transition: opacity 200ms ease-out;
+}
+.dw-rotor > svg { display: block; width: 100%; height: 100%; transition: filter 260ms ease-out; }
+.dw-rotor[data-fast='1'] > svg { filter: blur(1.6px); transition-duration: 120ms; }
+.dw-cabinet[data-fade] .dw-rotor { opacity: 0.4; transition-duration: 120ms; }
+.dw-glow {
+  position: absolute;
+  pointer-events: none;
+  will-change: transform, opacity;
+  opacity: 0;
+}
+.dw-glow[data-on] { opacity: 1; }
+.dw-glow > svg { display: block; width: 100%; height: 100%; }
+
+.dw-value {
+  font-family: var(--tixy-font-num);
+  font-weight: var(--tixy-weight-num);
+  font-size: 30px;
+  letter-spacing: var(--tixy-tracking-num);
+}
+.dw-value[data-sliver] { font-size: 19px; }
+.dw-hub {
+  font-family: var(--tixy-font-num);
+  font-weight: var(--tixy-weight-num);
+  font-size: 30px;
+}
+
+.dw-dim path { opacity: 0.4; }
+.dw-glow[data-on] { animation: dw-glow-in 220ms ease-out both; }
+@keyframes dw-glow-in { from { opacity: 0; } }
+
+.dw-flapper {
+  position: absolute;
+  will-change: transform;
+  pointer-events: none;
+}
+.dw-flapper > svg { display: block; width: 100%; height: 100%; overflow: visible; }
+
+/* Rim lights. Off unless something happened: one flash on a landing, a
+   chase on the 100 (1 lap) and the 200 (3 laps). */
+.dw-bulb { fill: #4a3d32; }
+/* The lit bulbs are HTML, so their opacity runs on the compositor. */
+.dw-bulbs { position: absolute; inset: 0; pointer-events: none; }
+.dw-bulbs i {
+  position: absolute;
+  border-radius: 50%;
+  background: var(--tixy-ticket);
+  opacity: 0;
+}
+.dw-cabinet[data-phase='landed'] .dw-bulbs i { animation: dw-flash 420ms ease-out both; }
+.dw-cabinet[data-chase] .dw-bulbs i {
+  animation: dw-chase 400ms linear calc(var(--i) * 400ms / 24) both;
+}
+.dw-cabinet[data-chase='1'] .dw-bulbs i { animation-iteration-count: 1; }
+.dw-cabinet[data-chase='3'] .dw-bulbs i { animation-iteration-count: 3; }
+@keyframes dw-flash { 0% { opacity: 0; } 25% { opacity: 1; } 100% { opacity: 0.35; } }
+@keyframes dw-chase { 0% { opacity: 1; } 35% { opacity: 1; } 100% { opacity: 0.35; } }
+
+.dw-lever {
+  position: absolute;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  cursor: grab;
+  touch-action: none;
+}
+.dw-lever[aria-disabled='true'] { cursor: default; }
+.dw-knob {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--tixy-red);
+  box-shadow: inset -4px -5px 0 rgb(0 0 0 / 0.22), inset 3px 3px 0 rgb(255 255 255 / 0.18);
+  will-change: transform;
+}
+.dw-lever[aria-disabled='true'] .dw-knob { filter: saturate(0.4) brightness(0.8); }
+
+.dw-chip {
+  position: absolute;
+  width: 9px;
+  height: 6px;
+  border-radius: 2px;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dw-cabinet[data-chase] .dw-bulbs i,
+  .dw-cabinet[data-phase='landed'] .dw-bulbs i { animation: none; opacity: 0.6; }
+  .dw-glow[data-on] { animation: none; }
+}
+
+/* The home card's still wheel. */
+.dw-badge { display: block; width: 58px; height: 58px; flex: none; }
+.dw-badge[data-dim] { filter: saturate(0.35) brightness(0.92); }
+.dw-badge-hub {
+  font-family: var(--tixy-font-num);
+  font-weight: var(--tixy-weight-num);
+  font-size: 104px;
+}

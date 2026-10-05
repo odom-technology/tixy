@@ -1,0 +1,184 @@
+/* The bet sheet. machine-bet-sheet.tsx. It renders in ArcadeDialog, on
+   paper, so it uses the paper tokens: the field on paper 2, the step
+   buttons paper 3, the set button ink. */
+@layer components {
+  .arc-bet-sheet {
+    display: grid;
+    gap: 0.75rem;
+    font-family: var(--tixy-font-text);
+    color: var(--tixy-ink);
+  }
+
+  .arc-bet-sheet-amount {
+    display: grid;
+    grid-template-columns: 3.5rem minmax(0, 1fr) 3.5rem;
+    gap: 0.5rem;
+    align-items: stretch;
+  }
+
+  .arc-bet-sheet-step {
+    display: grid;
+    min-height: 4rem;
+    place-items: center;
+    border-radius: var(--tixy-radius-button);
+    background: var(--tixy-paper-3);
+    color: var(--tixy-ink);
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    transition: transform var(--tixy-press-out) ease-out;
+  }
+
+  .arc-bet-sheet-step:active:not(:disabled) {
+    transform: translateY(1px) scale(var(--tixy-press-scale));
+    transition-duration: var(--tixy-press-in);
+  }
+
+  .arc-bet-sheet-step:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .arc-bet-sheet-step:focus-visible {
+    outline: 2px solid var(--tixy-ink);
+    outline-offset: 2px;
+  }
+
+  .arc-bet-sheet-field {
+    display: block;
+    min-width: 0;
+  }
+
+  .arc-bet-sheet-field input {
+    width: 100%;
+    height: 100%;
+    min-height: 4rem;
+    padding: 0 0.5rem;
+    border: 2px solid transparent;
+    border-radius: var(--tixy-radius-button);
+    background: var(--tixy-paper-2);
+    color: var(--tixy-ink);
+    font-family: var(--tixy-font-num);
+    font-size: 2.5rem;
+    font-weight: var(--tixy-weight-num);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: var(--tixy-tracking-num);
+    line-height: 1;
+    text-align: center;
+    caret-color: var(--tixy-ink);
+    outline: none;
+    transition: border-color var(--tixy-panel-fast) var(--tixy-ease-settle);
+  }
+
+  .arc-bet-sheet-field input:focus-visible,
+  .arc-bet-sheet-field input:focus {
+    border-color: var(--tixy-ink);
+  }
+
+  .arc-bet-sheet-field input[aria-invalid='true'] {
+    border-color: var(--tixy-red);
+  }
+
+  .arc-bet-sheet-range {
+    display: flex;
+    justify-content: space-between;
+    margin-top: -0.25rem;
+    padding: 0 0.25rem;
+    font-size: 0.875rem;
+    color: var(--tixy-ink-2);
+  }
+
+  .arc-bet-sheet-range .arc-digits {
+    font-size: 1rem;
+    color: var(--tixy-ink);
+  }
+
+  .arc-bet-sheet-stubs {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.25rem;
+  }
+
+  .arc-bet-sheet-stub {
+    display: grid;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    padding: 0;
+    place-items: center;
+    border-radius: var(--tixy-radius-button-sm);
+    background: none;
+    transition: transform var(--tixy-press-out) ease-out;
+  }
+
+  .arc-bet-sheet-stub .arc-ticket-stub {
+    min-width: 3.25rem;
+  }
+
+  .arc-bet-sheet-stub:active {
+    transform: translateY(1px) scale(var(--tixy-press-scale));
+    transition-duration: var(--tixy-press-in);
+  }
+
+  .arc-bet-sheet-stub:focus-visible {
+    outline: 2px solid var(--tixy-ink);
+    outline-offset: 1px;
+  }
+
+  /* all in: the whole balance in one press. A step quieter than the set
+     button, on paper 3 like the step buttons. */
+  .arc-bet-sheet-allin {
+    display: flex;
+    min-height: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 0 1rem;
+    border-radius: var(--tixy-radius-button);
+    background: var(--tixy-paper-3);
+    color: var(--tixy-ink);
+    font-size: 0.9375rem;
+    font-weight: var(--tixy-weight-button);
+    line-height: 1;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform var(--tixy-press-out) ease-out;
+  }
+
+  .arc-bet-sheet-allin:active {
+    transform: translateY(1px) scale(var(--tixy-press-scale));
+    transition-duration: var(--tixy-press-in);
+  }
+
+  .arc-bet-sheet-allin:focus-visible {
+    outline: 2px solid var(--tixy-ink);
+    outline-offset: 2px;
+  }
+
+  .arc-bet-sheet-allin-amount .arc-digits {
+    font-size: 1.0625rem;
+    color: var(--tixy-ink);
+  }
+
+  .arc-bet-sheet-note {
+    min-height: 1.5rem;
+    margin: 0;
+    font-size: 0.9375rem;
+    line-height: 1.5rem;
+    text-align: center;
+    color: var(--tixy-ink-2);
+  }
+
+  .arc-bet-sheet-note[data-tone='bad'] {
+    color: var(--tixy-red-text, var(--tixy-red));
+  }
+
+  .arc-bet-sheet-note .arc-digits {
+    font-size: 1.0625rem;
+    color: var(--tixy-ink);
+  }
+
+  .arc-bet-sheet-set {
+    width: 100%;
+  }
+}

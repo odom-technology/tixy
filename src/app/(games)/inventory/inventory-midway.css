@@ -1,0 +1,68 @@
+/* Inventory-scoped Midway chrome — imported only by the /inventory route.
+   Mirrors the store's rarity-tier enamel edges and recessed preview wells,
+   plus a loadout-slot "filled vs empty" treatment. All paints come from the
+   --enamel-* token set so this tracks every sub-theme; no mockup palette is
+   hardcoded. Hover lift is gated by prefers-reduced-motion; the `arcprev-*`
+   mini-previews keep their own (globals) reduced-motion gate. */
+
+.inv-mw-card {
+  position: relative;
+  isolation: isolate;
+  transition:
+    transform 140ms ease,
+    box-shadow 140ms ease;
+}
+
+.inv-mw-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  border-left: 4px solid var(--inv-mw-rail, var(--border-soft));
+  pointer-events: none;
+}
+
+.inv-mw-rarity-common {
+  --inv-mw-rail: var(--border-soft);
+}
+.inv-mw-rarity-rare {
+  --inv-mw-rail: var(--enamel-info-edge);
+}
+.inv-mw-rarity-epic {
+  --inv-mw-rail: var(--enamel-prize-edge);
+}
+.inv-mw-rarity-legendary {
+  --inv-mw-rail: var(--enamel-tickets-edge);
+}
+.inv-mw-rarity-mythic {
+  --inv-mw-rail: var(--enamel-primary-edge);
+}
+
+/* Recessed preview well: drops the mini-preview into a dark screen-well. */
+.inv-mw-well {
+  border: var(--border-w, 2px) solid var(--border-ink);
+  border-radius: var(--radius-well);
+  background: var(--screen-well);
+  box-shadow: var(--shadow-well);
+  overflow: hidden;
+}
+
+.inv-mw-stub-edge {
+  border-top: 2px dashed var(--border-soft);
+}
+
+/* Loadout slot rows: a filled slot reads as a seated cream key (left edge
+   accent), an empty slot stays a flat recessed tag. */
+.inv-mw-slot-filled {
+  border-left: 3px solid var(--enamel-prize-edge);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .inv-mw-card:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      var(--shadow-panel),
+      0 6px 0 var(--border-ink);
+  }
+}

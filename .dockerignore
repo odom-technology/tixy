@@ -1,0 +1,49 @@
+# Build artifacts and dependencies (rebuilt inside the image)
+.next/
+node_modules/
+dist/
+coverage/
+
+# Secrets — never bake env files into the image
+.env
+.env.*
+env/.env
+env/.env.*
+
+# Local tooling and VCS
+.git/
+.github/
+.forgejo/
+.claude/
+.DS_Store
+*.log
+*.tsbuildinfo
+
+# Docker files themselves
+Dockerfile
+.dockerignore
+compose*.yml
+compose*.yaml
+
+# Docs (not needed at build or runtime)
+docs/
+README.md
+
+# Private local data and credential files.
+exports/
+backups/
+runtime/
+*.dump
+*.backup
+*.sql.gz
+*.sqlite
+*.sqlite3
+*.db
+*.pem
+*.key
+id_rsa*
+id_ed25519*
+*.p12
+*.pfx
+**/tunnel.env
+**/credentials.json

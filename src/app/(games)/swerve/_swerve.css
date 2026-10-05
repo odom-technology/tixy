@@ -1,0 +1,59 @@
+/* ──────────────────────────────────────────────────────────────────────
+   SWERVE — Midway scoped panel. Namespaced under .swerve-midway so it can't
+   leak into other games or shells. The game itself is canvas-rendered (a tall
+   lacquered-wood chute with enamel-block obstacles and a cream keycap cart);
+   this file only frames the stage, layers the start/over/error overlay, and
+   honors prefers-reduced-motion. Hard bevels + offset drop shadows; NOTHING
+   GLOWS.
+   ────────────────────────────────────────────────────────────────────── */
+
+.swerve-midway .swerve-stage {
+  /* Recessed cabinet framing around the canvas — a hard ink edge + offset drop
+     shadow, no blur halo. The canvas paints its own wood + chute on top. */
+  border-radius: var(--radius-well);
+  box-shadow:
+    0 1px 0 var(--bevel-hi),
+    0 8px 0 var(--shadow-color),
+    0 16px 30px #00000055;
+}
+
+/* The canvas sits flush in the stage; its own border-2/rounded-well handles the
+   inner edge. Keep it block-level with no inline whitespace gap. */
+.swerve-midway .swerve-stage canvas {
+  display: block;
+}
+
+/* ── Overlay (idle / gameover / error) covering the whole stage ── */
+.swerve-midway .swerve-overlay {
+  z-index: 4;
+}
+
+/* ── Close-call combo chip (top center, presentation only) ── */
+.swerve-midway .swerve-combo {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  pointer-events: none;
+  padding: 2px 10px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #f6eddc;
+  background: #7e2225;
+  border: 2px solid #0f0a06;
+  border-radius: 4px;
+  box-shadow: 0 2px 0 var(--shadow-color);
+}
+
+/* The floating bonus is a shared callout plate (.arc-floater). */
+
+@media (prefers-reduced-motion: reduce) {
+  /* The canvas loop already drops the crash spectacle / shakes / FOV play under
+     reduced-motion (the sim still scrolls — that IS the game). Collapse the
+     overlay transition too. */
+  .swerve-midway .swerve-overlay {
+    transition: none;
+  }
+}

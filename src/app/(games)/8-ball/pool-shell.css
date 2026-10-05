@@ -1,0 +1,532 @@
+/* 8-ball inside the game shell: the HUD under the strip, the controls row,
+   the lobby's rail, and the quiet sections under the cabinet. Scoped to
+   .pool-midway (GameShell className). The cabinet is ink under every theme,
+   so these use the tixy brand tokens, which every theme defines. */
+@layer components {
+  .pool-midway .arc-shell-screen {
+    background: var(--tixy-screen);
+  }
+
+  .pool-table {
+    display: grid;
+    width: 100%;
+    height: 100%;
+    place-items: center;
+  }
+
+  .pool-table canvas {
+    display: block;
+    cursor: crosshair;
+    border-radius: 0.5rem;
+  }
+
+  /* ── HUD: players, the clock and whose shot it is ── */
+  .pool-hud {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.125rem 0.75rem 0.5rem;
+    color: var(--tixy-paper);
+  }
+
+  .pool-player {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .pool-player[data-side='right'] {
+    flex-direction: row-reverse;
+    text-align: right;
+  }
+
+  .pool-avatar {
+    display: inline-flex;
+    flex: none;
+    border-radius: 50%;
+  }
+
+  .pool-avatar[data-turn] {
+    box-shadow: 0 0 0 2px var(--tixy-screen), 0 0 0 4px var(--tixy-red);
+  }
+
+  /* No room for an avatar beside the balls on a phone, except one that
+     wears a frame, which shrinks to fit. */
+  @media (max-width: 26rem) {
+    .pool-avatar:not([data-framed]) {
+      display: none;
+    }
+
+    .pool-avatar[data-framed] .arc-avatar {
+      width: 1.75rem;
+      height: 1.75rem;
+    }
+  }
+
+  .pool-who {
+    display: grid;
+    min-width: 0;
+    gap: 0.25rem;
+  }
+
+  .pool-name {
+    overflow: hidden;
+    font-size: 0.9375rem;
+    font-weight: var(--tixy-weight-button);
+    line-height: 1.1;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .pool-name small {
+    margin-left: 0.375rem;
+    font-weight: var(--tixy-weight-body);
+    color: var(--tixy-on-ink-2);
+  }
+
+  .pool-row {
+    display: flex;
+    min-height: 1.125rem;
+    gap: 0.125rem;
+    align-items: center;
+  }
+
+  .pool-player[data-side='right'] .pool-row {
+    justify-content: flex-end;
+  }
+
+  .pool-row-note {
+    font-size: 0.8125rem;
+    color: var(--tixy-on-ink-2);
+  }
+
+  /* A ball in your row: big enough to read its number on a phone. */
+  .pool-ball {
+    position: relative;
+    display: grid;
+    flex: none;
+    width: 1.125rem;
+    height: 1.125rem;
+    place-items: center;
+    border-radius: 50%;
+    font-family: var(--tixy-font-num);
+    font-size: 0.75rem;
+    font-weight: var(--tixy-weight-num);
+    line-height: 1;
+    color: var(--tixy-ink);
+  }
+
+  .pool-ball > span {
+    display: grid;
+    width: 0.8125rem;
+    height: 0.8125rem;
+    place-items: center;
+    border-radius: 50%;
+    background: #fff;
+  }
+
+  @media (min-width: 40rem) {
+    .pool-ball {
+      width: 1.375rem;
+      height: 1.375rem;
+      font-size: 0.875rem;
+    }
+
+    .pool-ball > span {
+      width: 1rem;
+      height: 1rem;
+    }
+  }
+
+  /* The potted ball drops out of the row. */
+  .pool-ball[data-dropping] {
+    animation: pool-ball-drop 420ms var(--tixy-ease-settle) forwards;
+  }
+
+  @keyframes pool-ball-drop {
+    0% {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+    35% {
+      transform: translateY(-3px) scale(1.15);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(1.25rem) scale(0.6);
+      opacity: 0;
+    }
+  }
+
+  .pool-centre {
+    display: grid;
+    justify-items: center;
+    gap: 0.25rem;
+  }
+
+  .pool-clock .arc-digits {
+    font-family: var(--tixy-font-num);
+    font-size: 1.75rem;
+    font-weight: var(--tixy-weight-num);
+    line-height: 1;
+  }
+
+  /* Whose shot: words, not a chip. Yours is in red. */
+  .pool-turn {
+    font-size: 0.9375rem;
+    font-weight: var(--tixy-weight-button);
+    white-space: nowrap;
+    color: var(--tixy-on-ink-2);
+  }
+
+  .pool-turn[data-mine] {
+    color: var(--tixy-on-ink-red);
+  }
+
+  /* ── controls: spin, power, the menu ── */
+  .pool-controls {
+    display: flex;
+    min-height: 3.5rem;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--tixy-paper);
+  }
+
+  .pool-controls-note {
+    flex: 1;
+    min-width: 0;
+    font-size: 0.9375rem;
+    color: var(--tixy-on-ink-2);
+  }
+
+  .pool-spin {
+    position: relative;
+    flex: none;
+    width: 3.25rem;
+    height: 3.25rem;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #fff 0%, #f1ece4 55%, #d8d0c3 100%);
+    touch-action: none;
+    cursor: crosshair;
+  }
+
+  .pool-spin:focus-visible {
+    outline: 2px solid var(--tixy-paper);
+    outline-offset: 2px;
+  }
+
+  .pool-spin[aria-disabled='true'] {
+    opacity: 0.45;
+  }
+
+  .pool-spin-dot {
+    position: absolute;
+    width: 0.625rem;
+    height: 0.625rem;
+    margin: -0.3125rem 0 0 -0.3125rem;
+    border-radius: 50%;
+    background: var(--tixy-red);
+    pointer-events: none;
+  }
+
+  .pool-power {
+    position: relative;
+    flex: 1;
+    height: 0.75rem;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgb(244 235 220 / 0.14);
+  }
+
+  /* Your shot: the bar is a control too, with a 44px press area. */
+  .pool-power[data-live] {
+    cursor: ew-resize;
+    touch-action: none;
+    background-clip: content-box;
+    height: 2.75rem;
+    padding: 1rem 0;
+    overflow: visible;
+  }
+
+  .pool-power[data-live] > span {
+    inset: 1rem auto 1rem 0;
+  }
+
+  .pool-power > span {
+    position: absolute;
+    inset: 0 auto 0 0;
+    border-radius: inherit;
+    background: var(--tixy-paper);
+  }
+
+  .pool-power-num {
+    flex: none;
+    min-width: 3.25rem;
+    text-align: right;
+  }
+
+  .pool-power-num .arc-digits {
+    font-family: var(--tixy-font-num);
+    font-size: 1.5rem;
+    font-weight: var(--tixy-weight-num);
+  }
+
+  .pool-icon-button {
+    display: grid;
+    flex: none;
+    width: 2.75rem;
+    height: 2.75rem;
+    place-items: center;
+    border-radius: var(--tixy-radius-button);
+    color: inherit;
+  }
+
+  .pool-icon-button:hover {
+    background: rgb(244 235 220 / 0.1);
+  }
+
+  .pool-icon-button:focus-visible {
+    outline: 2px solid var(--tixy-paper);
+    outline-offset: -2px;
+  }
+
+  /* ── the call on the table: foul, your shot ── */
+  .pool-banner {
+    position: absolute;
+    top: 0.75rem;
+    left: 50%;
+    z-index: 3;
+    max-width: calc(100% - 1.5rem);
+    padding: 0.375rem 0.875rem;
+    border-radius: var(--tixy-radius-button);
+    background: var(--tixy-paper);
+    color: var(--tixy-ink);
+    font-size: 0.9375rem;
+    font-weight: var(--tixy-weight-button);
+    text-align: center;
+    pointer-events: none;
+    transform: translateX(-50%);
+    animation: pool-banner-in 160ms var(--tixy-ease-settle);
+  }
+
+  .pool-banner[data-tone='foul'] {
+    background: var(--tixy-red);
+    color: var(--tixy-paper);
+  }
+
+  @keyframes pool-banner-in {
+    from {
+      opacity: 0;
+      transform: translate(-50%, -6px);
+    }
+    to {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+  }
+
+  /* ── the lobby: the rail under the racked table ── */
+  .pool-rail {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr) minmax(0, 1fr);
+    gap: 0.5rem;
+    align-items: stretch;
+  }
+
+  .pool-rail .arc-key {
+    justify-content: center;
+    min-height: 2.75rem;
+  }
+
+  .pool-rail-queue {
+    grid-column: 1 / -1;
+  }
+
+  /* Practice's level under the cabinet: the lobby's segments on a card. */
+  .pool-practice {
+    display: grid;
+    gap: 0.625rem;
+    padding: 0.875rem 1rem 1rem;
+    border-radius: var(--tixy-radius-panel-sm);
+    background: var(--surface-panel);
+  }
+
+  .pool-practice p {
+    margin: 0 0.25rem;
+    font-size: 0.9375rem;
+    color: var(--text-muted);
+  }
+
+  .pool-practice p .arc-digits {
+    font-size: 1.25em;
+    line-height: 1;
+    color: var(--text-strong);
+  }
+
+  /* An invite lands on the table itself. */
+  .pool-invite {
+    position: absolute;
+    top: 0.75rem;
+    left: 50%;
+    z-index: 4;
+    display: flex;
+    width: min(calc(100% - 1.5rem), 26rem);
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border-radius: var(--tixy-radius-panel-sm);
+    background: var(--tixy-paper);
+    color: var(--tixy-ink);
+    transform: translateX(-50%);
+    animation: pool-banner-in 420ms var(--tixy-ease-spring);
+    /* A paper card on the ink screen: its buttons take the paper tokens
+       back, so accept is ink and decline is paper 3. */
+    --enamel-primary: var(--tixy-ink);
+    --enamel-primary-on: var(--tixy-paper);
+    --enamel-primary-edge: var(--tixy-ink);
+    --enamel-primary-hi: var(--tixy-ink);
+    --key-face: var(--tixy-paper-3);
+    --key-face-on: var(--tixy-ink);
+    --key-face-edge: var(--tixy-paper-3);
+    --key-face-hi: var(--tixy-paper-3);
+    --text-strong: var(--tixy-ink);
+    --text-body: var(--tixy-ink);
+    --focus-outline: 2px solid var(--tixy-ink);
+  }
+
+  .pool-invite p {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    font-size: 0.9375rem;
+    line-height: 1.3;
+  }
+
+  .pool-invite p strong {
+    display: block;
+  }
+
+  .pool-invite p small {
+    color: var(--tixy-ink-2);
+    font-size: 0.9375rem;
+  }
+
+  .pool-invite-actions {
+    display: flex;
+    flex: none;
+    gap: 0.375rem;
+  }
+
+  /* ── under the cabinet: your games, stats, tournaments ── */
+  .pool-below {
+    display: grid;
+    gap: 1rem;
+  }
+
+  @media (min-width: 64rem) {
+    .pool-below {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-items: start;
+    }
+
+    .pool-below > .pool-wide {
+      grid-column: 1 / -1;
+    }
+  }
+
+  .pool-section h2 {
+    margin: 0 0 0.5rem;
+    font-family: var(--tixy-font-text);
+    font-size: 1.125rem;
+    font-weight: var(--tixy-weight-heading);
+    letter-spacing: var(--tixy-tracking-name);
+    color: var(--text-strong);
+  }
+
+  .pool-list {
+    display: grid;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    border-radius: var(--tixy-radius-panel-sm);
+    background: var(--surface-panel);
+    list-style: none;
+  }
+
+  .pool-list > li {
+    display: flex;
+    min-height: 3.25rem;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0.875rem;
+  }
+
+  .pool-list > li + li {
+    border-top: 1px solid var(--border-soft);
+  }
+
+  .pool-list a.pool-list-main {
+    flex: 1;
+    min-width: 0;
+    color: var(--text-strong);
+    text-decoration: none;
+  }
+
+  .pool-list-main strong {
+    display: block;
+    overflow: hidden;
+    font-weight: var(--tixy-weight-button);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .pool-list-main small {
+    color: var(--text-muted);
+    font-size: 0.9375rem;
+  }
+
+  .pool-list-main small[data-turn] {
+    color: var(--tixy-red-text, var(--tixy-red));
+    font-weight: var(--tixy-weight-button);
+  }
+
+  .pool-menu {
+    display: grid;
+    gap: 1rem;
+    font-family: var(--font-ui);
+    color: var(--text-body);
+  }
+
+  .pool-menu h3 {
+    margin: 0 0 0.375rem;
+    font-size: 0.9375rem;
+    font-weight: var(--tixy-weight-button);
+    color: var(--text-strong);
+  }
+
+  .pool-menu-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+  }
+
+  .pool-menu-row .arc-key {
+    justify-content: center;
+  }
+
+  .pool-menu p {
+    margin: 0;
+    font-size: 0.9375rem;
+    color: var(--text-muted);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pool-ball[data-dropping],
+    .pool-banner,
+    .pool-invite {
+      animation-duration: 0s;
+    }
+  }
+}

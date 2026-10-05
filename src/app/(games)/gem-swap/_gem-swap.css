@@ -1,0 +1,53 @@
+/* ──────────────────────────────────────────────────────────────────────
+   GEM SWAP — Midway scoped panel. Namespaced under .gem-midway so it can't
+   leak into other games or shells. The game itself is canvas-rendered (a
+   lacquered well holding the 8×8 gem grid); this file only frames the stage,
+   layers the start/over overlay, and honors prefers-reduced-motion. Hard
+   bevels + offset drop shadows; NOTHING GLOWS.
+   ────────────────────────────────────────────────────────────────────── */
+
+.gem-midway .gem-stage {
+  /* Recessed cabinet framing around the canvas — a hard ink edge + offset drop
+     shadow, no blur halo. The canvas paints its own board + gems on top. */
+  position: relative;
+  border-radius: var(--radius-well);
+  box-shadow:
+    0 1px 0 var(--bevel-hi),
+    0 8px 0 var(--shadow-color),
+    0 16px 30px #00000055;
+}
+
+/* A single hard top-edge highlight line so the cabinet reads as lacquered metal,
+   not a flat rectangle. Hairline only — NOTHING GLOWS (Midway house rule). */
+.gem-midway .gem-stage::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-well);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--bevel-hi) 60%, transparent);
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* While a run is live the canvas drives all motion; give the stage a near-instant
+   tactile press feedback on pointer-down so taps feel physical. */
+.gem-midway .gem-stage canvas:active {
+  transform: translateY(0.5px);
+}
+
+/* The canvas sits flush in the stage; its own border-2/rounded-well handles the
+   inner edge. Keep it block-level with no inline whitespace gap. */
+.gem-midway .gem-stage canvas {
+  display: block;
+}
+
+/* ── Overlay (idle / gameover / error) covering the whole stage ── */
+.gem-midway .gem-overlay {
+  z-index: 4;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gem-midway .gem-overlay {
+    transition: none;
+  }
+}

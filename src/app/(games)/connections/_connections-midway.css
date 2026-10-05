@@ -1,0 +1,252 @@
+/* ── Midway-skinned Connections graphics ──
+   Extracted from the former styled-jsx global block in page.tsx (styled-jsx
+   does not render under this app's custom server + Next 16, so the CSS must
+   live in a route-scoped stylesheet). Word tiles are beveled cream/wood "key"
+   chips on a recessed well; selected chips depress into amber enamel; solved
+   groups become the four enamel plates. All motion degrades under
+   prefers-reduced-motion. */
+
+/* recessed board well that holds the tile grid */
+.cn-bezel {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  padding: 12px;
+  border-radius: var(--radius-well, 8px);
+  background: linear-gradient(180deg, var(--surface-well, #17110a), #060505);
+  border: 1px solid var(--border-ink, #0f0a06);
+  box-shadow:
+    inset 0 2px 10px #000000bb,
+    inset 0 0 0 1px #ffffff08;
+}
+@media (min-width: 640px) {
+  .cn-bezel { gap: 10px; padding: 14px; }
+}
+
+/* ── word tile: beveled cream/wood KEY chip ── */
+.cn-tile {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 54px;
+  padding: 10px 6px;
+  border-radius: var(--radius-key, 9px);
+  cursor: pointer;
+  user-select: none;
+  font-family: var(--font-display, 'Bungee', system-ui, sans-serif);
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: var(--cn-tile-text, var(--key-face-on, #1b140d));
+  border: 1px solid var(--key-face-edge, #c4b392);
+  background: linear-gradient(180deg, var(--cn-tile-bg-hi, var(--key-face-hi, #fdf7ea)), var(--cn-tile-bg, var(--key-face, #f6eddc)));
+  box-shadow:
+    inset 0 1px 0 var(--key-bevel-hi, #fffaf0),
+    inset 0 -3px 5px var(--key-bevel-lo, #c9b791),
+    0 4px 0 var(--key-side, #6b5631),
+    0 6px 10px #00000050;
+  transition: transform 0.07s ease, box-shadow 0.07s ease, background 0.12s ease;
+}
+@media (min-width: 640px) {
+  .cn-tile { min-height: 62px; font-size: 14px; padding: 12px 8px; }
+}
+.cn-tile-word {
+  display: block;
+  line-height: 1.05;
+  text-align: center;
+  word-break: break-word;
+  hyphens: auto;
+}
+.cn-tile:hover:not([data-selected]):not(:disabled) {
+  background: linear-gradient(180deg, var(--cn-tile-bg-hi, #fffaee), var(--cn-tile-bg, #ecdfc4));
+}
+.cn-tile:focus-visible {
+  outline: none;
+  box-shadow:
+    inset 0 1px 0 var(--key-bevel-hi, #fffaf0),
+    inset 0 -3px 5px var(--key-bevel-lo, #c9b791),
+    0 4px 0 var(--key-side, #6b5631),
+    0 0 0 3px var(--cn-accent, var(--focus-ring, #f2a33c));
+}
+/* pressed / selected → depress into amber enamel */
+.cn-tile[data-selected] {
+  color: var(--cn-sel-text, var(--enamel-tickets-on, #2a1b06));
+  border-color: var(--enamel-tickets-edge, #9a621a);
+  background: linear-gradient(180deg, var(--cn-sel-bg-hi, var(--enamel-tickets-hi, #f7bd5e)), var(--cn-sel-bg, var(--enamel-tickets, #f2a33c)));
+  transform: translateY(3px);
+  box-shadow:
+    inset 0 1px 0 #ffffff38,
+    inset 0 -2px 4px #00000055,
+    0 1px 0 var(--enamel-tickets-edge, #9a621a),
+    0 2px 6px #00000050;
+}
+.cn-tile:active:not(:disabled) { transform: translateY(3px); }
+.cn-tile:disabled { cursor: default; }
+.cn-tile[data-locked] { opacity: 0.65; }
+
+/* ── HUD: lives + timer ── */
+.cn-hud {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 2px;
+}
+.cn-lives, .cn-timer { display: inline-flex; align-items: center; gap: 9px; }
+.cn-hud-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-faint, #8a7c63);
+}
+.cn-lives-dots { display: inline-flex; gap: 4px; }
+.cn-heart {
+  color: var(--cn-mistake, var(--enamel-primary, #c73538));
+  fill: var(--cn-mistake, var(--enamel-primary, #c73538));
+  transition: color 0.25s ease, fill 0.25s ease, opacity 0.25s ease;
+  filter: drop-shadow(0 1px 0 var(--shadow-color, #0c0804));
+}
+.cn-heart[data-spent] {
+  color: var(--border-soft, #3d3022);
+  fill: var(--border-soft, #3d3022);
+  opacity: 0.6;
+  filter: none;
+}
+.cn-hud-mono {
+  font-family: var(--font-mono-arcade, ui-monospace, monospace);
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  color: var(--text-muted, #b3a48a);
+}
+.cn-timer-val { font-size: 15px; color: var(--text-strong, #f6eddc); }
+
+/* ── solved-group enamel plate ── */
+.cn-band {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 12px 16px;
+  text-align: center;
+  border-radius: var(--radius-well, 8px);
+  box-shadow:
+    inset 0 1px 0 #ffffff35,
+    inset 0 -3px 5px #00000050,
+    0 4px 0 var(--shadow-color, #0c0804),
+    0 6px 12px #00000050;
+}
+.cn-band[data-tone='tickets'] {
+  background: linear-gradient(180deg, var(--cn-group-1-hi, var(--enamel-tickets-hi, #f7bd5e)), var(--cn-group-1, var(--enamel-tickets, #f2a33c)));
+  border: 1px solid var(--enamel-tickets-edge, #9a621a);
+  color: var(--enamel-tickets-on, #2a1b06);
+}
+.cn-band[data-tone='prize'] {
+  background: linear-gradient(180deg, var(--cn-group-2-hi, var(--enamel-prize-hi, #46cdbb)), var(--cn-group-2, var(--enamel-prize, #2fb8a6)));
+  border: 1px solid var(--enamel-prize-edge, #1b7466);
+  color: var(--enamel-prize-on, #07211d);
+}
+.cn-band[data-tone='info'] {
+  background: linear-gradient(180deg, var(--cn-group-3-hi, var(--enamel-info-hi, #88a6ee)), var(--cn-group-3, var(--enamel-info, #6c8fe0)));
+  border: 1px solid var(--enamel-info-edge, #3d5694);
+  color: var(--enamel-info-on, #0a1430);
+}
+.cn-band[data-tone='primary'] {
+  background: linear-gradient(180deg, var(--cn-group-4-hi, var(--enamel-primary-hi, #d34b4e)), var(--cn-group-4, var(--enamel-primary, #c73538)));
+  border: 1px solid var(--enamel-primary-edge, #7e2225);
+  color: var(--enamel-primary-on, #ffefe4);
+}
+.cn-band-missed { opacity: 0.55; }
+.cn-band-title {
+  font-family: var(--font-display, 'Bungee', system-ui, sans-serif);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-shadow: 0 1px 0 #00000040;
+}
+.cn-band-words {
+  font-size: 12px;
+  font-weight: 600;
+  opacity: 0.88;
+}
+
+/* ── toast plate (cream stub) ── */
+.cn-toast {
+  white-space: nowrap;
+  padding: 8px 16px;
+  border-radius: var(--radius-stub, 8px);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--key-face-on, #1b140d);
+  background: linear-gradient(180deg, var(--key-face-hi, #fdf7ea), var(--key-face, #f6eddc));
+  border: 1px solid var(--key-face-edge, #c4b392);
+  box-shadow:
+    inset 0 1px 0 var(--key-bevel-hi, #fffaf0),
+    0 3px 0 var(--shadow-color, #0c0804),
+    0 5px 10px #00000050;
+}
+
+.cn-result-title {
+  font-family: var(--font-display, 'Bungee', system-ui, sans-serif);
+  letter-spacing: 0.02em;
+  text-shadow: 0 2px 0 var(--shadow-color, #0c0804);
+}
+.cn-share-msg { color: var(--pos, #5fc06a); }
+
+/* ── animations ── */
+@keyframes connections-shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 50%, 90% { transform: translateX(-4px); }
+  30%, 70% { transform: translateX(4px); }
+}
+.connections-shake {
+  animation: connections-shake 600ms ease-in-out;
+}
+
+/* tile "pop" — selected tiles bounce upward in sequence before the
+   guess is judged. Stagger applied via inline animation-delay. The
+   selected chips already sit depressed (translateY 3px), so the pop
+   lifts from there. */
+@keyframes connections-pop {
+  0%   { transform: translateY(3px)   scale(1); }
+  40%  { transform: translateY(-9px)  scale(1.05); }
+  70%  { transform: translateY(-1px)  scale(1.03); }
+  100% { transform: translateY(3px)   scale(1); }
+}
+.connections-pop {
+  animation: connections-pop 220ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* Toast: brief fade + lift in, hold, fade + lift out. */
+@keyframes connections-toast-in {
+  0%   { opacity: 0; transform: translateY(8px) scale(0.96); }
+  15%  { opacity: 1; transform: translateY(0)   scale(1);    }
+  85%  { opacity: 1; transform: translateY(0)   scale(1);    }
+  100% { opacity: 0; transform: translateY(-4px) scale(0.98); }
+}
+.connections-toast {
+  animation: connections-toast-in 1600ms ease-out forwards;
+}
+
+/* Solved-group plate drops in with a gentle squash. */
+@keyframes connections-group-strip-in {
+  0%   { opacity: 0; transform: translateY(-12px) scaleY(0.75); transform-origin: top; }
+  60%  { opacity: 1; transform: translateY(0)     scaleY(1.04); transform-origin: top; }
+  100% { opacity: 1; transform: translateY(0)     scaleY(1);    transform-origin: top; }
+}
+.connections-group-strip {
+  animation: connections-group-strip-in 480ms cubic-bezier(0.34, 1.3, 0.64, 1) both;
+}
+
+/* ── reduced motion: no travel, instant states ── */
+@media (prefers-reduced-motion: reduce) {
+  .cn-tile { transition: none; }
+  .connections-shake,
+  .connections-pop,
+  .connections-toast,
+  .connections-group-strip {
+    animation: none;
+  }
+}

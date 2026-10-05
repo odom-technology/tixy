@@ -1,0 +1,220 @@
+/* ──────────────────────────────────────────────────────────────────────
+   MINESWEEPER — Midway scoped polish. Namespaced under .minesweeper-midway so
+   it can't leak into other games or shells. Warm lacquered-wood cabinet with
+   cream enamel keycap covers that depress into a flat warm-parchment revealed
+   face — the same enamel language as the Sudoku cabinet. HARD bevels + offset
+   shadows; NOTHING GLOWS by default. Adjacency digits use a WARM enamel ramp
+   that stays distinguishable by lightness/weight, not hue alone. Decorative
+   motion (staggered reveal cascade, win sweep, error shake) degrades under
+   prefers-reduced-motion to a static state.
+
+   Column/row counts vary by difficulty, so the grid template is set inline by
+   the client (--ms-cols / --ms-rows); this file owns the look of each cell.
+   Each cell also carries an inline --ms-i (row+col) used to stagger the reveal
+   cascade + win sweep into a diagonal wave.
+   ────────────────────────────────────────────────────────────────────── */
+
+.minesweeper-midway .ms-board {
+  position: relative;
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(var(--ms-cols, 9), 1fr);
+  /* keep cells square via aspect-ratio on the cell, not the board. */
+  gap: 1px;
+  padding: 4px;
+  background: var(--ms-board-bg, #1c160d);
+  border-radius: var(--radius-well, 12px);
+  box-shadow:
+    inset 0 2px 6px rgba(0, 0, 0, 0.6),
+    inset 0 0 0 2px var(--ms-box-border, #0f0a06),
+    0 1px 0 var(--bevel-hi, #fffdf6),
+    0 6px 0 var(--shadow-color, #00000055),
+    0 10px 24px rgba(0, 0, 0, 0.45);
+  touch-action: manipulation;
+  user-select: none;
+}
+
+/* A single cell. Default = a raised cream enamel keycap. */
+.minesweeper-midway .ms-cell {
+  position: relative;
+  appearance: none;
+  margin: 0;
+  padding: 0;
+  border: none;
+  aspect-ratio: 1 / 1;
+  display: grid;
+  place-items: center;
+  background: var(--ms-cover-bg, linear-gradient(180deg, #efe1bf 0%, #d8c495 100%));
+  color: var(--ms-revealed-digit, #2a2114);
+  font-family: var(--ms-font, var(--font-mono-arcade, ui-monospace, monospace));
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  outline: none;
+  /* hard keycap bevel: top hi-light, bottom shade, thin ink seam. */
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.55),
+    inset 0 -3px 3px rgba(0, 0, 0, 0.2),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.16);
+  font-size: clamp(9px, 3.4vw, 22px);
+  transition:
+    background-color 90ms ease,
+    box-shadow 90ms ease,
+    transform 70ms ease;
+}
+
+.minesweeper-midway .ms-cell:not([data-revealed]):not([data-disabled]):hover {
+  background: var(--ms-hover-highlight, linear-gradient(180deg, #f6ead0 0%, #e4d3ac 100%));
+}
+
+/* Revealed face — depressed into the cabinet, flat warm parchment. */
+.minesweeper-midway .ms-cell[data-revealed] {
+  background: var(--ms-revealed-bg, #ede1c6);
+  cursor: default;
+  transform: translateY(1px);
+  box-shadow:
+    inset 0 2px 3px rgba(0, 0, 0, 0.16),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.12),
+    0 0 10px 1px var(--ms-reveal-glow, transparent);
+}
+
+/* Adjacency digit colors — a WARM enamel ramp. 1 & 6 keep on-brand cool enamel
+   (info blue / prize teal) as anchors so all eight stay distinguishable; the
+   rest are warm. Every digit is dark enough on the parchment face to read on
+   value alone (accessibility: not hue-dependent), and the 700 weight adds
+   contrast. 7 (coffee) and 8 (taupe) separate by LIGHTNESS, not hue. */
+.minesweeper-midway .ms-cell[data-adj='1'] { color: #2f5aa8; }
+.minesweeper-midway .ms-cell[data-adj='2'] { color: #2f7d38; }
+.minesweeper-midway .ms-cell[data-adj='3'] { color: #c23a29; }
+.minesweeper-midway .ms-cell[data-adj='4'] { color: #7a3f9c; }
+.minesweeper-midway .ms-cell[data-adj='5'] { color: #9a5a1a; }
+.minesweeper-midway .ms-cell[data-adj='6'] { color: #16756b; }
+.minesweeper-midway .ms-cell[data-adj='7'] { color: #3a2a1a; }
+.minesweeper-midway .ms-cell[data-adj='8'] { color: #6b5238; }
+
+/* Flagged cover — a red enamel flag planted on the cream key. */
+.minesweeper-midway .ms-cell[data-flag] {
+  color: var(--ms-flag, #c73538);
+}
+
+/* A mine shown after a loss — cast-iron dark on the parchment; the one the
+   player hit is scorched with a burnt-enamel blast face. */
+.minesweeper-midway .ms-cell[data-mine] {
+  color: var(--ms-mine, #3a2a1a);
+  background: var(--ms-revealed-bg, #ede1c6);
+}
+.minesweeper-midway .ms-cell[data-exploded] {
+  color: #2a1206;
+  background: linear-gradient(180deg, #eab784 0%, #d5713f 100%);
+}
+
+.minesweeper-midway .ms-cell-face {
+  display: block;
+}
+
+/* ── Reveal cascade ──────────────────────────────────────────────────────
+   A freshly-revealed cell pops its face in. When a flood opens a whole region
+   at once, the per-cell delay (from the inline --ms-i = row+col) staggers them
+   into a soft diagonal wave rather than a single flat flip. */
+.minesweeper-midway .ms-cell[data-revealed] .ms-cell-face {
+  animation: ms-reveal 190ms ease-out backwards;
+  animation-delay: calc(min(var(--ms-i, 0), 16) * 13ms);
+}
+/* Mines don't carry data-revealed (they render via data-mine), so give them
+   their own cascade so the whole minefield pops open on a loss. */
+.minesweeper-midway .ms-cell[data-mine] .ms-cell-face {
+  animation: ms-reveal 220ms ease-out backwards;
+  animation-delay: calc(min(var(--ms-i, 0), 16) * 18ms);
+}
+@keyframes ms-reveal {
+  0% { transform: scale(0.68); opacity: 0.4; }
+  70% { transform: scale(1.08); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Keyboard focus ring — on-theme warm amber, no glow. */
+.minesweeper-midway .ms-cell:focus-visible {
+  box-shadow:
+    inset 0 0 0 3px var(--bevel-hi, #fffdf6),
+    inset 0 0 0 4px var(--ms-accent, #b46b16),
+    inset 0 2px 0 rgba(255, 255, 255, 0.5);
+  z-index: 3;
+}
+
+/* Board stage sheen layer (above cells, below overlays). */
+.minesweeper-midway .ms-stage {
+  position: relative;
+}
+
+/* Pre-game (no board dealt yet) the .ms-board collapses to ~0 height, so the
+   absolutely-positioned start overlay would float up over the difficulty tabs
+   and stat bar. Reserve the board area's space by giving the stage the same
+   aspect ratio the live board will have (cols/rows of the SELECTED difficulty,
+   each cell square). The overlay (inset-0) then centers WITHIN this reserved
+   play area, well below the controls. A min-height floor keeps short boards
+   (e.g. expert's wide 16×30) from feeling cramped, and a viewport-based
+   max-height keeps tall boards (beginner's 9×9 square) from overflowing small
+   screens — the overlay stays centered either way. */
+.minesweeper-midway .ms-stage[data-empty] {
+  width: 100%;
+  aspect-ratio: var(--ms-cols, 9) / var(--ms-rows, 9);
+  min-height: 16rem;
+  max-height: min(70vh, 30rem);
+}
+.minesweeper-midway .ms-stage::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  border-radius: var(--radius-well, 12px);
+  background: linear-gradient(155deg, #ffffff12 0%, #ffffff05 24%, transparent 48%);
+  mix-blend-mode: screen;
+}
+
+.minesweeper-midway .ms-overlay {
+  z-index: 4;
+}
+
+/* ── Win ceremony ────────────────────────────────────────────────────────
+   On a clean clear the whole revealed field gets a warm enamel shimmer that
+   sweeps diagonally (again staggered off --ms-i). Idle boards never move. */
+.minesweeper-midway .ms-board[data-won] .ms-cell[data-revealed] {
+  animation: ms-win-sweep 640ms ease-out;
+  animation-delay: calc(min(var(--ms-i, 0), 16) * 42ms);
+}
+@keyframes ms-win-sweep {
+  0%, 100% { filter: brightness(1); }
+  45% { filter: brightness(1.16) saturate(1.08); transform: translateY(0); }
+}
+
+/* Board-level error shake (e.g. hit a mine). */
+.minesweeper-midway .ms-board[data-shake] {
+  animation: ms-shake 320ms ease-in-out;
+}
+@keyframes ms-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .minesweeper-midway .ms-cell {
+    transition: none;
+  }
+  .minesweeper-midway .ms-cell[data-revealed] .ms-cell-face,
+  .minesweeper-midway .ms-cell[data-mine] .ms-cell-face {
+    animation: none;
+  }
+  .minesweeper-midway .ms-board[data-won] .ms-cell[data-revealed] {
+    animation: none;
+  }
+  .minesweeper-midway .ms-board[data-shake] {
+    animation: none;
+  }
+  .minesweeper-midway .ms-stage::after {
+    background: linear-gradient(155deg, #ffffff0a 0%, transparent 48%);
+  }
+}

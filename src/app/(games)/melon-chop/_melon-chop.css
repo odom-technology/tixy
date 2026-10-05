@@ -1,0 +1,177 @@
+/* ──────────────────────────────────────────────────────────────────────
+   MELON CHOP — Midway scoped polish. Namespaced under .melon-chop-midway
+   so it cannot leak into other games or shared shells. The canvas paints the
+   carnival melon-chopping booth: an enamel-bunting backdrop over a chopping
+   board, with fruit lobbed up in ballistic arcs. This file frames the stage
+   as a recessed booth well and lays a static glass sheen. The only motion
+   here is the HUD score pop + combo badge, both flattened under reduced
+   motion; NOTHING glows by default.
+   ────────────────────────────────────────────────────────────────────── */
+
+.melon-chop-midway .melon-stage {
+  position: relative;
+  border-radius: var(--radius-well);
+  box-shadow:
+    inset 0 2px 8px #000000bb,
+    inset 0 0 26px #00000080,
+    inset 0 0 0 1px #ffffff0a,
+    0 1px 0 var(--bevel-hi),
+    0 6px 0 var(--shadow-color),
+    0 9px 20px #00000055;
+  touch-action: none;
+}
+
+/* Static glass sheen over the booth — fixed diagonal gradient, no motion,
+   never intercepts pointer/touch. */
+.melon-chop-midway .melon-stage::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(
+    155deg,
+    #ffffff0e 0%,
+    #ffffff03 22%,
+    transparent 46%
+  );
+  mix-blend-mode: screen;
+}
+
+/* The idle / game-over / error overlay must sit above the sheen. */
+.melon-chop-midway .melon-overlay {
+  z-index: 4;
+}
+
+/* The lone START keycap below the board — a cream enamel keycap with real
+   travel, used as the primary control on touch + as a visual affordance on
+   desktop. Hard bevel + offset drop shadow; no glow. */
+.melon-chop-midway .melon-start {
+  appearance: none;
+  border: none;
+  margin: 0;
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-width: clamp(160px, 42%, 280px);
+  padding: clamp(12px, 2.4vw, 18px) clamp(20px, 5vw, 36px);
+  border-radius: clamp(10px, 2.4%, 16px);
+  font-family: var(--font-mono-arcade, ui-monospace, monospace);
+  font-weight: 800;
+  font-size: clamp(15px, 4vw, 20px);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #143024;
+  background: linear-gradient(180deg, #fdf6e7 0%, #ecdcbd 100%);
+  box-shadow:
+    inset 0 3px 0 rgba(255, 255, 255, 0.75),
+    inset 0 -5px 6px rgba(46, 92, 60, 0.32),
+    inset 0 0 0 2px rgba(0, 0, 0, 0.16),
+    0 5px 0 #8fae86,
+    0 7px 10px rgba(0, 0, 0, 0.32);
+  transition:
+    transform 70ms ease,
+    box-shadow 70ms ease,
+    filter 70ms ease;
+}
+.melon-chop-midway .melon-start:hover {
+  filter: brightness(1.04);
+}
+.melon-chop-midway .melon-start:active,
+.melon-chop-midway .melon-start[data-pressed='true'] {
+  transform: translateY(4px);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.6),
+    inset 0 -3px 5px rgba(46, 92, 60, 0.3),
+    inset 0 0 0 2px rgba(0, 0, 0, 0.18),
+    0 1px 0 #8fae86,
+    0 2px 4px rgba(0, 0, 0, 0.3);
+}
+.melon-chop-midway .melon-start:focus-visible {
+  outline: none;
+  box-shadow:
+    inset 0 0 0 3px var(--ink, #0c1810),
+    inset 0 3px 0 rgba(255, 255, 255, 0.6),
+    0 5px 0 #8fae86,
+    0 7px 10px rgba(0, 0, 0, 0.32);
+}
+.melon-chop-midway .melon-start:disabled {
+  cursor: default;
+  filter: grayscale(0.35) brightness(0.9);
+}
+
+/* HUD score pop — brief scale pulse each time the score ticks up (the span
+   remounts via key={score}, replaying the animation). */
+@keyframes melon-score-pop {
+  0% {
+    transform: scale(1);
+  }
+  35% {
+    transform: scale(1.35);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.melon-chop-midway .melon-score-pop {
+  display: inline-block;
+  transform-origin: left center;
+  animation: melon-score-pop 220ms ease-out;
+}
+
+/* Live combo badge under the HUD score — a small enamel pill echoing the
+   current swipe combo while it is fresh. Absolutely positioned so its
+   appear/disappear never shifts the HUD row. */
+@keyframes melon-combo-pop {
+  0% {
+    transform: scale(0.6);
+  }
+  60% {
+    transform: scale(1.12);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.melon-chop-midway .melon-combo-badge {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-family: var(--font-mono-arcade, ui-monospace, monospace);
+  font-weight: 800;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  pointer-events: none;
+  color: #143024;
+  background: linear-gradient(180deg, #fdf6e7 0%, #ecdcbd 100%);
+  box-shadow:
+    0 2px 0 #8fae86,
+    0 3px 6px rgba(0, 0, 0, 0.3);
+  animation: melon-combo-pop 160ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Flatten the sheen. The canvas loop already checks reduced-motion to
+     suppress juice particles + screen-shake; fruit still arc (that motion IS
+     the game). */
+  .melon-chop-midway .melon-stage::after {
+    background: linear-gradient(155deg, #ffffff0a 0%, transparent 46%);
+  }
+  .melon-chop-midway .melon-start {
+    transition: none;
+  }
+  .melon-chop-midway .melon-score-pop,
+  .melon-chop-midway .melon-combo-badge {
+    animation: none;
+  }
+}

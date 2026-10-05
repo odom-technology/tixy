@@ -1,0 +1,256 @@
+/* ──────────────────────────────────────────────────────────────────────
+   GOPHER POP — Midway scoped panel. Namespaced under .gopher-midway so it
+   can't leak into other games or shells. A lacquered-wood cabinet holds a 3×3
+   grid of bevelled holes; enamel gophers (and the occasional bomb) pop up from
+   the holes for short windows and the player bonks them. The grid itself is a
+   single <canvas> that fills the wide stage; this file styles the cabinet frame,
+   the HUD strip, the countdown bar, and the idle/gameover/error overlay.
+   Hard bevels + offset drop shadows; NOTHING GLOWS. Under prefers-reduced-motion
+   the decorative cabinet sheen + timebar animation collapse to static states.
+   ────────────────────────────────────────────────────────────────────── */
+
+.gopher-midway .gopher-stage {
+  /* Width is set inline to the canvas size (like the other games' stages) and
+     centred in the content column. `w-full` previously made the wood field
+     wider than the fixed-width canvas, left-aligning the board. */
+  max-width: 100%;
+  margin-inline: auto;
+}
+
+/* ── The HUD strip above the field: score / time / best on a wood rail ── */
+.gopher-midway .gopher-hud {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px clamp(12px, 3%, 22px);
+  border-radius: var(--radius-well);
+  background: linear-gradient(180deg, #6b4a2c 0%, #573a22 100%);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -4px 0 rgba(0, 0, 0, 0.34),
+    inset 0 0 0 2px var(--ink, #1c160d),
+    0 1px 0 var(--bevel-hi),
+    0 6px 0 var(--shadow-color),
+    0 10px 22px #00000055;
+}
+.gopher-midway .gopher-hud-stat {
+  font-family: var(--font-mono-arcade, ui-monospace, monospace);
+  font-variant-numeric: tabular-nums;
+  font-size: clamp(12px, 3.2vw, 16px);
+  letter-spacing: 0.04em;
+  color: #f0e2c6;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.45);
+}
+.gopher-midway .gopher-hud-stat b {
+  font-weight: 800;
+  color: #fffaf0;
+}
+.gopher-midway .gopher-hud-stat[data-low='true'] b {
+  color: #f1b0b2;
+  /* Low-time urgency: the clock throbs under 10s left. */
+  animation: gopher-lowtime-pulse 900ms ease-in-out infinite;
+}
+@keyframes gopher-lowtime-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Countdown bar — an inset enamel track that drains over the 60s. */
+.gopher-midway .gopher-timebar {
+  position: relative;
+  height: 12px;
+  border-radius: 999px;
+  margin: 10px 0 0;
+  background: #120d08;
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.7),
+    inset 0 0 0 2px #0f0a06;
+  overflow: hidden;
+}
+.gopher-midway .gopher-timebar-fill {
+  position: absolute;
+  inset: 0;
+  transform-origin: left center;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #f7bd5e 0%, #f2a33c 55%, #c47c1f 100%);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.32),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.32);
+  /* width is driven by inline style; transition keeps the drain smooth. */
+  transition: width 200ms linear;
+}
+.gopher-midway .gopher-timebar-fill[data-low='true'] {
+  background: linear-gradient(180deg, #e2666a 0%, #c73538 55%, #7e2225 100%);
+}
+
+/* ── Combo meter: multiplier chip + tier-progress track + streak label ── */
+.gopher-midway .gopher-combo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+  padding: 5px 10px;
+  border-radius: var(--radius-well);
+  background: linear-gradient(180deg, #4a3019 0%, #3a2511 100%);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.34),
+    inset 0 0 0 2px var(--ink, #1c160d);
+  opacity: 0.55;
+  transition: opacity 160ms ease;
+}
+.gopher-midway .gopher-combo[data-live='true'] {
+  opacity: 1;
+}
+.gopher-midway .gopher-combo[data-broke='true'] {
+  animation: gopher-combo-shake 360ms ease-out 1;
+}
+.gopher-midway .gopher-combo-mult {
+  min-width: 52px;
+  text-align: center;
+  padding: 2px 8px;
+  border-radius: 8px;
+  font-family: var(--font-mono-arcade, ui-monospace, monospace);
+  font-weight: 900;
+  font-size: clamp(14px, 3.4vw, 18px);
+  font-variant-numeric: tabular-nums;
+  color: #2a1a08;
+  background: linear-gradient(180deg, #f7bd5e 0%, #e8a23c 60%, #c47c1f 100%);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.28),
+    0 2px 0 rgba(0, 0, 0, 0.4);
+  animation: gopher-combo-pulse 320ms ease-out 1;
+}
+.gopher-midway .gopher-combo-mult[data-max='true'] {
+  color: #fffaf0;
+  background: linear-gradient(180deg, #e2666a 0%, #c73538 60%, #7e2225 100%);
+}
+.gopher-midway .gopher-combo-track {
+  position: relative;
+  flex: 1;
+  height: 8px;
+  border-radius: 999px;
+  background: #120d08;
+  box-shadow:
+    inset 0 2px 3px rgba(0, 0, 0, 0.7),
+    inset 0 0 0 1px #0f0a06;
+  overflow: hidden;
+}
+.gopher-midway .gopher-combo-fill {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #6fd3c2 0%, #2bb2a0 60%, #1d8073 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  transition: width 120ms ease-out;
+}
+.gopher-midway .gopher-combo-streak {
+  font-family: var(--font-mono-arcade, ui-monospace, monospace);
+  font-variant-numeric: tabular-nums;
+  font-size: clamp(10px, 2.6vw, 13px);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  color: #e6d5b4;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.45);
+}
+
+@keyframes gopher-combo-pulse {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.18);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes gopher-combo-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-5px);
+  }
+  40% {
+    transform: translateX(4px);
+  }
+  60% {
+    transform: translateX(-3px);
+  }
+  80% {
+    transform: translateX(2px);
+  }
+}
+.gopher-midway .gopher-combo[data-broke='true'] .gopher-combo-mult {
+  animation: none;
+  background: linear-gradient(180deg, #8a4a4c 0%, #6e3335 60%, #4e2224 100%);
+  color: #f1b0b2;
+}
+
+/* ── The play field: a lacquered-wood cabinet panel holding the canvas ── */
+.gopher-midway .gopher-field {
+  position: relative;
+  margin-top: clamp(10px, 2.6%, 18px);
+  border-radius: var(--radius-well);
+  /* No padding: the canvas paints its own lacquered board edge-to-edge, so it
+     fills the field exactly (keeps the board centred — symmetric padding around
+     a narrower canvas was the source of the offset). The box-shadow frames it. */
+  padding: 0;
+  /* warm planked wood, hard bevel + offset shadow */
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.06) 0px,
+      rgba(0, 0, 0, 0.06) 1px,
+      transparent 1px,
+      transparent 7px
+    ),
+    linear-gradient(180deg, #6b4a2c 0%, #54381f 100%);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -5px 0 rgba(0, 0, 0, 0.36),
+    inset 0 0 0 2px var(--ink, #1c160d),
+    0 1px 0 var(--bevel-hi),
+    0 8px 0 var(--shadow-color),
+    0 14px 26px #00000066;
+}
+
+/* the canvas itself — recessed into the wood with a hard ink frame */
+.gopher-midway .gopher-canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-well);
+  box-shadow:
+    inset 0 0 0 2px #0f0a06,
+    0 2px 0 rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+  touch-action: none;
+}
+
+/* ── Overlay (idle / gameover / error) covering the whole field ── */
+.gopher-midway .gopher-overlay {
+  z-index: 4;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gopher-midway .gopher-timebar-fill {
+    transition: none;
+  }
+  .gopher-midway .gopher-combo[data-broke='true'] {
+    animation: none;
+  }
+  .gopher-midway .gopher-combo-mult {
+    animation: none;
+  }
+  .gopher-midway .gopher-combo-fill {
+    transition: none;
+  }
+  .gopher-midway .gopher-hud-stat[data-low='true'] b {
+    animation: none;
+  }
+}

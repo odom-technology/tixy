@@ -1,0 +1,265 @@
+/* Shared feedback pieces (tixy/r-kit): ticket counts and flights, the
+   daily cap notice, the toast frame, loading and empty states. Tokens only,
+   so they read under every theme and flip on an ink screen. Gabarito for
+   words, Big Shoulders for numbers, motion only when something happens. */
+
+/* ── tickets ──────────────────────────────────────────────────────── */
+
+.tx-ticket-count {
+  display: inline-flex;
+  transform-origin: center;
+}
+
+.tx-fly-stub {
+  --n: 5px;
+  position: fixed;
+  z-index: 130;
+  width: 46px;
+  height: 30px;
+  border-radius: 5px;
+  background: var(--tixy-ticket);
+  pointer-events: none;
+  -webkit-mask:
+    radial-gradient(circle var(--n) at 0 50%, #0000 97%, #000) 0 0 / 51% 100% no-repeat,
+    radial-gradient(circle var(--n) at 100% 50%, #0000 97%, #000) 100% 0 / 51% 100% no-repeat;
+  mask:
+    radial-gradient(circle var(--n) at 0 50%, #0000 97%, #000) 0 0 / 51% 100% no-repeat,
+    radial-gradient(circle var(--n) at 100% 50%, #0000 97%, #000) 100% 0 / 51% 100% no-repeat;
+}
+
+/* ── the daily cap ────────────────────────────────────────────────── */
+
+.tx-cap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 8px 12px 8px 8px;
+  border-radius: var(--tixy-radius-button);
+  background: var(--surface-panel);
+  color: var(--text-body);
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  line-height: 1.35;
+}
+
+.tx-cap .arc-ticket-stub {
+  flex: none;
+}
+
+/* ── the toast ────────────────────────────────────────────────────── */
+
+.tx-toast {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: min(20rem, calc(100vw - 1.5rem));
+  padding: 8px;
+  border-radius: var(--tixy-radius-panel-sm);
+  background: var(--surface-panel);
+  box-shadow: var(--tixy-shadow-lift);
+  color: var(--text-body);
+  font-family: var(--font-ui);
+}
+
+.tx-toast-body {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  align-items: center;
+  gap: 12px;
+  padding: 4px;
+  border-radius: var(--tixy-radius-button);
+  color: inherit;
+  text-decoration: none;
+}
+
+.tx-toast-body:focus-visible,
+.tx-toast-close:focus-visible {
+  outline: var(--focus-outline);
+  outline-offset: 2px;
+}
+
+.tx-toast-icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+}
+
+.tx-toast-text {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.tx-toast-title {
+  overflow: hidden;
+  color: var(--text-strong);
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tx-toast-line {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  line-height: 1.35;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.tx-toast-meta {
+  color: var(--text-strong);
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+.tx-toast-meta .arc-digits {
+  font-size: 1.125rem;
+}
+
+.tx-toast-close {
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  flex: none;
+  place-items: center;
+  border: 0;
+  border-radius: var(--tixy-radius-button);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.tx-toast-close:hover {
+  background: var(--surface-raised);
+  color: var(--text-strong);
+}
+
+/* One axis: in from the right, out the same way. Phones: up from the dock. */
+@media (prefers-reduced-motion: no-preference) {
+  .tx-toast.arc-toast[data-state='open'] {
+    animation: tx-toast-in var(--tixy-panel-slow) var(--tixy-ease-settle) both;
+  }
+
+  .tx-toast.arc-toast[data-state='closed'] {
+    animation: tx-toast-out var(--tixy-panel-fast) ease-in both;
+  }
+}
+
+@keyframes tx-toast-in {
+  from { opacity: 0; transform: translateX(28px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes tx-toast-out {
+  from { opacity: 1; transform: none; }
+  to { opacity: 0; transform: translateX(28px); }
+}
+
+@media (max-width: 639px) {
+  @keyframes tx-toast-in {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  @keyframes tx-toast-out {
+    from { opacity: 1; transform: none; }
+    to { opacity: 0; transform: translateY(20px); }
+  }
+}
+
+/* ── loading ──────────────────────────────────────────────────────── */
+
+.tx-loading {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-muted);
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+}
+
+.tx-loading[data-size='md'] {
+  font-size: 0.9375rem;
+}
+
+.tx-dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.tx-dots i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.55;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .tx-dots i {
+    animation: tx-dot 900ms var(--tixy-ease-settle) infinite;
+  }
+
+  .tx-dots i:nth-child(2) { animation-delay: 150ms; }
+  .tx-dots i:nth-child(3) { animation-delay: 300ms; }
+}
+
+@keyframes tx-dot {
+  0%, 60%, 100% { opacity: 0.3; transform: none; }
+  25% { opacity: 1; transform: translateY(-2px); }
+}
+
+/* ── empty ────────────────────────────────────────────────────────── */
+
+.tx-empty {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 20px;
+  border-radius: var(--tixy-radius-panel);
+  background: var(--surface-panel);
+  color: var(--text-body);
+  font-family: var(--font-ui);
+}
+
+.tx-empty-host {
+  flex: none;
+}
+
+.tx-empty-text {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.tx-empty-title {
+  margin: 0;
+  color: var(--text-strong);
+  font-size: 1.0625rem;
+  font-weight: 800;
+}
+
+.tx-empty-line {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.9375rem;
+}
+
+.tx-empty-action {
+  margin-top: 8px;
+}
+
+@media (max-width: 30rem) {
+  .tx-empty[data-host] {
+    flex-direction: column;
+    text-align: center;
+  }
+}

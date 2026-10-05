@@ -1,0 +1,163 @@
+/* The daily spin dialog (daily-spin.tsx). A full height sheet under 640 px,
+   a dialog above. Paper panel, the wheel in its ink cabinet. */
+
+.ds-root {
+  position: fixed;
+  inset: 0;
+  z-index: 100; /* over the dock (60), under flying stubs (130) */
+  display: grid;
+  place-items: center;
+  color: var(--tixy-ink);
+  font-family: var(--tixy-font-text);
+}
+.ds-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgb(31 26 22 / 0.55);
+  animation: ds-fade 180ms ease-out both;
+}
+.ds-panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: min(480px, calc(100vw - 32px));
+  max-height: calc(100dvh - 32px);
+  overflow: auto;
+  padding: 16px 18px 18px;
+  border-radius: var(--tixy-radius-panel-lg);
+  background: var(--tixy-paper);
+  box-shadow: var(--tixy-shadow-lift);
+  animation: ds-rise 180ms var(--tixy-ease-settle) both;
+  outline: none;
+}
+@keyframes ds-fade { from { opacity: 0; } }
+@keyframes ds-rise { from { opacity: 0; transform: translateY(14px); } }
+
+@media (max-width: 639px) {
+  .ds-root { place-items: stretch; }
+  .ds-panel {
+    width: 100%;
+    max-height: none;
+    height: 100dvh;
+    border-radius: 0;
+    padding: max(14px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom));
+    animation-name: ds-sheet;
+    animation-duration: 220ms;
+  }
+  /* The wheel sits in the middle of the screen, the head stays on top. */
+  .ds-panel > .ds-week { margin-top: auto; }
+  .ds-panel > .ds-foot { margin-bottom: auto; }
+  @keyframes ds-sheet { from { transform: translateY(100%); } }
+}
+
+.ds-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.ds-head h2 {
+  margin: 0 auto 0 0;
+  font-size: 22px;
+  font-weight: var(--tixy-weight-heading);
+  letter-spacing: var(--tixy-tracking-name);
+}
+.ds-balance { display: inline-flex; transform-origin: 70% 50%; }
+.ds-close {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-right: -8px;
+  border: 0;
+  border-radius: var(--tixy-radius-button);
+  background: transparent;
+  color: var(--tixy-ink-2);
+  cursor: pointer;
+}
+.ds-close:hover { background: var(--tixy-paper-2); color: var(--tixy-ink); }
+.ds-close:focus-visible { outline: 3px solid var(--tixy-ticket); outline-offset: 1px; }
+
+.ds-week {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.ds-week li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 6px 0 5px;
+  border-radius: 10px;
+  background: var(--tixy-paper-2);
+}
+.ds-week small {
+  font-size: 13px;
+  color: var(--tixy-ink-3);
+  white-space: nowrap;
+}
+.ds-week b { font-size: 21px; line-height: 1.05; }
+.ds-week li[data-day='done'] { background: var(--tixy-paper-3); }
+.ds-week li[data-day='done'] small { color: var(--tixy-ink-2); }
+.ds-week li[data-day='today'],
+.ds-week li[data-day='spun'] { background: var(--tixy-ticket); }
+.ds-week li[data-day='today'] small,
+.ds-week li[data-day='spun'] small { color: var(--tixy-ink); }
+
+.ds-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 14px;
+  min-height: 108px;
+  align-content: center;
+}
+.ds-foot p {
+  flex: 1 1 200px;
+  margin: 0;
+  font-size: 15px;
+  color: var(--tixy-ink-2);
+}
+.ds-foot .tx-btn { min-width: 112px; }
+.ds-foot .tx-btn:disabled { opacity: 0.45; }
+.ds-error { color: var(--tixy-red-text) !important; }
+
+.ds-result {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1 1 100%;
+  min-height: 50px;
+}
+.ds-base,
+.ds-mult {
+  font-family: var(--tixy-font-num);
+  font-weight: var(--tixy-weight-num);
+  font-size: 34px;
+  line-height: 1;
+}
+.ds-mult { color: var(--tixy-ink-2); }
+.ds-total { display: inline-flex; margin-left: auto; }
+.ds-total:empty { min-width: 1px; }
+.ds-result .ds-base,
+.ds-result .ds-mult { opacity: 0; }
+.ds-result[data-beat='1'] .ds-base,
+.ds-result[data-beat='2'] .ds-base,
+.ds-result[data-beat='3'] .ds-base,
+.ds-result[data-beat='2'] .ds-mult,
+.ds-result[data-beat='3'] .ds-mult {
+  opacity: 1;
+  animation: ds-stamp 240ms var(--tixy-ease-spring) both;
+}
+@keyframes ds-stamp { from { opacity: 0; transform: scale(1.5); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-overlay,
+  .ds-panel,
+  .ds-result span { animation: none !important; }
+}

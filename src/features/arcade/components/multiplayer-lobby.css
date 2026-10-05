@@ -1,0 +1,718 @@
+/* The board-game lobby (multiplayer-lobby.tsx), in the season page's
+   language (PLAN.md, "Design rules"): panels told apart by tone, cards on a
+   panel, numbers in Big Shoulders through <Num>, one clear primary action,
+   text at 15 px and up. No outlines, no pills, no labels over headings.
+   Motion only on a press; the reduced-motion catch-all in globals.css ends
+   every animation. */
+
+.ml {
+  display: grid;
+  gap: 16px;
+  font-family: var(--tixy-font-text, inherit);
+  color: var(--tixy-ink, #1f1a16);
+}
+
+.ml-grid {
+  display: grid;
+  gap: 16px;
+}
+
+@media (min-width: 64rem) {
+  .ml-grid {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    align-items: start;
+  }
+  .ml-wide {
+    grid-column: 1 / -1;
+  }
+}
+
+.ml-panel {
+  min-width: 0;
+  padding: 20px;
+  border-radius: var(--tixy-radius-panel-lg, 22px);
+  background: var(--tixy-paper-2, #eadfcb);
+  color: var(--tixy-ink, #1f1a16);
+}
+
+.ml-panel > h2 {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 4px 14px;
+  font-size: 1.375rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.ml-panel > h2 small {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--tixy-ink-2, #54483d);
+}
+
+/* ── the options: one row per choice, the word beside its segments ── */
+
+.ml-options {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.ml-choice {
+  display: grid;
+  grid-template-columns: 7rem minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.ml-choice-label {
+  padding: 0 4px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--tixy-ink-2, #54483d);
+}
+
+.ml-seg {
+  display: grid;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 12px;
+  background: var(--tixy-paper-3, #ded0b7);
+}
+
+.ml-seg > button {
+  display: inline-flex;
+  min-width: 0;
+  min-height: 44px;
+  align-items: baseline;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: var(--tixy-radius-button-sm, 8px);
+  background: transparent;
+  color: var(--tixy-ink, #1f1a16);
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 44px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color var(--tixy-panel-fast, 120ms) ease-out,
+    color var(--tixy-panel-fast, 120ms) ease-out,
+    transform var(--tixy-press-out, 90ms) ease-out;
+}
+
+.ml-seg > button:hover:not([aria-checked='true']) {
+  background: var(--tixy-paper-2, #eadfcb);
+}
+
+.ml-seg > button:active {
+  transform: scale(var(--tixy-press-scale, 0.96));
+  transition-duration: var(--tixy-press-in, 40ms);
+}
+
+.ml-seg > button:focus-visible {
+  outline: 3px solid var(--tixy-ticket, #f2a33c);
+  outline-offset: 1px;
+}
+
+.ml-seg > button[aria-checked='true'] {
+  background: var(--tixy-ink, #1f1a16);
+  color: var(--tixy-paper, #f4ebdc);
+  cursor: default;
+}
+
+/* A number beside a choice's word: a clock, a bot's rating. */
+.ml-seg-num {
+  font-size: 1.0625rem;
+  color: var(--tixy-ink-2, #54483d);
+}
+
+.ml-seg > button[aria-checked='true'] .ml-seg-num {
+  /* paper 80% over ink: on-ink 2 under the default, and still 4.5:1 on
+     the light ink fill of a dark scheme */
+  color: color-mix(in srgb, var(--tixy-paper, #f4ebdc) 80%, var(--tixy-ink, #1f1a16));
+}
+
+.ml-choice-note {
+  grid-column: 2;
+  margin: -2px 4px 0;
+  font-size: 0.9375rem;
+  color: var(--tixy-ink-2, #54483d);
+}
+
+@media (max-width: 30rem) {
+  .ml-choice {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+  }
+  .ml-choice-note {
+    grid-column: 1;
+  }
+  .ml-seg > button {
+    padding: 0 4px;
+    gap: 4px;
+  }
+}
+
+/* ── the actions: play now dominates, two quiet ones under it ── */
+
+.ml-go {
+  display: flex;
+  width: 100%;
+  min-height: 64px;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--tixy-ink, #1f1a16);
+  color: var(--tixy-paper, #f4ebdc);
+  font: inherit;
+  font-size: 1.375rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  transition:
+    filter var(--tixy-panel-fast, 120ms) ease-out,
+    transform var(--tixy-press-out, 90ms) ease-out;
+}
+
+.ml-go:hover:not(:disabled) {
+  filter: brightness(1.25);
+}
+
+.ml-go:active:not(:disabled) {
+  transform: translateY(1px) scale(var(--tixy-press-scale, 0.96));
+  transition-duration: var(--tixy-press-in, 40ms);
+}
+
+.ml-go:focus-visible {
+  outline: 3px solid var(--tixy-ticket, #f2a33c);
+  outline-offset: 2px;
+}
+
+.ml-go:disabled {
+  cursor: default;
+  opacity: 0.7;
+}
+
+.ml-more {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.ml-more > .arc-key {
+  justify-content: center;
+  min-height: 48px;
+  font-size: 1rem;
+}
+
+.ml-more > :only-child {
+  grid-column: 1 / -1;
+}
+
+/* Leaderboard, inventory and the rules: quiet, at the panel's foot. */
+.ml-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  margin: 12px -6px -6px;
+}
+
+.ml-links .arc-key {
+  min-height: 44px;
+  font-size: 0.9375rem;
+}
+
+.ml-rules {
+  margin: 8px 0 0;
+  padding: 14px 16px;
+  border-radius: var(--tixy-radius-panel-sm, 14px);
+  background: var(--tixy-paper, #f4ebdc);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.ml-rules p {
+  margin: 0;
+}
+
+.ml-rules p + p {
+  margin-top: 6px;
+}
+
+/* ── waiting in the queue: the clock, and a way out ── */
+
+.ml-queue {
+  display: grid;
+  gap: 10px;
+  padding: 12px 12px 12px 18px;
+  border-radius: 12px;
+  background: var(--tixy-paper, #f4ebdc);
+  color: var(--tixy-ink, #1f1a16);
+}
+
+.ml-queue-row {
+  display: flex;
+  min-height: 40px;
+  align-items: center;
+  gap: 14px;
+}
+
+.ml-queue-clock {
+  font-family: var(--tixy-font-num, inherit);
+  font-size: 2.5rem;
+  font-weight: var(--tixy-weight-num, 800);
+  line-height: 1;
+}
+
+.ml-queue-words {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.ml-queue-note {
+  margin: 0;
+  font-size: 0.9375rem;
+  color: var(--tixy-ink-2, #54483d);
+}
+
+/* The queue card on a paper card: its buttons take paper tokens. */
+.ml-queue .arc-key {
+  --key-face: var(--tixy-paper-3, #ded0b7);
+  --key-face-on: var(--tixy-ink, #1f1a16);
+  --key-face-edge: var(--tixy-paper-3, #ded0b7);
+  --key-face-hi: var(--tixy-paper-3, #ded0b7);
+  min-height: 44px;
+}
+
+/* ── your record: big numbers, a sentence when there are none ── */
+
+.ml-rating {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 12px;
+  margin: 0 4px;
+}
+
+.ml-rating-num {
+  font-family: var(--tixy-font-num, inherit);
+  font-size: 72px;
+  font-weight: var(--tixy-weight-num, 800);
+  line-height: 0.9;
+}
+
+.ml-rating-word {
+  font-size: 1rem;
+  color: var(--tixy-ink-2, #54483d);
+}
+
+.ml-rating-word .arc-digits {
+  font-size: 1.35em;
+  line-height: 1;
+  color: var(--tixy-ink, #1f1a16);
+}
+
+.ml-sub {
+  margin: 12px 4px 0;
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  color: var(--tixy-ink-2, #54483d);
+}
+
+.ml-sub .arc-digits {
+  font-size: 1.3em;
+  line-height: 1;
+  color: var(--tixy-ink, #1f1a16);
+}
+
+.ml-nums {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(5.5rem, 1fr));
+  gap: 8px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ml-nums > li {
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+  border-radius: var(--tixy-radius-panel-sm, 14px);
+  background: var(--tixy-paper, #f4ebdc);
+}
+
+.ml-num {
+  font-family: var(--tixy-font-num, inherit);
+  font-size: 2.5rem;
+  font-weight: var(--tixy-weight-num, 800);
+  line-height: 1;
+}
+
+.ml-nums small {
+  font-size: 0.9375rem;
+  color: var(--tixy-ink-2, #54483d);
+}
+
+.ml-chart {
+  margin-top: 16px;
+  padding: 12px 14px 6px;
+  border-radius: var(--tixy-radius-panel-sm, 14px);
+  background: var(--tixy-paper, #f4ebdc);
+}
+
+/* ── lists: your games, open games, live, recent ── */
+
+.ml-section + .ml-section {
+  margin-top: 18px;
+}
+
+.ml-section > h3 {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 4px 4px;
+  font-size: 1.0625rem;
+  font-weight: 800;
+}
+
+.ml-section > h3 > button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.ml-section > h3 > button:focus-visible {
+  outline: 3px solid var(--tixy-ticket, #f2a33c);
+  outline-offset: 2px;
+}
+
+.ml-section > h3 .arc-digits {
+  font-size: 1.2em;
+  color: var(--tixy-ink-2, #54483d);
+}
+
+.ml-section > h3 svg {
+  transition: transform var(--tixy-panel-fast, 120ms) ease-out;
+}
+
+.ml-section > h3 [aria-expanded='true'] svg {
+  transform: rotate(180deg);
+}
+
+.ml-list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border-radius: var(--tixy-radius-panel-sm, 14px);
+  background: var(--tixy-paper, #f4ebdc);
+  list-style: none;
+}
+
+.ml-list[data-scroll] {
+  max-height: 28rem;
+  overflow-y: auto;
+}
+
+.ml-list > li {
+  display: flex;
+  min-height: 60px;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px 10px 16px;
+}
+
+.ml-list > li + li {
+  border-top: 1px solid var(--tixy-paper-3, #ded0b7);
+}
+
+.ml-row-main {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+  gap: 2px;
+  color: inherit;
+  text-decoration: none;
+}
+
+a.ml-row-main:hover strong {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+a.ml-row-main:focus-visible {
+  outline: 3px solid var(--tixy-ticket, #f2a33c);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+.ml-row-main strong {
+  overflow: hidden;
+  font-size: 1rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ml-row-main small {
+  font-size: 0.9375rem;
+  color: var(--tixy-ink-2, #54483d);
+}
+
+.ml-row-main small .arc-digits {
+  font-size: 1.2em;
+  line-height: 1;
+}
+
+.ml-row-state {
+  font-weight: 700;
+  color: var(--tixy-ink, #1f1a16);
+}
+
+.ml-row-state[data-tone='turn'],
+.ml-row-state[data-tone='lost'] {
+  color: var(--tixy-red-text, #9a2d20);
+}
+
+.ml-list .arc-key {
+  flex: none;
+  min-height: 40px;
+}
+
+.ml-empty {
+  margin: 0 4px;
+  font-size: 1rem;
+  color: var(--tixy-ink-2, #54483d);
+}
+
+.ml-panel > .ml-empty:only-child {
+  margin: 0;
+}
+
+/* Guests: one line where the record and the lists would be. */
+.ml-panel .arc-signin-line {
+  padding: 0 4px;
+  font-size: 1rem;
+}
+
+/* ── a banner: an incoming challenge, an error ── */
+
+.ml-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 16px;
+  padding: 16px 16px 16px 20px;
+  border-radius: var(--tixy-radius-panel, 18px);
+  background: var(--tixy-paper-3, #ded0b7);
+  color: var(--tixy-ink, #1f1a16);
+}
+
+.ml-banner > p {
+  flex: 1 1 16rem;
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.ml-banner > p strong {
+  display: block;
+  font-size: 1.0625rem;
+}
+
+.ml-banner > p small {
+  font-size: 0.9375rem;
+  color: var(--tixy-ink-2, #54483d);
+}
+
+.ml-banner[data-tone='error'] > p {
+  color: var(--tixy-red-text, #9a2d20);
+}
+
+.ml-banner-actions {
+  display: flex;
+  flex: none;
+  gap: 8px;
+}
+
+.ml-banner .arc-key {
+  min-height: 44px;
+}
+
+/* ── the dialogs: practice, challenge ── */
+
+.ml-dialog {
+  display: grid;
+  gap: 14px;
+  font-size: 1rem;
+  color: var(--tixy-ink, #1f1a16);
+}
+
+.ml-dialog > p,
+.ml-card > p {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  color: var(--tixy-ink-2, #54483d);
+}
+
+.ml-dialog .ml-error,
+.ml-card .ml-error {
+  color: var(--tixy-red-text, #9a2d20);
+}
+
+.ml-dialog > .arc-key,
+.ml-card > .arc-key {
+  justify-content: center;
+  width: 100%;
+}
+
+/* A card in a dialog: paper on the dialog's paper 2. */
+.ml-card {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border-radius: var(--tixy-radius-panel-sm, 14px);
+  background: var(--tixy-paper, #f4ebdc);
+}
+
+.ml-card > h3 {
+  display: flex;
+  min-height: 32px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0;
+  font-size: 1.0625rem;
+  font-weight: 800;
+}
+
+.ml-field {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+}
+
+.ml-field .arc-key {
+  min-height: 44px;
+}
+
+.ml-field input,
+.ml-field select,
+.ml-card input,
+.ml-card select {
+  min-height: 44px;
+  font-size: 1rem;
+}
+
+.ml-code {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 12px;
+  background: var(--tixy-paper-2, #eadfcb);
+}
+
+.ml-code-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.ml-code-value {
+  font-family: var(--tixy-font-num, inherit);
+  font-size: 2rem;
+  font-weight: var(--tixy-weight-num, 800);
+  letter-spacing: 0.08em;
+  line-height: 1;
+}
+
+.ml-check {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ml-check input {
+  width: 20px;
+  height: 20px;
+  min-height: 0;
+  accent-color: var(--tixy-ink, #1f1a16);
+}
+
+@media (pointer: coarse) {
+  .ml-list .arc-key,
+  .ml-links .arc-key {
+    min-height: 44px;
+  }
+}
+
+/* ── a lobby's tabs (chess: play, puzzles): the chosen one is ink ── */
+
+.ml-tabs {
+  display: flex;
+  gap: 4px;
+  font-family: var(--tixy-font-text, inherit);
+}
+
+.ml-tabs > * {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  padding: 0 18px;
+  border-radius: var(--tixy-radius-button, 10px);
+  color: var(--tixy-ink-2, #54483d);
+  font-size: 1rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background-color var(--tixy-panel-fast, 120ms) ease-out;
+}
+
+.ml-tabs > a:hover {
+  background: var(--tixy-paper-3, #ded0b7);
+  color: var(--tixy-ink, #1f1a16);
+}
+
+.ml-tabs > a:focus-visible {
+  outline: 3px solid var(--tixy-ticket, #f2a33c);
+  outline-offset: 2px;
+}
+
+.ml-tabs > [aria-current] {
+  background: var(--tixy-ink, #1f1a16);
+  color: var(--tixy-paper, #f4ebdc);
+}

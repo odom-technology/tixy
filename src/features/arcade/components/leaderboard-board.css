@@ -1,0 +1,327 @@
+/* The board: one leaderboard design for every game. leaderboard-board.tsx.
+   Rank and the scores around you first, then the top. Paper ground, ink
+   text, your row in ticket, numbers in Big Shoulders. The tixy brand tokens
+   are defined under every theme, so the board reads the same everywhere.
+   In the components layer so a call site's own utilities still win. */
+@layer components {
+  .arc-board {
+    --board-pad: 0px;
+    display: grid;
+    gap: 14px;
+    padding: var(--board-pad);
+    background: var(--tixy-paper);
+    color: var(--tixy-ink);
+    font-family: var(--tixy-font-text);
+  }
+
+  /* ── Tabs: one button shape, ink when picked, paper 3 otherwise ──── */
+  .arc-board-nav {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    display: grid;
+    gap: 6px;
+    margin: 0 calc(-1 * var(--board-sticky-bleed, 0px));
+    padding: 0 var(--board-sticky-bleed, 0px) 2px;
+    background: var(--tixy-paper);
+  }
+  .arc-board-nav:empty {
+    display: none;
+  }
+  .arc-board-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .arc-board-tab {
+    flex: none;
+    min-height: 40px;
+    padding: 0 14px;
+    border: 0;
+    border-radius: var(--tixy-radius-button);
+    background: var(--tixy-paper-3);
+    color: var(--tixy-ink);
+    font: inherit;
+    font-size: 0.9375rem;
+    font-weight: var(--tixy-weight-button);
+    line-height: 1;
+    text-transform: lowercase;
+    cursor: pointer;
+    transition: transform var(--tixy-press-out) ease-out;
+  }
+  .arc-board-tab:active {
+    transform: translateY(1px) scale(var(--tixy-press-scale));
+    transition-duration: var(--tixy-press-in);
+  }
+  .arc-board-tab[aria-selected='true'] {
+    background: var(--tixy-ink);
+    color: var(--tixy-paper);
+  }
+  .arc-board-tab:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+  .arc-board-tab:focus-visible,
+  .arc-board-more:focus-visible,
+  .arc-board-row:is(a):focus-visible {
+    outline: 2px solid var(--tixy-ink);
+    outline-offset: 2px;
+  }
+
+  /* ── You: rank, your score, the gap to the next rank ─────────────── */
+  .arc-board-you {
+    display: grid;
+    grid-template-columns: repeat(var(--cols, 2), minmax(0, 1fr));
+    gap: 8px;
+  }
+  .arc-board-you > div {
+    min-width: 0;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: var(--tixy-paper-2);
+  }
+  .arc-board-you b {
+    display: block;
+    overflow: hidden;
+    font-family: var(--tixy-font-num);
+    font-size: 1.875rem;
+    font-weight: var(--tixy-weight-num);
+    line-height: 1.05;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .arc-board-you small {
+    font-size: var(--text-xs, 0.75rem);
+    color: var(--tixy-ink-2);
+  }
+  .arc-board-note {
+    margin: 0;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: var(--tixy-paper-2);
+    color: var(--tixy-ink-2);
+    font-size: 0.9375rem;
+  }
+
+  /* ── Lists ───────────────────────────────────────────────────────── */
+  .arc-board-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .arc-board-title {
+    margin: 0 0 2px;
+    font-size: 0.9375rem;
+    font-weight: var(--tixy-weight-button);
+    color: var(--tixy-ink-2);
+  }
+  .arc-board-list > li + li {
+    border-top: 1px solid rgb(31 26 22 / 0.12);
+  }
+  .arc-board-list > li:has(+ li[data-you]),
+  .arc-board-list > li[data-you] + li {
+    border-top-color: transparent;
+  }
+  .arc-board-row {
+    display: grid;
+    grid-template-columns: 2.5rem 36px minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: 10px;
+    min-height: 56px;
+    padding: 6px 4px;
+    color: inherit;
+    text-decoration: none;
+  }
+  .arc-board-row[data-you] {
+    margin-inline: -8px;
+    padding-inline: 12px 12px;
+    border-radius: 12px;
+    background: var(--tixy-ticket);
+  }
+  .arc-board-rank {
+    font-family: var(--tixy-font-num);
+    font-size: 1.375rem;
+    font-weight: var(--tixy-weight-num);
+    line-height: 1;
+    color: var(--tixy-ink-2);
+    text-align: center;
+  }
+  .arc-board-row[data-you] .arc-board-rank {
+    color: var(--tixy-ink);
+  }
+  .arc-board-avatar {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    overflow: hidden;
+  }
+  .arc-board-who {
+    min-width: 0;
+  }
+  .arc-board-name {
+    overflow: hidden;
+    font-weight: var(--tixy-weight-button);
+    line-height: 1.2;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .arc-board-sub {
+    overflow: hidden;
+    font-size: 0.8125rem;
+    line-height: 1.25;
+    color: var(--tixy-ink-2);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .arc-board-row[data-you] .arc-board-sub {
+    color: var(--tixy-ink);
+  }
+  .arc-board-score {
+    font-family: var(--tixy-font-num);
+    font-size: 1.625rem;
+    font-weight: var(--tixy-weight-num);
+    line-height: 1;
+    text-align: right;
+    white-space: nowrap;
+  }
+  .arc-board-more {
+    min-height: 44px;
+    width: 100%;
+    border: 0;
+    border-radius: var(--tixy-radius-button);
+    background: var(--tixy-paper-3);
+    color: var(--tixy-ink);
+    font: inherit;
+    font-weight: var(--tixy-weight-button);
+    cursor: pointer;
+  }
+
+  /* ── Empty and loading ───────────────────────────────────────────── */
+  .arc-board-empty {
+    display: grid;
+    justify-items: center;
+    gap: 10px;
+    padding: 18px 0 8px;
+    text-align: center;
+  }
+  .arc-board-empty p {
+    margin: 0;
+    font-size: 1rem;
+    color: var(--tixy-ink-2);
+  }
+  .arc-board-skeleton {
+    display: grid;
+    gap: 8px;
+  }
+  .arc-board-skeleton > span {
+    height: 48px;
+    border-radius: 12px;
+    background: var(--tixy-paper-2);
+  }
+  .arc-board[aria-busy='true'] .arc-board-body {
+    opacity: 0.5;
+  }
+
+  /* ── The modal: a sheet on phones, a card from 640 px ────────────── */
+  .arc-board-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    background: rgb(31 26 22 / 0.55);
+  }
+  .arc-board-sheet {
+    display: flex;
+    flex-direction: column;
+    width: min(100%, 30rem);
+    max-height: min(88dvh, 46rem);
+    border-radius: var(--tixy-radius-panel-lg) var(--tixy-radius-panel-lg) 0 0;
+    background: var(--tixy-paper);
+    color: var(--tixy-ink);
+    box-shadow: var(--tixy-shadow-lift);
+    font-family: var(--tixy-font-text);
+    outline: none;
+  }
+  @media (min-width: 40rem) {
+    .arc-board-overlay {
+      align-items: center;
+      padding: 1.5rem;
+    }
+    .arc-board-sheet {
+      border-radius: var(--tixy-radius-panel-lg);
+    }
+  }
+  .arc-board-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 20px 20px 12px;
+  }
+  .arc-board-head h2 {
+    min-width: 0;
+    margin: 0;
+    overflow: hidden;
+    font-size: 1.875rem;
+    font-weight: var(--tixy-weight-wordmark);
+    letter-spacing: var(--tixy-tracking-name);
+    line-height: 1;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .arc-board-close {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    border-radius: var(--tixy-radius-button);
+    background: var(--tixy-paper-3);
+    color: var(--tixy-ink);
+    cursor: pointer;
+    transition: transform var(--tixy-press-out) ease-out;
+  }
+  .arc-board-close:active {
+    transform: translateY(1px) scale(var(--tixy-press-scale));
+    transition-duration: var(--tixy-press-in);
+  }
+  .arc-board-close:focus-visible {
+    outline: 2px solid var(--tixy-ink);
+    outline-offset: 2px;
+  }
+  /* The modal scrolls as one, so the tabs stick to its top. Anything a game
+     puts above its board (a mode picker) scrolls away. */
+  .arc-board-scroll {
+    --board-sticky-bleed: 20px;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 4px 20px calc(20px + env(safe-area-inset-bottom));
+  }
+  .arc-board-sheet .arc-board {
+    gap: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .arc-board-overlay {
+    animation: arc-board-fade 120ms ease-out both;
+  }
+  .arc-board-sheet {
+    animation: arc-board-rise 180ms var(--tixy-ease-settle) both;
+  }
+}
+@keyframes arc-board-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes arc-board-rise {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: none; }
+}

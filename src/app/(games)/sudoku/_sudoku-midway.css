@@ -1,0 +1,325 @@
+/* ──────────────────────────────────────────────────────────────────────
+   SUDOKU — Midway scoped polish. Namespaced under .sudoku-midway so it can't
+   leak into other games or shells. Warm lacquered-wood cabinet, cream keycap
+   cells, enamel number keypad. HARD bevels + offset shadows; NOTHING GLOWS.
+   The 9×9 board + keypad fill the wide stage and are touch + keyboard friendly.
+   Decorative motion (cell-pop on fill, error shake) degrades under
+   prefers-reduced-motion to a static state.
+   ────────────────────────────────────────────────────────────────────── */
+
+/* The board cabinet — a recessed ink frame holding the cream grid. The 3×3
+   box rules are painted by thick ink borders on the cells (see below); the
+   outer frame supplies the deep bevel + offset drop so the whole board reads
+   as a physical plate set into the cabinet. */
+.sudoku-midway .sudoku-board {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  grid-template-rows: repeat(9, 1fr);
+  /* hairline gaps between cells; thicker ink shows through at box edges. */
+  gap: 1px;
+  padding: 4px;
+  background: var(--sk-board-bg, var(--ink, #1c160d));
+  border-radius: var(--radius-well, 12px);
+  box-shadow:
+    inset 0 2px 6px rgba(0, 0, 0, 0.6),
+    inset 0 0 0 2px var(--sk-box-border, #0f0a06),
+    0 1px 0 var(--bevel-hi, #fffdf6),
+    0 6px 0 var(--shadow-color, #00000055),
+    0 10px 24px rgba(0, 0, 0, 0.45);
+  touch-action: manipulation;
+  user-select: none;
+}
+
+/* A single cell — a small cream keycap. Givens are darker engraved chips;
+   player entries are amber ink; notes are a tiny 3×3 pencil grid. */
+.sudoku-midway .sudoku-cell {
+  position: relative;
+  appearance: none;
+  margin: 0;
+  padding: 0;
+  border: none;
+  display: grid;
+  place-items: center;
+  background: var(--sk-cell-bg, linear-gradient(180deg, #f6eddc 0%, #ece0c6 100%));
+  color: var(--ink, #1c160d);
+  font-family: var(--sk-font, var(--font-mono-arcade, ui-monospace, monospace));
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  outline: none;
+  /* hard keycap bevel: top hi-light, bottom shade, thin ink seam. */
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.55),
+    inset 0 -3px 3px rgba(0, 0, 0, 0.18),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.14);
+  /* font-size scales with the board; clamp keeps digits legible on phones. */
+  font-size: clamp(15px, 4.4vw, 30px);
+  transition:
+    background-color 90ms ease,
+    box-shadow 90ms ease,
+    transform 80ms ease;
+}
+
+/* Thick ink rules between the 3×3 boxes — drawn as extra margins on the cells
+   at box boundaries so the grouping reads instantly. Columns 3 & 6 get a left
+   rule; rows 3 & 6 get a top rule. */
+.sudoku-midway .sudoku-cell[data-box-left] {
+  margin-left: 2px;
+}
+.sudoku-midway .sudoku-cell[data-box-top] {
+  margin-top: 2px;
+}
+
+/* Given (clue) cells — engraved into the cabinet: a slightly darker, flatter
+   chip with stronger ink so they read as fixed. */
+.sudoku-midway .sudoku-cell[data-given] {
+  background: var(--sk-given-cell-bg, linear-gradient(180deg, #e7dabd 0%, #d8c8a6 100%));
+  color: var(--sk-given-digit, #14100a);
+  font-weight: 700;
+  cursor: default;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.26),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.2);
+}
+
+/* Player-entered digits — amber enamel ink (tickets enamel). */
+.sudoku-midway .sudoku-cell[data-entry]:not([data-given]) {
+  color: var(--sk-entered-digit, var(--enamel-tickets, #b46b16));
+}
+
+/* Tactile press on a playable (non-given) keycap — the cell dips into the
+   cabinet on tap/click, matching the keypad's travel. Givens are fixed and
+   don't move. Subtle, no glow. */
+.sudoku-midway .sudoku-cell:not([data-given]):active {
+  transform: translateY(1px);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.42),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.26),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.18);
+}
+
+/* Selected cell — amber enamel keycap, pressed slightly. The trailing
+   --sk-selected-glow layer is transparent by default (renders nothing); the
+   optional accent-slot glow effect sets it to a color. */
+.sudoku-midway .sudoku-cell[data-selected] {
+  background: var(--sk-selected-cell, linear-gradient(180deg, #f7d79a 0%, #f0bf6a 100%));
+  transform: translateY(1px);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -3px 4px rgba(0, 0, 0, 0.28),
+    inset 0 0 0 2px var(--sk-accent, var(--enamel-tickets-edge, #9a621a)),
+    0 0 14px 2px var(--sk-selected-glow, transparent);
+  z-index: 2;
+}
+
+/* Peers (same row / col / box as the selection) — a calm warm wash so the
+   constraint lines are visible without shouting. */
+.sudoku-midway .sudoku-cell[data-peer]:not([data-selected]) {
+  background: var(--sk-peer-highlight, linear-gradient(180deg, #f1e6cd 0%, #e3d4b3 100%));
+}
+
+/* Same-number highlight — cells holding the same digit as the selected value
+   get a teal seam so you can scan the board. */
+.sudoku-midway .sudoku-cell[data-same]:not([data-selected]) {
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -3px 3px rgba(0, 0, 0, 0.18),
+    inset 0 0 0 2px var(--sk-accent, var(--enamel-prize, #2fb8a6));
+}
+
+/* Conflict — a duplicate in a row/col/box — flips the digit to danger red
+   and tints the keycap. */
+.sudoku-midway .sudoku-cell[data-conflict] {
+  color: var(--sk-conflict, var(--enamel-primary, #c73538)) !important;
+  background: linear-gradient(180deg, #f3d9cf 0%, #e8bdaf 100%);
+}
+
+/* Keyboard focus ring — on-theme, no glow. */
+.sudoku-midway .sudoku-cell:focus-visible {
+  box-shadow:
+    inset 0 0 0 3px var(--bevel-hi, #fffdf6),
+    inset 0 0 0 4px var(--sk-accent, var(--enamel-tickets-edge, #9a621a)),
+    inset 0 2px 0 rgba(255, 255, 255, 0.5);
+  z-index: 3;
+}
+
+/* A freshly-entered digit gives a tiny pop (decorative). */
+.sudoku-midway .sudoku-cell[data-pop] .sudoku-cell-value {
+  animation: sudoku-pop 180ms ease-out;
+}
+@keyframes sudoku-pop {
+  0% {
+    transform: scale(0.55);
+    opacity: 0.4;
+  }
+  70% {
+    transform: scale(1.12);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.sudoku-midway .sudoku-cell-value {
+  display: block;
+}
+
+/* Pencil-mark notes: a 3×3 micro-grid of candidate digits inside an empty
+   cell. Tiny, muted ink. */
+.sudoku-midway .sudoku-notes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  width: 100%;
+  height: 100%;
+  padding: 6%;
+}
+.sudoku-midway .sudoku-note {
+  display: grid;
+  place-items: center;
+  font-size: clamp(6px, 1.7vw, 11px);
+  font-weight: 600;
+  line-height: 1;
+  color: #7c6a45;
+}
+
+/* ── Number keypad ─────────────────────────────────────────────────────
+   A row/grid of cream enamel keys (1-9) plus erase + notes toggle. Each is a
+   real beveled key with travel. Fills the stage width; large hit targets. */
+.sudoku-midway .sudoku-keypad {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  gap: clamp(4px, 1.2vw, 8px);
+}
+@media (max-width: 460px) {
+  /* On narrow phones, wrap the digits 5 + 4 so keys stay tappable. */
+  .sudoku-midway .sudoku-keypad {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+.sudoku-midway .sudoku-key {
+  position: relative;
+  appearance: none;
+  border: none;
+  margin: 0;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1 / 1;
+  border-radius: clamp(8px, 1.8vw, 14px);
+  background: linear-gradient(180deg, #fbf3e3 0%, #ece0c6 100%);
+  color: var(--ink, #1c160d);
+  font-family: var(--sk-font, var(--font-mono-arcade, ui-monospace, monospace));
+  font-weight: 700;
+  font-size: clamp(16px, 4vw, 26px);
+  cursor: pointer;
+  outline: none;
+  touch-action: manipulation;
+  box-shadow:
+    inset 0 3px 0 rgba(255, 255, 255, 0.6),
+    inset 0 -4px 4px rgba(0, 0, 0, 0.22),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.18),
+    0 4px 0 var(--shadow-color, rgba(0, 0, 0, 0.4));
+  transition:
+    transform 80ms ease,
+    box-shadow 80ms ease,
+    background-color 90ms ease;
+}
+.sudoku-midway .sudoku-key:active,
+.sudoku-midway .sudoku-key[data-pressed] {
+  transform: translateY(3px);
+  box-shadow:
+    inset 0 3px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.3),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.2),
+    0 1px 0 var(--shadow-color, rgba(0, 0, 0, 0.4));
+}
+.sudoku-midway .sudoku-key:not([data-disabled]):hover {
+  background: linear-gradient(180deg, #fdf7ea 0%, #f1e6cd 100%);
+}
+
+/* A small "remaining" count under each digit key (how many of that digit are
+   left to place). Muted ink; hidden when the digit is exhausted. */
+.sudoku-midway .sudoku-key-count {
+  position: absolute;
+  bottom: 6%;
+  right: 8%;
+  font-size: clamp(7px, 1.6vw, 11px);
+  font-weight: 600;
+  color: #8a7752;
+}
+.sudoku-midway .sudoku-key[data-exhausted] {
+  color: #b0a384;
+  cursor: default;
+}
+.sudoku-midway .sudoku-key[data-exhausted] .sudoku-key-count {
+  opacity: 0;
+}
+
+/* Utility keys (erase, notes) read as enamel tools, not cream digits. */
+.sudoku-midway .sudoku-tool {
+  border-radius: clamp(8px, 1.8vw, 14px);
+}
+.sudoku-midway .sudoku-tool[data-on] {
+  background: linear-gradient(180deg, #5fd0c0 0%, #2fb8a6 100%);
+  color: #07221d;
+  box-shadow:
+    inset 0 3px 0 rgba(255, 255, 255, 0.45),
+    inset 0 -3px 4px rgba(0, 0, 0, 0.3),
+    inset 0 0 0 2px var(--enamel-prize-edge, #1b7466),
+    0 2px 0 var(--shadow-color, rgba(0, 0, 0, 0.4));
+  transform: translateY(2px);
+}
+
+/* The board "well" frame element (wraps the board so the cabinet sheen sits
+   above the cells but below overlays). */
+.sudoku-midway .sudoku-stage {
+  position: relative;
+}
+.sudoku-midway .sudoku-stage::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  border-radius: var(--radius-well, 12px);
+  background: linear-gradient(155deg, #ffffff10 0%, #ffffff04 24%, transparent 48%);
+  mix-blend-mode: screen;
+}
+
+.sudoku-midway .sudoku-overlay {
+  z-index: 4;
+}
+
+/* Board-level error shake when a finished board is wrong. */
+.sudoku-midway .sudoku-board[data-shake] {
+  animation: sudoku-shake 320ms ease-in-out;
+}
+@keyframes sudoku-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sudoku-midway .sudoku-cell,
+  .sudoku-midway .sudoku-key {
+    transition: none;
+  }
+  .sudoku-midway .sudoku-cell[data-pop] .sudoku-cell-value {
+    animation: none;
+  }
+  .sudoku-midway .sudoku-board[data-shake] {
+    animation: none;
+  }
+  .sudoku-midway .sudoku-stage::after {
+    background: linear-gradient(155deg, #ffffff0a 0%, transparent 48%);
+  }
+}

@@ -1,0 +1,1200 @@
+/* The tixy home (docs/design/tixy-rebrand/PLAN.md, "Layout"; mockup.html,
+   "Home, signed in, 1280 wide"). Only rendered under the tixy theme, so
+   everything is scoped to .tx-home. Colours are the six tixy tokens; game art
+   (the table, the posters) can use any. Motion only on a press, a pointer, a
+   claim or an arriving request; the reduced-motion catch-all in globals.css
+   takes every animation to its end. */
+
+.tx-home {
+  --tx-felt: var(--tixy-felt);
+  --tx-rail: var(--tixy-rail);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 20px;
+  padding-block: 6px 32px;
+  color: var(--tixy-ink);
+  font-family: var(--tixy-font-text);
+}
+
+/* The lead (the table, the quests under it) and the rail are two stacks.
+   The rail stretches to the lead's height and the season card takes what is
+   left, so both columns end on one line. Below 64rem the lead dissolves into
+   the page and the quests follow the rail. */
+.tx-lead { display: contents; }
+.tx-home > .tx-floor,
+.tx-home > .tx-counter { order: 2; }
+.tx-lead > .tx-quests { order: 1; }
+
+@media (min-width: 64rem) {
+  .tx-home {
+    grid-template-columns: minmax(0, 1fr) 330px;
+    align-items: start;
+  }
+  .tx-lead {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    gap: 20px;
+    min-width: 0;
+  }
+  .tx-home > .tx-lead,
+  .tx-home > .tx-rail { align-self: stretch; }
+  /* When the rail is the taller column, the quest cards take the extra
+     (below their content; see .tx-q). */
+  .tx-lead > .tx-quests { display: flex; flex-direction: column; }
+  .tx-lead > .tx-quests > .tx-qs { flex: 1; }
+  .tx-home > .tx-floor,
+  .tx-home > .tx-counter {
+    grid-column: 1 / -1;
+  }
+}
+
+.tx-num {
+  font-family: var(--tixy-font-num);
+  font-weight: var(--tixy-weight-num);
+  letter-spacing: var(--tixy-tracking-num);
+}
+
+/* ── buttons on the felt and on the counter ───────────────────────────── */
+
+.tx-btn {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: var(--tixy-radius-button);
+  background: var(--tixy-ink);
+  color: var(--tixy-paper);
+  font: var(--tixy-weight-button) 1rem/1 var(--tixy-font-text);
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    transform var(--tixy-press-out) ease-out,
+    filter var(--tixy-panel-fast) ease-out,
+    background-color var(--tixy-panel-fast) ease-out;
+}
+.tx-btn:hover { filter: brightness(1.18); }
+.tx-btn:active {
+  transform: translateY(1px) scale(var(--tixy-press-scale));
+  transition-duration: var(--tixy-press-in);
+}
+.tx-btn:focus-visible {
+  outline: 3px solid var(--tixy-ticket);
+  outline-offset: 3px;
+}
+.tx-btn:disabled { cursor: default; filter: none; }
+.tx-btn[data-tone='paper'] { background: var(--tixy-paper); color: var(--tixy-ink); }
+.tx-btn[data-tone='paper']:hover,
+.tx-btn[data-tone='quiet']:hover { filter: brightness(0.95); }
+.tx-btn[data-tone='quiet'] { background: var(--tixy-paper-3); color: var(--tixy-ink); }
+.tx-btn[data-tone='on-dark'] { background: rgb(244 235 220 / 0.14); color: var(--tixy-paper); }
+.tx-btn[data-size='sm'] {
+  min-height: 34px;
+  padding: 0 13px;
+  font-size: 0.875rem;
+  border-radius: var(--tixy-radius-button-sm);
+}
+
+/* ── 8-ball, the flagship ─────────────────────────────────────────────── */
+
+.tx-table {
+  position: relative;
+  border-radius: 22px;
+  overflow: hidden;
+  background: var(--tx-rail);
+  isolation: isolate;
+}
+.tx-table-art {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.tx-table-art[data-shape='phone'] { display: none; }
+@media (max-width: 39.999rem) {
+  .tx-table-art[data-shape='wide'] { display: none; }
+  .tx-table-art[data-shape='phone'] { display: block; }
+}
+.tx-table .tx-cue {
+  transition: transform 420ms var(--tixy-ease-settle);
+}
+.tx-table:hover .tx-cue {
+  transform: translate(calc(var(--ux) * -18px), calc(var(--uy) * -18px));
+}
+.tx-table:hover .tx-aim {
+  animation: tx-march 700ms linear infinite;
+}
+@keyframes tx-march { to { stroke-dashoffset: -13; } }
+
+.tx-table-copy {
+  position: absolute;
+  left: clamp(26px, 5.2%, 58px);
+  bottom: clamp(22px, 9%, 50px);
+  right: 16px;
+  color: var(--tixy-paper);
+}
+.tx-table-copy h2 {
+  margin: 0;
+  font-size: clamp(44px, 6.4vw, 76px);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 0.9;
+}
+.tx-table-copy h2 a { color: inherit; text-decoration: none; }
+.tx-table-copy h2 a:focus-visible { outline: 3px solid var(--tixy-ticket); outline-offset: 4px; border-radius: 6px; }
+.tx-table-line {
+  margin: 12px 0 18px;
+  max-width: 34rem;
+  font-size: 17px;
+  line-height: 1.35;
+  color: rgb(244 235 220 / 0.9);
+}
+.tx-table-line .tx-num { font-size: 1.1em; }
+.tx-table-btns { display: flex; flex-wrap: wrap; gap: 10px; }
+@media (max-width: 39.999rem) {
+  .tx-table-line { margin: 6px 0 12px; font-size: 15px; max-width: 62%; }
+  /* One sentence on a phone, so the line stays clear of the rack. */
+  .tx-table-line > span + span { display: none; }
+  .tx-table-btns { gap: 8px; }
+  .tx-table-btns .tx-btn { min-height: 36px; padding: 0 13px; font-size: 0.9375rem; border-radius: var(--tixy-radius-button-sm); }
+}
+
+/* The challenge picker: a paper panel over the table, one axis in. */
+.tx-picker {
+  position: absolute;
+  z-index: 2;
+  left: clamp(16px, 5.2%, 58px);
+  bottom: 16px;
+  width: min(320px, calc(100% - 32px));
+  max-height: calc(100% - 32px);
+  overflow: auto;
+  border-radius: 18px;
+  background: var(--tixy-paper);
+  color: var(--tixy-ink);
+  padding: 14px 14px 8px;
+  box-shadow: var(--tixy-shadow-lift);
+  animation: tx-panel-in var(--tixy-panel-slow) var(--tixy-ease-settle) both;
+}
+@keyframes tx-panel-in { from { transform: translateY(10px); opacity: 0; } }
+.tx-picker h3 {
+  margin: 0 0 6px;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  font-size: 17px;
+  font-weight: 800;
+}
+.tx-picker p { margin: 4px 0 10px; font-size: 14px; color: var(--tixy-ink-2); }
+.tx-picker-close {
+  border: 0;
+  background: none;
+  padding: 4px 6px;
+  font: 600 14px var(--tixy-font-text);
+  color: var(--tixy-ink-2);
+  cursor: pointer;
+  border-radius: 6px;
+}
+.tx-picker-close:hover { color: var(--tixy-ink); }
+.tx-picker-close:focus-visible { outline: 3px solid var(--tixy-ticket); outline-offset: 2px; }
+.tx-picker-search {
+  width: 100%;
+  min-height: 40px;
+  margin: 2px 0 6px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: var(--tixy-radius-button-sm);
+  background: var(--tixy-paper-2);
+  color: var(--tixy-ink);
+  font: 400 15px var(--tixy-font-text);
+}
+.tx-picker-search:focus-visible { outline: 3px solid var(--tixy-ticket); outline-offset: 1px; }
+.tx-picker-list { max-height: 240px; overflow-y: auto; overscroll-behavior: contain; }
+.tx-table-error {
+  flex-basis: 100%;
+  font-size: 15px;
+  color: var(--tixy-paper);
+}
+
+/* ── the rail: friends and tickets ────────────────────────────────────── */
+
+.tx-rail {
+  display: grid;
+  gap: 20px;
+  align-content: start;
+}
+@media (min-width: 40rem) and (max-width: 63.999rem) {
+  .tx-rail { grid-template-columns: 1fr 1fr; align-items: start; }
+}
+
+.tx-panel {
+  border-radius: 18px;
+  background: var(--tixy-paper-2);
+  padding: 18px 18px 10px;
+}
+.tx-panel h2 {
+  margin: 0 0 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+.tx-panel h2 small {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--tixy-ink-3);
+}
+.tx-panel-note {
+  margin: 4px 0 10px;
+  font-size: 15px;
+  color: var(--tixy-ink-2);
+}
+.tx-panel-note + .tx-btn { margin-bottom: 10px; }
+
+.tx-who {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 9px 0;
+}
+.tx-who + .tx-who { box-shadow: 0 -1px 0 rgb(31 26 22 / 0.08); }
+.tx-who > div { flex: 1; min-width: 0; }
+.tx-who strong {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 16px;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tx-who small {
+  display: block;
+  font-size: 14px;
+  color: var(--tixy-ink-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tx-who small .tx-num { font-size: 15px; color: var(--tixy-ink); }
+.tx-who-error {
+  margin: -2px 0 8px 43px;
+  font-size: 14px;
+  color: var(--tixy-red-text);
+}
+.tx-dot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--tixy-red);
+}
+.tx-av {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--tixy-paper-3);
+  color: var(--tixy-ink);
+  font-weight: 800;
+  font-size: 14px;
+  line-height: 1;
+}
+.tx-av img { width: 100%; height: 100%; object-fit: cover; }
+.tx-av[data-waiting='true'] { background: var(--tixy-red); color: var(--tixy-on-red); }
+
+/* A friend is waiting: the request slides in, the avatar rings twice. */
+.tx-who[data-arrived='true'] {
+  animation: tx-slide-in 420ms var(--tixy-ease-spring) both;
+}
+.tx-who[data-arrived='true'] .tx-av {
+  animation: tx-ring 700ms ease-out 250ms 2 both;
+}
+@keyframes tx-slide-in { from { transform: translateX(18px); opacity: 0; } }
+@keyframes tx-ring {
+  0% { box-shadow: 0 0 0 0 rgb(184 54 39 / 0.55); }
+  100% { box-shadow: 0 0 0 10px rgb(184 54 39 / 0); }
+}
+
+/* A wagered match asks before it joins: joining holds the stake. */
+.tx-confirm {
+  margin: -2px 0 10px 43px;
+  padding: 10px 12px;
+  border-radius: var(--tixy-radius-button);
+  background: var(--tixy-paper-3);
+}
+.tx-confirm p { margin: 0 0 8px; font-size: 14px; color: var(--tixy-ink); }
+.tx-confirm p .tx-num { font-size: 15px; }
+.tx-confirm div { display: flex; gap: 8px; }
+
+/* Accept: the button fills, then the match opens. */
+.tx-accept::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgb(244 235 220 / 0.24);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+.tx-accept > span { position: relative; }
+.tx-accept[data-busy='true']::before { animation: tx-fill 700ms var(--tixy-ease-settle) both; }
+@keyframes tx-fill { to { transform: scaleX(1); } }
+
+/* Tickets: the balance, today's claim, the run to the next bonus day. */
+.tx-balance {
+  display: inline-flex;
+  transform-origin: 70% 50%;
+}
+.tx-balance[data-punch='true'] {
+  animation: tx-punch 520ms var(--tixy-ease-spring) both;
+}
+@keyframes tx-punch {
+  0% { transform: none; }
+  30% { transform: scale(1.16) rotate(-3deg); }
+  65% { transform: scale(0.97); }
+  100% { transform: none; }
+}
+.tx-daily {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 4px 0 12px;
+}
+.tx-daily > div { flex: 1; min-width: 0; }
+.tx-daily .arc-ticket-stub {
+  flex: none;
+  height: 50px;
+  padding: 0 28px 0 14px;
+  font-size: 30px;
+  transition: transform 160ms var(--tixy-ease-spring);
+}
+.tx-daily .arc-ticket-stub[data-perf]::after { right: 13px; }
+.tx-daily small {
+  display: block;
+  margin-top: 7px;
+  font-size: 14px;
+  color: var(--tixy-ink-2);
+}
+.tx-week { display: flex; gap: 4px; }
+.tx-week i {
+  width: 14px;
+  height: 6px;
+  border-radius: 2px;
+  background: var(--tixy-paper-3);
+}
+.tx-week i[data-day='done'] { background: var(--tixy-ink); }
+.tx-week i[data-day='today'] { background: var(--tixy-ticket); }
+/* The still wheel and today's stub open the daily spin. */
+.tx-daily-wheel,
+.tx-daily-stub {
+  flex: none;
+  display: inline-flex;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+  transition: transform 160ms var(--tixy-ease-spring);
+}
+.tx-daily-stub { border-radius: 8px; }
+.tx-daily-wheel:hover,
+.tx-daily-stub:hover { transform: rotate(-8deg); }
+.tx-daily-stub:hover { transform: translateY(-2px); }
+.tx-daily-wheel:focus-visible,
+.tx-daily-stub:focus-visible { outline: 3px solid var(--tixy-ticket); outline-offset: 3px; }
+
+/* ── the floor ────────────────────────────────────────────────────────── */
+
+.tx-floor { margin-top: 14px; min-width: 0; }
+.tx-floor-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 28px;
+  margin-bottom: 16px;
+}
+.tx-floor-head h2 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+}
+.tx-filters {
+  display: flex;
+  gap: 4px;
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.tx-filters::-webkit-scrollbar { display: none; }
+.tx-filters button {
+  flex: none;
+  border: 0;
+  background: none;
+  padding: 7px 12px;
+  border-radius: var(--tixy-radius-button-sm);
+  font: 600 15px var(--tixy-font-text);
+  color: var(--tixy-ink-2);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background-color var(--tixy-panel-fast),
+    color var(--tixy-panel-fast),
+    transform var(--tixy-press-out);
+}
+.tx-filters button:hover { background: var(--tixy-paper-2); color: var(--tixy-ink); }
+.tx-filters button:active { transform: scale(var(--tixy-press-scale)); transition-duration: var(--tixy-press-in); }
+.tx-filters button[aria-pressed='true'] { background: var(--tixy-ink); color: var(--tixy-paper); }
+.tx-filters button:focus-visible { outline: 3px solid var(--tixy-ticket); outline-offset: 2px; }
+.tx-filters b {
+  margin-left: 5px;
+  font-family: var(--tixy-font-num);
+  font-weight: 800;
+  opacity: 0.8;
+}
+@media (max-width: 39.999rem) {
+  .tx-floor-head { gap: 8px; }
+  .tx-floor-head h2 { font-size: 24px; }
+  .tx-filters { margin-inline: -16px; padding-inline: 16px; }
+  .tx-filters button { font-size: 14px; padding: 7px 11px; }
+}
+
+/* Tiles keep one size at each width: the widest row holds --max tiles. How
+   many columns a group uses is picked per breakpoint (--c4 and --c5 come
+   from floorColumns in home-floor.tsx), so the last row is never a lone tile:
+   20 tiles are 5 by 4, six are 3 by 2, and the grid is only as wide as its
+   columns. */
+.tx-grid {
+  --max: 4;
+  --cols: var(--c4, 4);
+  display: grid;
+  grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+  gap: 12px;
+  max-width: 100%;
+  /* One column past --max is allowed when it avoids a lone tile (floor-columns.ts), so cap at the full width. */
+  width: min(100%, calc((100% - (var(--max) - 1) * 12px) / var(--max) * var(--cols) + (var(--cols) - 1) * 12px));
+}
+@media (min-width: 76rem) { .tx-grid { --max: 5; --cols: var(--c5, 5); } }
+
+/* A cabinet: an ink bezel around the screen, the name, one number. */
+.tx-tile {
+  position: relative;
+  display: block;
+  min-width: 0;
+  border-radius: 16px;
+  background: var(--tixy-paper-2);
+  padding: 8px 8px 13px;
+  color: inherit;
+  text-decoration: none;
+  transition:
+    transform 200ms var(--tixy-ease-spring),
+    background-color var(--tixy-panel-fast);
+}
+.tx-tile[href]:hover { transform: translateY(-4px); background: var(--tixy-paper-3); }
+.tx-tile[href]:active { transform: translateY(-1px) scale(0.98); transition-duration: 60ms; }
+.tx-tile[href]:focus-visible { outline: 3px solid var(--tixy-ticket); outline-offset: 3px; }
+.tx-tile[data-closed='true'] { opacity: 0.7; }
+
+.tx-screen {
+  position: relative;
+  display: block;
+  aspect-ratio: 1.6;
+  border: var(--tixy-bezel) solid var(--tixy-cabinet);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--tixy-screen);
+}
+.tx-screen > img,
+.tx-screen > [data-game-screen],
+.tx-screen > .arc-preview-anim {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.tx-screen > img,
+.tx-screen > [data-game-screen] {
+  filter: brightness(0.86) saturate(0.9);
+}
+.tx-tile[href]:hover .tx-screen > img,
+.tx-row[href]:hover .tx-screen > img,
+.tx-tile[href]:hover .tx-screen > [data-game-screen],
+.tx-row[href]:hover .tx-screen > [data-game-screen] {
+  animation: tx-power 300ms linear both;
+}
+@keyframes tx-power {
+  0% { filter: brightness(0.86) saturate(0.9); }
+  15% { filter: brightness(1.5) saturate(1.2); }
+  30% { filter: brightness(0.8); }
+  50% { filter: brightness(1.25) saturate(1.15); }
+  100% { filter: brightness(1.05) saturate(1.05); }
+}
+.tx-screen > .arc-preview-anim { animation: tx-screen-on 300ms linear both; }
+@keyframes tx-screen-on {
+  0% { opacity: 0; }
+  20% { opacity: 1; }
+  35% { opacity: 0.4; }
+  55% { opacity: 1; }
+}
+
+.tx-tile-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 5px 1px;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tx-fact {
+  display: block;
+  margin: 0 5px;
+  font-size: 14px;
+  color: var(--tixy-ink-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tx-fact .tx-num { font-size: 17px; color: var(--tixy-ink); }
+.tx-fact[data-you='true'] { color: var(--tixy-red-text); font-weight: 700; }
+
+/* Favourite: a star in the tile's corner, on the screen's bezel. */
+.tx-fav {
+  position: absolute;
+  z-index: 1;
+  top: 12px;
+  right: 12px;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: var(--tixy-radius-button-sm);
+  background: rgb(31 26 22 / 0.72);
+  color: var(--tixy-paper);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity var(--tixy-panel-fast), transform var(--tixy-press-out);
+}
+.tx-fav:active { transform: scale(var(--tixy-press-scale)); }
+.tx-fav[aria-pressed='true'] { opacity: 1; color: var(--tixy-ticket); }
+.tx-cab:hover .tx-fav,
+.tx-cab:focus-within .tx-fav { opacity: 1; }
+.tx-fav:focus-visible { outline: 3px solid var(--tixy-ticket); outline-offset: 2px; }
+@media (hover: none) { .tx-fav { opacity: 1; } }
+.tx-cab { position: relative; min-width: 0; }
+
+/* Phones: rows instead of tiles. */
+.tx-rows { display: none; }
+@media (max-width: 39.999rem) {
+  .tx-grid[data-rows-on-phone='true'] { display: none; }
+  .tx-rows { display: grid; gap: 2px; }
+}
+.tx-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 7px 0;
+  color: inherit;
+  text-decoration: none;
+  border-radius: 10px;
+}
+.tx-row[href]:active { transform: scale(0.98); }
+.tx-row[href]:focus-visible { outline: 3px solid var(--tixy-ticket); outline-offset: 2px; }
+.tx-row .tx-screen {
+  width: 84px;
+  flex: none;
+  border-width: 3px;
+  border-radius: 8px;
+}
+.tx-row > div { flex: 1; min-width: 0; }
+.tx-row strong {
+  display: block;
+  font-size: 17px;
+  font-weight: 800;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tx-row .tx-fact { margin: 0; }
+.tx-cab .tx-row + .tx-fav { position: absolute; top: 50%; right: 0; margin-top: -16px; opacity: 1; background: none; color: var(--tixy-ink-3); }
+.tx-cab .tx-row + .tx-fav[aria-pressed='true'] { color: var(--tixy-ink); }
+.tx-cab:has(> .tx-row) { padding-right: 36px; }
+
+.tx-more {
+  margin-top: 18px;
+}
+.tx-more-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.tx-more-toggle b { font-family: var(--tixy-font-num); font-weight: 800; }
+.tx-reserve {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2px 20px;
+}
+@media (min-width: 40rem) { .tx-reserve { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 64rem) { .tx-reserve { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.tx-reserve .tx-screen { width: 64px; }
+.tx-reserve .tx-row strong { font-size: 16px; }
+.tx-empty { margin: 8px 0; font-size: 15px; color: var(--tixy-ink-2); }
+
+/* ── the prize counter ────────────────────────────────────────────────── */
+
+.tx-counter {
+  margin-top: 18px;
+  border-radius: 22px;
+  background: var(--tx-rail);
+  color: var(--tixy-paper);
+  padding: 24px 28px 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 20px;
+  overflow: hidden;
+}
+@media (min-width: 64rem) {
+  .tx-counter {
+    grid-template-columns: 250px minmax(0, 1fr) 150px;
+    gap: 24px;
+    align-items: end;
+  }
+}
+.tx-counter-copy { align-self: start; }
+.tx-counter h2 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+}
+.tx-counter p {
+  margin: 8px 0 0;
+  font-size: 16px;
+  color: var(--tixy-on-ink-2);
+}
+.tx-counter p .tx-num { color: var(--tixy-ticket); font-size: 18px; }
+.tx-counter-copy .tx-btn { margin-top: 14px; }
+.tx-case {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  border-radius: 14px 14px 0 0;
+  background: rgb(244 235 220 / 0.07);
+  padding: 14px 14px 18px;
+}
+@media (min-width: 40rem) { .tx-case { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.tx-prize {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+  border-radius: 10px;
+}
+.tx-prize:focus-visible { outline: 3px solid var(--tixy-ticket); outline-offset: 3px; }
+.tx-prize-art {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 1.6;
+  margin-bottom: 8px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: rgb(244 235 220 / 0.06);
+  transition:
+    transform 240ms var(--tixy-ease-spring),
+    background-color var(--tixy-panel-fast);
+}
+.tx-prize-art > * { max-width: 100%; max-height: 100%; }
+.tx-prize:hover .tx-prize-art { transform: translateY(-5px); background: rgb(244 235 220 / 0.12); }
+.tx-prize-name {
+  max-width: 100%;
+  font-size: 16px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tx-prize-kind {
+  display: grid;
+  max-width: 100%;
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: var(--tixy-on-ink-3);
+}
+.tx-prize-kind > span {
+  grid-area: 1 / 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition:
+    opacity 140ms,
+    transform 220ms var(--tixy-ease-spring);
+}
+.tx-prize-kind > span:last-child { opacity: 0; transform: translateY(5px); color: var(--tixy-paper); }
+.tx-prize-kind .tx-num { color: var(--tixy-ticket); font-size: 15px; }
+.tx-prize:is(:hover, :focus-visible) .tx-prize-kind > span:first-child { opacity: 0; transform: translateY(-5px); }
+.tx-prize:is(:hover, :focus-visible) .tx-prize-kind > span:last-child { opacity: 1; transform: none; }
+.tx-prize .arc-ticket-stub { transition: transform 260ms var(--tixy-ease-spring); }
+.tx-prize:hover .arc-ticket-stub { transform: rotate(-6deg) scale(1.08); }
+/* No pointer to hover with: show how far each prize is, under its kind. */
+@media (hover: none) {
+  .tx-prize-kind > span { grid-area: auto; }
+  .tx-prize-kind > span:last-child { opacity: 1; transform: none; }
+}
+
+.tx-host { display: none; }
+@media (min-width: 64rem) {
+  .tx-host { display: block; margin-bottom: -6px; justify-self: center; }
+}
+.tx-host [data-host-part='arm-left'] { transform-box: view-box; transform-origin: 22px 62px; }
+.tx-host [data-host-part='eyes'] { transform-box: fill-box; transform-origin: center; }
+.tx-counter:hover .tx-host [data-host-part='arm-left'] { animation: tx-wave 900ms ease-in-out both; }
+.tx-counter:hover .tx-host [data-host-part='eyes'] { animation: tx-blink 160ms linear 950ms both; }
+@keyframes tx-wave {
+  0%, 100% { transform: none; }
+  20%, 60% { transform: rotate(-24deg); }
+  40%, 80% { transform: rotate(14deg); }
+}
+@keyframes tx-blink { 50% { transform: scaleY(0.1); } }
+
+.tx-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* Fingers: every control on the home is at least 44 px to touch. */
+@media (pointer: coarse) {
+  .tx-btn[data-size='sm'],
+  .tx-table-btns .tx-btn,
+  .tx-filters button,
+  .tx-picker-close {
+    min-height: 44px;
+  }
+  .tx-picker-close { min-width: 44px; }
+  .tx-fav {
+    width: 44px;
+    height: 44px;
+    top: 8px;
+    right: 8px;
+  }
+  .tx-cab .tx-row + .tx-fav { margin-top: -22px; }
+  .tx-cab:has(> .tx-row) { padding-right: 48px; }
+}
+
+
+/* ── the rail fills the column ─────────────────────────────────────────── */
+
+@media (min-width: 64rem) {
+  .tx-rail { display: flex; flex-direction: column; }
+  .tx-rail > .tx-sc { flex: 1 0 auto; }
+}
+@media (min-width: 40rem) and (max-width: 63.999rem) {
+  .tx-rail > .tx-sc { grid-column: 1 / -1; }
+}
+/* Phones: one column, the day's things first. Table, friends, tickets, then
+   the quests, then the season card. */
+@media (max-width: 39.999rem) {
+  .tx-rail { display: contents; }
+  .tx-rail > .tx-sc { order: 1; }
+}
+
+/* ── today's quests: a card each ───────────────────────────────────────
+   Under the table on a wide screen; on a phone, after the rail, as a row
+   you swipe. Cards are paper 2 on the ground, like the floor's cabinets. */
+
+.tx-quests { min-width: 0; }
+.tx-quests-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  margin: 0 2px 10px;
+}
+.tx-quests-head h2 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+.tx-quests-head p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--tixy-ink-2);
+}
+.tx-quests-head p .arc-digits { font-size: 1.15em; color: var(--tixy-ink); }
+.tx-quests-line { margin: 8px 2px 0; font-size: 14px; color: var(--tixy-ink-2); }
+.tx-quests-line[data-error='true'] { color: var(--tixy-red-text); }
+
+.tx-qs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+@media (max-width: 47.999rem) {
+  .tx-qs {
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: min(82%, 300px);
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 16px;
+    margin-inline: -16px;
+    padding-inline: 16px;
+    scrollbar-width: none;
+  }
+  .tx-qs::-webkit-scrollbar { display: none; }
+  .tx-q { scroll-snap-align: start; }
+}
+
+.tx-q {
+  /* Holds the number face's screen-reader copies (absolutely placed), so
+     they stay inside the swipe row instead of widening a phone's page. */
+  position: relative;
+  display: grid;
+  /* Content sits at the top. When the rail is the taller column and the
+     card stretches to meet it, the extra is plain paper 2 under the footer,
+     not a gap between the task and its progress. */
+  align-content: start;
+  gap: 10px;
+  min-width: 0;
+  min-height: 150px;
+  padding: 10px 12px 12px 10px;
+  border-radius: 16px;
+  background: var(--tixy-paper-2);
+  color: var(--tixy-ink);
+}
+.tx-q[data-state='hold'] { min-height: 150px; }
+.tx-q[data-fresh] { animation: tx-q-settle 420ms var(--tixy-ease-spring) both; }
+.tx-q[data-arrived] { animation: tx-q-in 180ms var(--tixy-ease-settle) both; }
+@keyframes tx-q-settle {
+  0% { transform: scale(1.03); }
+  100% { transform: none; }
+}
+@keyframes tx-q-in { from { transform: translateY(8px); opacity: 0; } }
+
+.tx-q-top {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+}
+.tx-q-screen.tx-screen {
+  width: 72px;
+  border-width: 3px;
+  border-radius: 8px;
+}
+.tx-q[data-state='claimed'] .tx-q-screen > * { filter: brightness(0.6) saturate(0.6); }
+.tx-q-words {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.25;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.tx-q[data-state='claimed'] .tx-q-words { color: var(--tixy-ink-2); }
+
+.tx-q-reroll {
+  align-self: start;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  margin: -2px -4px 0 0;
+  border: 0;
+  border-radius: var(--tixy-radius-button-sm);
+  background: none;
+  color: var(--tixy-ink-3);
+  cursor: pointer;
+  transition:
+    background-color var(--tixy-panel-fast),
+    color var(--tixy-panel-fast),
+    transform var(--tixy-press-out);
+}
+.tx-q-reroll:hover { background: var(--tixy-paper-3); color: var(--tixy-ink); }
+.tx-q-reroll:active { transform: translateY(1px) scale(var(--tixy-press-scale)); transition-duration: var(--tixy-press-in); }
+.tx-q-reroll:active svg { transform: rotate(90deg); }
+.tx-q-reroll svg { transition: transform 240ms var(--tixy-ease-settle); }
+.tx-q-reroll:disabled { cursor: default; opacity: 0.5; }
+.tx-q-reroll:focus-visible { outline: 3px solid var(--tixy-ticket); outline-offset: 1px; }
+
+.tx-q-prog {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.tx-q-count {
+  flex: none;
+  font-size: 14px;
+  color: var(--tixy-ink-2);
+  white-space: nowrap;
+}
+.tx-q-count > .arc-digits:first-child { font-size: 26px; line-height: 1; color: var(--tixy-ink); }
+.tx-q-count .arc-digits { color: var(--tixy-ink); font-size: 1.15em; }
+.tx-q-bar {
+  flex: 0 1 96px;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--tixy-paper-3);
+  overflow: hidden;
+}
+.tx-q-bar > i {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+  background: var(--tixy-ticket);
+  transition: width 360ms var(--tixy-ease-settle);
+}
+.tx-q[data-state='claimed'] .tx-q-bar > i { background: var(--tixy-ink-3); }
+.tx-q-note {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.3;
+  color: var(--tixy-ink-2);
+}
+
+.tx-q-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 34px;
+}
+.tx-q-pay {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+}
+.tx-q-stub { display: inline-flex; }
+.tx-q-xp { font-size: 14px; color: var(--tixy-ink-2); }
+.tx-q-xp .arc-digits { font-size: 1.2em; color: var(--tixy-ink); }
+.tx-q-done {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--tixy-ink-2);
+}
+
+/* ── the season card ───────────────────────────────────────────────────── */
+
+.tx-sc {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-bottom: 14px;
+}
+.tx-sc h2 { margin: 0; }
+.tx-sc-all {
+  margin: -4px -8px -4px 0;
+  padding: 5px 8px;
+  border: 0;
+  border-radius: var(--tixy-radius-button-sm);
+  background: none;
+  font: 600 14px var(--tixy-font-text);
+  color: var(--tixy-ink-2);
+  cursor: pointer;
+  transition: background-color var(--tixy-panel-fast), color var(--tixy-panel-fast);
+}
+.tx-sc-all:hover { background: var(--tixy-paper-3); color: var(--tixy-ink); }
+.tx-sc-all:focus-visible { outline: 3px solid var(--tixy-ticket); outline-offset: 1px; }
+
+.tx-sc-now {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.tx-sc-big {
+  flex: none;
+  min-width: 0.6em;
+  font-family: var(--tixy-font-num);
+  font-weight: var(--tixy-weight-num);
+  font-size: 64px;
+  line-height: 0.85;
+  text-align: center;
+  color: var(--tixy-ink);
+  transform-origin: 50% 70%;
+}
+.tx-sc-big[data-punch] { animation: tx-punch 520ms var(--tixy-ease-spring) both; }
+.tx-sc-meter {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 6px;
+}
+.tx-sc-of,
+.tx-sc-xp {
+  font-size: 14px;
+  color: var(--tixy-ink-2);
+}
+.tx-sc-of .arc-digits,
+.tx-sc-xp .arc-digits { font-size: 1.2em; color: var(--tixy-ink); }
+.tx-sc-bar {
+  display: block;
+  height: 10px;
+  border-radius: 5px;
+  background: var(--tixy-paper-3);
+  overflow: hidden;
+}
+.tx-sc-bar > i {
+  display: block;
+  height: 100%;
+  border-radius: 5px;
+  background: var(--tixy-ticket);
+  transition: width 360ms var(--tixy-ease-settle);
+}
+
+/* Tiers waiting: what they pay, and the claim. */
+.tx-sc-ready {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: var(--tixy-paper-3);
+}
+.tx-sc-ready-pay { display: inline-flex; align-items: center; gap: 6px; }
+.tx-sc-ready-stub { display: inline-flex; }
+.tx-sc-ready-line { font-size: 14px; font-weight: 700; line-height: 1.2; }
+.tx-sc-ready-line .arc-digits { font-size: 1.15em; }
+.tx-sc-ready .tx-sc-art { width: 38px; height: 38px; background: var(--tixy-paper-2); }
+
+/* What the next tier pays, drawn as the prize. */
+.tx-sc-next {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 8px 12px;
+}
+.tx-sc-next > p { margin: 0; font-size: 14px; color: var(--tixy-ink-2); }
+.tx-sc-next > p .arc-digits { font-size: 1.2em; color: var(--tixy-ink); }
+.tx-sc-prizes {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  min-width: 0;
+}
+.tx-sc-stub.arc-ticket-stub { height: 34px; font-size: 1.375rem; }
+.tx-sc-item { display: inline-flex; align-items: center; gap: 8px; min-width: 0; }
+.tx-sc-art {
+  flex: none;
+  display: grid;
+  place-items: center;
+  min-width: 44px;
+  height: 44px;
+  padding: 0 4px;
+  overflow: hidden;
+  border-radius: 10px;
+  background: var(--tixy-paper-3);
+}
+.tx-sc-art img { display: block; height: 32px; width: auto; max-width: 128px; }
+.tx-sc-art > :not(img) { width: 100%; height: 100%; }
+.tx-sc-item-name {
+  min-width: 0;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.2;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.tx-sc-status {
+  margin: 0;
+  font-size: 14px;
+  color: var(--tixy-ink-2);
+}
+.tx-sc-status:empty { display: none; }
+
+/* This week's card: its games' cabinets, ticked when done. */
+.tx-sc-week {
+  margin: auto -8px 0;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-radius: 12px;
+  color: inherit;
+  text-decoration: none;
+  transition: background-color var(--tixy-panel-fast);
+}
+.tx-sc-week:hover { background: var(--tixy-paper-3); }
+.tx-sc-week:focus-visible { outline: 3px solid var(--tixy-ticket); outline-offset: 1px; }
+.tx-sc-marks {
+  flex: none;
+  display: grid;
+  grid-template-columns: repeat(3, 52px);
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.tx-sc-marks li { position: relative; display: grid; gap: 4px; }
+.tx-sc-marks .tx-q-screen.tx-screen { width: 52px; border-width: 3px; border-radius: 7px; }
+.tx-sc-check {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--tixy-ink);
+  color: var(--tixy-paper);
+}
+.tx-sc-mark-bar {
+  display: block;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--tixy-paper-3);
+  overflow: hidden;
+}
+.tx-sc-week:hover .tx-sc-mark-bar { background: var(--tixy-paper-2); }
+.tx-sc-mark-bar > i { display: block; height: 100%; background: var(--tixy-ticket); }
+.tx-sc-marks li[data-done] .tx-sc-mark-bar > i { background: var(--tixy-ink); }
+.tx-sc-week-line { font-size: 14px; line-height: 1.3; color: var(--tixy-ink-2); }
+.tx-sc-week-line .arc-digits { font-size: 1.15em; color: var(--tixy-ink); }
+
+@media (pointer: coarse) {
+  .tx-q-reroll { width: 44px; height: 44px; margin: -8px -8px 0 0; }
+  .tx-sc-all { min-height: 44px; }
+}

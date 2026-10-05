@@ -1,0 +1,102 @@
+/* Ticket stop: the cabinet's DOM layer over the canvas. The ring is drawn
+   in the canvas; the round row and the big button are DOM so their type is
+   Gabarito and Big Shoulders. The whole stage is the button. */
+
+.ts-stage {
+  position: absolute;
+  inset: 0;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.ts-stage > canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+.ts-rounds {
+  position: absolute;
+  inset: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(1.25rem, 7vw, 3.5rem);
+  pointer-events: none;
+}
+
+.ts-round {
+  display: grid;
+  justify-items: center;
+  gap: 0.125rem;
+  min-width: 4.5rem;
+  color: #f7e7c6;
+}
+
+.ts-round small {
+  font-family: var(--tixy-font-text, 'Gabarito'), system-ui, sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: rgb(247 231 198 / 0.72);
+}
+
+.ts-round[data-current] small {
+  color: #f2a33c;
+  font-weight: 700;
+}
+
+.ts-round b {
+  font-family: var(--tixy-font-num, 'Big Shoulders'), system-ui, sans-serif;
+  font-size: clamp(1.5rem, 4.2vh, 2.25rem);
+  font-weight: 800;
+  line-height: 1;
+}
+
+.ts-round[data-center] b {
+  color: #f2a33c;
+}
+
+/* The heavy button: a socket and a cream cap that sinks 5 px. */
+.ts-button {
+  position: absolute;
+  box-sizing: border-box;
+  padding: 5%;
+  border-radius: 50%;
+  background: #14110e;
+  pointer-events: none;
+}
+
+.ts-button-cap {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 32%, #fff6e2 0%, #f7e7c6 52%, #dcc79f 100%);
+  box-shadow:
+    0 0.4em 0 #8a7656,
+    0 0.55em 0.5em rgb(0 0 0 / 0.45);
+  color: #1f1a16;
+  font-family: var(--tixy-font-text, 'Gabarito'), system-ui, sans-serif;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  transition:
+    translate 90ms cubic-bezier(0.2, 1.5, 0.4, 1),
+    box-shadow 90ms ease-out;
+}
+
+.ts-button-cap[data-pressed] {
+  translate: 0 0.32em;
+  box-shadow:
+    0 0.08em 0 #8a7656,
+    0 0.15em 0.2em rgb(0 0 0 / 0.45);
+  transition-duration: 40ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ts-button-cap {
+    transition: none;
+  }
+}

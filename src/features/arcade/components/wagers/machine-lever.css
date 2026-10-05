@@ -1,0 +1,71 @@
+/* The lever: a machine's big button with an arm on its right. The arm is a
+   stick pivoting at the base, a red ball on its tip. Pulled, it swings down
+   toward the player and springs back. */
+.arc-lever {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  touch-action: pan-x;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.arc-lever-label {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.arc-lever-detail {
+  font-size: 1.25rem;
+}
+
+.arc-lever-gear {
+  position: relative;
+  flex: none;
+  width: 3.25rem;
+  height: 2.5rem;
+  pointer-events: none;
+}
+
+/* The housing the arm comes out of. */
+.arc-lever-base {
+  position: absolute;
+  left: 0.25rem;
+  bottom: 0.125rem;
+  width: 1.25rem;
+  height: 0.75rem;
+  border-radius: 0.375rem 0.375rem 0.125rem 0.125rem;
+  background: var(--tixy-ink);
+}
+
+/* Pivots at the base. Upright is rest; a pull rotates it toward the right. */
+.arc-lever-arm {
+  position: absolute;
+  left: calc(0.875rem - 2px);
+  bottom: 0.4375rem;
+  width: 4px;
+  height: 1.5rem;
+  border-radius: 2px;
+  background: var(--tixy-ink);
+  transform-origin: 50% calc(100% - 2px);
+}
+
+.arc-lever-ball {
+  position: absolute;
+  left: 50%;
+  top: -0.4375rem;
+  width: 1.125rem;
+  height: 1.125rem;
+  margin-left: -0.5625rem;
+  border-radius: 50%;
+  background: var(--tixy-red);
+}
+
+.arc-lever[aria-disabled='true'] .arc-lever-ball,
+.arc-lever:disabled .arc-lever-ball {
+  background: var(--tixy-ink-3);
+}

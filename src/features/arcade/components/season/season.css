@@ -1,0 +1,93 @@
+/* The season card's shared pieces (PLAN.md, "Design rules"): a tier's prize
+   and the season modal. Tokens are the tixy six; numbers go
+   through <Num>, which renders .arc-digits. Surfaces are told apart by tone, with no outlines, no pills
+   and no labels over headings. Motion only when a claim lands; the
+   reduced-motion catch-all in globals.css ends every animation. */
+
+/* A claim lands: the card it was on settles. The track and the quest cards use it. */
+@keyframes sq-settle {
+  0% { transform: scale(1.015); }
+  100% { transform: none; }
+}
+
+/* ── a prize ──────────────────────────────────────────────────────────── */
+
+.sq-tierpay {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.sq-prize-art {
+  display: inline-flex;
+  flex: none;
+  height: 32px;
+  overflow: hidden;
+  border-radius: var(--tixy-radius-button-sm, 8px);
+}
+.sq-prize-art:not(:has(img)) { width: 32px; }
+/* Every kit file is drawn 32 px tall; a namecard is four times as wide. */
+.sq-prize-art img { display: block; height: 32px; width: auto; max-width: 128px; }
+.sq-prize-name {
+  font-size: 0.9375rem;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+/* ── the season modal ─────────────────────────────────────────────────── */
+
+.sm { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; color: var(--tixy-ink, #1f1a16); }
+
+.sm-head { display: grid; gap: 12px; justify-items: start; }
+.sm-tier-now {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 0;
+  color: var(--tixy-ink-2, #54483d);
+}
+.sm-big {
+  font-family: var(--tixy-font-num, inherit);
+  font-weight: var(--tixy-weight-num, 800);
+  font-size: 64px;
+  line-height: 0.9;
+  color: var(--tixy-ink, #1f1a16);
+}
+/* The words' numbers only: the big tier number has its own size. */
+.sm-tier-now > span:not(.sm-big) > .arc-digits { font-size: 1.4em; line-height: 1; }
+
+.sm-next {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  font-size: 1rem;
+}
+/* The sentence's numbers, not the prize stubs' (direct children only). */
+.sm-next > span > .arc-digits { font-size: 1.35em; line-height: 1; }
+.sm-quiet { margin: 0; font-size: 0.9375rem; color: var(--tixy-ink-2, #54483d); }
+.sm-status {
+  margin: 0;
+  min-height: 1.2em;
+  font-size: 0.9375rem;
+  color: var(--tixy-ink-2, #54483d);
+}
+.sm-status:empty { display: none; }
+
+/* The track runs out to the dialog's edges, like the season page's. */
+.sm-track { margin-inline: -20px; }
+.sm-track .st-scroll { padding-inline: 16px; scroll-padding-inline: 16px; }
+.sm-track .st-page[data-dir='back'] { left: 4px; }
+.sm-track .st-page[data-dir='on'] { right: 4px; }
+
+.sm-link {
+  justify-self: start;
+  font-size: 0.9375rem;
+  color: var(--tixy-ink-2, #54483d);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.sm-link:hover { color: var(--tixy-ink, #1f1a16); }
+.sm-link:focus-visible { outline: 3px solid var(--tixy-ticket, #f2a33c); outline-offset: 2px; }
+

@@ -1,0 +1,568 @@
+/* Word grid: tiles and keys in the tixy palette, on the shell's ink screen.
+   Scoped to .word-grid-root. The same tokens render under every theme, so
+   the cabinet looks the same under boardwalk.
+
+   The colours are the standard Wordle ones, so the game reads at a glance:
+   correct is green with a solid dot, present is yellow with a ring, absent
+   is grey with nothing. Letters on them are white. The board and keys sit
+   on the dark screen and cabinet under every scheme, so these are the dark
+   surface values (#538d4e, #b59f3b, #3a3a3c). The dot and the ring carry
+   the state when colour doesn't, and every tile and key also has a spoken
+   label.
+
+   Equipped tile and keyboard cosmetics set the --wg-* variables inline on
+   .wg-frame and .wg-controls (_word-grid-theme.ts); with nothing equipped
+   they set none and these defaults apply.
+
+   Sizes inside the board are container units (cqw), so the board looks the
+   same at any size. They mirror BOARD_PAD, BOARD_GAP and BOARD_ASPECT in
+   page.tsx: keep them in sync. Flip, shake, win and toast timings mirror
+   FLIP_PER_TILE_MS, FLIP_STAGGER_MS, SHAKE_DURATION and TOAST_DURATION. */
+
+/* Declared again on the cabinet so a colour scheme's cabinet reset
+   (globals.css) reaches them: the board and keys keep the default palette. */
+.word-grid-root,
+.word-grid-root .arc-shell-cabinet {
+  --wg-correct: #538d4e;
+  --wg-correct-on: #ffffff;
+  --wg-present: #b59f3b;
+  --wg-present-on: #ffffff;
+  --wg-absent: #3a3a3c;
+  --wg-absent-on: #ffffff;
+  --wg-empty-edge: var(--tixy-ink-3, #6b5e51);
+  --wg-typed-edge: var(--tixy-on-ink-3, #b0a89d);
+  --wg-tile-text: var(--tixy-paper, #f4ebdc);
+  --wg-key-bg: #818384;
+  --wg-key-text: #ffffff;
+  --wg-key-active: var(--tixy-paper, #f4ebdc);
+
+  --wg-key-h: 3.25rem;
+  --wg-key-gap: 0.375rem;
+}
+
+@media (min-width: 40rem) {
+  .word-grid-root {
+    --wg-key-h: 3.5rem;
+    --wg-key-gap: 0.4375rem;
+  }
+}
+
+/* A phone on its side is about 20rem tall: the keyboard moves beside the
+   board, so both stay on screen. */
+@media (max-height: 34rem) and (orientation: landscape) {
+  .word-grid-root {
+    --wg-key-h: 2.75rem;
+    --wg-key-gap: 0.3125rem;
+  }
+  .word-grid-root .arc-shell-stage {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    grid-template-rows: minmax(0, 1fr) auto;
+  }
+  .word-grid-root .arc-shell-area {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .word-grid-root .arc-shell-controls {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: center;
+    padding: 0 0.625rem 0 0;
+  }
+  .word-grid-root .arc-shell-hint {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+  .word-grid-root .wg-controls {
+    min-height: 0;
+  }
+}
+
+/* ── the board ── */
+.wg-frame {
+  position: absolute;
+  inset: 0;
+  container-type: size;
+  user-select: none;
+  font-family: var(--tixy-font-text);
+}
+
+.wg-board {
+  position: absolute;
+  inset: 3cqw;
+  display: grid;
+  grid-template-rows: repeat(6, 1fr);
+  gap: 2.4cqw;
+}
+
+.wg-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 2.4cqw;
+  perspective: 90cqw;
+}
+
+.wg-tile {
+  position: relative;
+  display: grid;
+  place-items: center;
+  border-radius: 1.6cqw;
+  background: var(--wg-tile-fill, transparent);
+  box-shadow: inset 0 0 0 0.55cqw var(--wg-tile-border, var(--wg-empty-edge));
+  color: var(--wg-tile-text);
+}
+
+.wg-tile-face {
+  font-size: 10.5cqw;
+  font-weight: var(--tixy-weight-heading, 800);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+/* a typed letter, not yet guessed */
+.wg-tile.wg-filled {
+  box-shadow: inset 0 0 0 0.55cqw var(--wg-accent, var(--wg-typed-edge));
+  animation: wg-pop 120ms var(--tixy-ease-spring, cubic-bezier(0.2, 1.5, 0.4, 1));
+}
+@keyframes wg-pop {
+  0% { transform: scale(0.9); }
+  100% { transform: scale(1); }
+}
+
+/* graded: the fill, the letter, and the dot or ring */
+.wg-tile.wg-correct,
+.wg-key-correct {
+  --wg-result: var(--wg-correct);
+  --wg-result-on: var(--wg-correct-on);
+}
+.wg-tile.wg-present,
+.wg-key-present {
+  --wg-result: var(--wg-present);
+  --wg-result-on: var(--wg-present-on);
+}
+.wg-tile.wg-absent,
+.wg-key-absent {
+  --wg-result: var(--wg-absent);
+  --wg-result-on: var(--wg-absent-on);
+}
+.wg-tile.wg-correct,
+.wg-tile.wg-present,
+.wg-tile.wg-absent {
+  background: var(--wg-result);
+  box-shadow: none;
+  color: var(--wg-result-on);
+}
+
+.wg-tile.wg-correct::after,
+.wg-tile.wg-present::after,
+.wg-key-correct::after,
+.wg-key-present::after {
+  content: '';
+  position: absolute;
+  top: 1.5cqw;
+  right: 1.5cqw;
+  width: 2.5cqw;
+  height: 2.5cqw;
+  box-sizing: border-box;
+  border-radius: 50%;
+  border: 0.5cqw solid var(--wg-result-on);
+}
+.wg-tile.wg-correct::after,
+.wg-key-correct::after {
+  background: var(--wg-result-on);
+}
+
+/* ── flip: the tile turns on X and the fill changes at the edge-on frame ── */
+@keyframes wg-flip {
+  0% {
+    transform: rotateX(0deg);
+    background: var(--wg-tile-fill, transparent);
+    box-shadow: inset 0 0 0 0.55cqw var(--wg-tile-border, var(--wg-empty-edge));
+  }
+  49.9% {
+    transform: rotateX(89.8deg);
+    background: var(--wg-tile-fill, transparent);
+    box-shadow: inset 0 0 0 0.55cqw var(--wg-tile-border, var(--wg-empty-edge));
+  }
+  50.1% {
+    transform: rotateX(89.8deg);
+    background: var(--wg-result);
+    box-shadow: none;
+  }
+  100% {
+    transform: rotateX(0deg);
+    background: var(--wg-result);
+    box-shadow: none;
+  }
+}
+@keyframes wg-flip-face {
+  0%, 50% { color: var(--wg-tile-text); }
+  50.1%, 100% { color: var(--wg-result-on); }
+}
+@keyframes wg-flip-mark {
+  0%, 50% { opacity: 0; }
+  50.1%, 100% { opacity: 1; }
+}
+.wg-tile.wg-flip {
+  animation: wg-flip 520ms ease-in-out var(--wg-delay, 0ms) both;
+  backface-visibility: hidden;
+}
+.wg-tile.wg-flip .wg-tile-face {
+  animation: wg-flip-face 520ms step-end var(--wg-delay, 0ms) both;
+}
+.wg-tile.wg-flip::after {
+  animation: wg-flip-mark 520ms step-end var(--wg-delay, 0ms) both;
+}
+
+/* ── skin sets (SKINS.md): the page's material, the tiles' shape ──
+   A skin sets the result colours through the --wg-* variables above and adds
+   a material behind the grid and one signature shape on the tiles. It changes
+   no size, no flip and no timing. The marks that carry a result without
+   colour stay: a solid dot for right place, a ring for right letter, and a
+   dash for absent. */
+.wg-frame[data-skin-material] {
+  background-color: var(--wg-ground);
+  border-radius: var(--tixy-radius-card, 14px);
+}
+.wg-frame[data-skin-material='paper'] {
+  background-image: linear-gradient(180deg, transparent calc(100% - 1px), var(--wg-line) 0);
+  background-size: 100% 1.75rem;
+}
+.wg-frame[data-skin-material='slate'] {
+  background-image: repeating-linear-gradient(100deg, transparent 0 2.9rem, var(--wg-line) 2.9rem calc(2.9rem + 1px), transparent calc(2.9rem + 1px) 8rem);
+}
+.wg-frame[data-skin-material='planks'] {
+  background-image:
+    linear-gradient(180deg, transparent calc(100% - 2px), var(--wg-line) 0),
+    repeating-linear-gradient(180deg, var(--wg-ground) 0 2.5rem, var(--wg-ground-2) 2.5rem 5rem);
+  background-size: 100% 2.5rem, 100% 5rem;
+}
+.wg-frame[data-skin-material='felt'] {
+  background-image: radial-gradient(circle, var(--wg-ground-2) 0.9px, transparent 1.2px);
+  background-size: 7px 7px;
+}
+
+/* the tiles' marks: an absent tile gets a dash, so all three results have one */
+.wg-frame[data-skin-material] .wg-tile.wg-absent::after,
+.wg-controls[data-skin-material] .wg-key-absent::after {
+  content: '';
+  position: absolute;
+  top: 2.5cqw;
+  right: 1.5cqw;
+  width: 2.8cqw;
+  height: 0.55cqw;
+  border-radius: 0.3cqw;
+  background: var(--wg-result-on);
+}
+.wg-controls[data-skin-material] .wg-key-absent::after {
+  top: 0.4375rem;
+  right: 0.3125rem;
+  width: 0.5rem;
+  height: 0.125rem;
+}
+
+/* the keys: tile faces with an edge, so they hold on the ink screen */
+.wg-controls[data-skin-material] .wg-key:not(.wg-key-correct):not(.wg-key-present):not(.wg-key-absent) {
+  box-shadow: inset 0 0 0 0.125rem var(--wg-tile-border);
+}
+.wg-controls[data-skin-material] .wg-key-absent {
+  background: var(--wg-key-absent-bg);
+  color: var(--wg-key-absent-on);
+}
+
+/* stub: a ticket stub, notched at both ends, with a perforation */
+.wg-frame[data-skin-shape='stub'] .wg-tile {
+  --wg-notch: 1.5cqw;
+  border-radius: 1cqw;
+  -webkit-mask:
+    radial-gradient(circle at 0 50%, #0000 var(--wg-notch), #000 calc(var(--wg-notch) + 0.5px)) left / 50.5% 100% no-repeat,
+    radial-gradient(circle at 100% 50%, #0000 var(--wg-notch), #000 calc(var(--wg-notch) + 0.5px)) right / 50.5% 100% no-repeat;
+  mask:
+    radial-gradient(circle at 0 50%, #0000 var(--wg-notch), #000 calc(var(--wg-notch) + 0.5px)) left / 50.5% 100% no-repeat,
+    radial-gradient(circle at 100% 50%, #0000 var(--wg-notch), #000 calc(var(--wg-notch) + 0.5px)) right / 50.5% 100% no-repeat;
+}
+.wg-frame[data-skin-shape='stub'] .wg-tile::before {
+  content: '';
+  position: absolute;
+  top: 14%;
+  bottom: 14%;
+  left: 22%;
+  border-left: 0.45cqw dashed var(--wg-perf, var(--wg-tile-border));
+  opacity: 0.6;
+}
+
+/* round: a chip, with a dashed ring set in from the edge */
+.wg-frame[data-skin-shape='round'] .wg-tile {
+  border-radius: 50%;
+}
+.wg-frame[data-skin-shape='round'] .wg-tile::before {
+  content: '';
+  position: absolute;
+  inset: 11%;
+  border-radius: 50%;
+  border: 0.45cqw dashed var(--wg-perf, var(--wg-tile-border));
+  opacity: 0.55;
+}
+.wg-frame[data-skin-shape='round'] .wg-tile.wg-correct::after,
+.wg-frame[data-skin-shape='round'] .wg-tile.wg-present::after,
+.wg-frame[data-skin-shape='round'] .wg-tile.wg-absent::after {
+  top: 3cqw;
+  right: 3cqw;
+}
+.wg-frame[data-skin-shape='round'] .wg-tile.wg-absent::after {
+  top: 3.7cqw;
+  right: 2.6cqw;
+}
+
+/* tag: a luggage tag, one corner cut and a punched hole */
+.wg-frame[data-skin-shape='tag'] .wg-tile {
+  border-radius: 1cqw;
+  clip-path: polygon(14% 0, 100% 0, 100% 100%, 0 100%, 0 14%);
+}
+.wg-frame[data-skin-shape='tag'] .wg-tile::before {
+  content: '';
+  position: absolute;
+  top: 14%;
+  left: 14%;
+  width: 2.6cqw;
+  height: 2.6cqw;
+  border-radius: 50%;
+  background: var(--wg-ground);
+}
+
+/* the dashes and rings follow the letter while a tile flips */
+@keyframes wg-flip-perf {
+  0%, 50% { border-color: var(--wg-tile-border); }
+  50.1%, 100% { border-color: var(--wg-result-on); }
+}
+.wg-frame[data-skin-shape='stub'] .wg-tile.wg-correct,
+.wg-frame[data-skin-shape='stub'] .wg-tile.wg-present,
+.wg-frame[data-skin-shape='stub'] .wg-tile.wg-absent,
+.wg-frame[data-skin-shape='round'] .wg-tile.wg-correct,
+.wg-frame[data-skin-shape='round'] .wg-tile.wg-present,
+.wg-frame[data-skin-shape='round'] .wg-tile.wg-absent {
+  --wg-perf: var(--wg-result-on);
+}
+.wg-frame[data-skin-shape='stub'] .wg-tile.wg-flip::before,
+.wg-frame[data-skin-shape='round'] .wg-tile.wg-flip::before {
+  animation: wg-flip-perf 520ms step-end var(--wg-delay, 0ms) both;
+}
+
+/* ── win: the solved row hops in a staggered wave ── */
+@keyframes wg-win-hop {
+  0% { transform: translateY(0); }
+  30% { transform: translateY(-9cqw) scale(1.04); }
+  60% { transform: translateY(0) scale(1); }
+  78% { transform: translateY(-2.5cqw); }
+  100% { transform: translateY(0); }
+}
+.wg-tile.wg-win {
+  animation: wg-win-hop 620ms var(--tixy-ease-spring, cubic-bezier(0.2, 1.5, 0.4, 1)) both;
+}
+
+/* ── an invalid or short word shakes its row ── */
+@keyframes wg-shake {
+  0%, 100% { transform: translateX(0); }
+  15%, 55%, 95% { transform: translateX(-2.2cqw); }
+  35%, 75% { transform: translateX(2.2cqw); }
+}
+.wg-shake {
+  animation: wg-shake 500ms ease-in-out;
+}
+
+/* ── the message plate ── */
+.wg-toast {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 3;
+  max-width: 90%;
+  padding: 0.5rem 0.875rem;
+  border-radius: var(--tixy-radius-button, 10px);
+  background: var(--tixy-paper, #f4ebdc);
+  color: var(--tixy-ink, #1f1a16);
+  font-family: var(--tixy-font-text);
+  font-size: 0.9375rem;
+  font-weight: var(--tixy-weight-button, 700);
+  line-height: 1.2;
+  text-align: center;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  animation: wg-toast-in 1600ms var(--tixy-ease-settle, ease-out) forwards;
+}
+@keyframes wg-toast-in {
+  0% { opacity: 0; transform: translate(-50%, -30%); }
+  12% { opacity: 1; transform: translate(-50%, -50%); }
+  85% { opacity: 1; transform: translate(-50%, -50%); }
+  100% { opacity: 0; transform: translate(-50%, -50%); }
+}
+
+/* ── the keyboard, under the screen ── */
+.wg-controls {
+  min-height: calc(3 * var(--wg-key-h) + 2 * var(--wg-key-gap));
+  font-family: var(--tixy-font-text);
+}
+
+.wg-keyboard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wg-key-gap);
+  width: 100%;
+  max-width: 36rem;
+  margin-inline: auto;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+.wg-key-row {
+  display: flex;
+  justify-content: center;
+  gap: var(--wg-key-gap);
+}
+
+.wg-key {
+  position: relative;
+  display: grid;
+  flex: 1 1 0;
+  min-width: 0;
+  height: var(--wg-key-h);
+  padding: 0;
+  place-items: center;
+  border: 0;
+  border-radius: var(--tixy-radius-button-sm, 8px);
+  background: var(--wg-result, var(--wg-key-bg));
+  color: var(--wg-result-on, var(--wg-key-text));
+  cursor: pointer;
+  font-family: var(--tixy-font-text);
+  font-size: 1.125rem;
+  font-weight: var(--tixy-weight-heading, 800);
+  line-height: 1;
+  text-transform: uppercase;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform var(--tixy-press-out, 90ms) var(--tixy-ease-settle, ease-out);
+}
+
+.wg-key-wide {
+  flex: 1.55 1 0;
+  font-size: 0.9375rem;
+  text-transform: lowercase;
+}
+
+.wg-key:active {
+  transform: translateY(1px) scale(var(--tixy-press-scale, 0.96));
+  transition-duration: var(--tixy-press-in, 40ms);
+}
+
+/* the dot and the ring on a key, smaller than on a tile */
+.wg-key-correct::after,
+.wg-key-present::after {
+  top: 0.3125rem;
+  right: 0.3125rem;
+  width: 0.4375rem;
+  height: 0.4375rem;
+  border-width: 0.125rem;
+}
+
+/* ── after the last guess: friends, the next puzzle and two buttons, where
+   the keys were ── */
+.wg-after {
+  display: grid;
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 36rem;
+  margin-inline: auto;
+  color: var(--tixy-paper, #f4ebdc);
+}
+
+.wg-next {
+  margin: 0;
+  color: var(--tixy-on-ink-2, #c9c1b4);
+  font-size: 0.9375rem;
+  text-align: center;
+}
+
+.wg-after-buttons {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 0.5rem;
+}
+
+/* ── friends' results: "maple 3/6" ── */
+.wg-friends {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  gap: 0.25rem;
+  list-style: none;
+}
+
+.wg-friend {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.5rem;
+  background: var(--tixy-paper-2, #eadfcb);
+  color: var(--tixy-ink, #1f1a16);
+  font-size: 1rem;
+  line-height: 1.25;
+}
+
+.wg-friend-name {
+  min-width: 0;
+  overflow: hidden;
+  font-weight: var(--tixy-weight-button, 700);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wg-friend-score {
+  flex: none;
+  font-family: var(--tixy-font-num);
+  font-size: 1.25rem;
+  font-weight: var(--tixy-weight-num, 800);
+}
+
+.wg-friends-more {
+  margin: 0.25rem 0 0;
+  color: var(--tixy-ink-2, #54483d);
+  font-size: 0.9375rem;
+}
+
+/* on the ink controls row the same list sits on ink */
+.wg-after .wg-friend {
+  background: var(--tixy-screen-2, #3a3029);
+  color: var(--tixy-paper, #f4ebdc);
+}
+.wg-after .wg-friends-more {
+  color: var(--tixy-on-ink-2, #c9c1b4);
+}
+
+.wg-share-copy {
+  margin: 0.5rem 0 0;
+  font-size: 0.875rem;
+  white-space: pre-wrap;
+}
+
+/* ── reduced motion: every state jumps to its end ── */
+@media (prefers-reduced-motion: reduce) {
+  .wg-key {
+    transition: none;
+  }
+  .wg-tile.wg-flip,
+  .wg-tile.wg-flip .wg-tile-face,
+  .wg-tile.wg-flip::after,
+  .wg-tile.wg-flip::before,
+  .wg-tile.wg-filled,
+  .wg-tile.wg-win,
+  .wg-shake,
+  .wg-toast {
+    animation: none;
+  }
+  .wg-toast {
+    transform: translate(-50%, -50%);
+  }
+}

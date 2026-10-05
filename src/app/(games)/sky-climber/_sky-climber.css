@@ -1,0 +1,153 @@
+/* ──────────────────────────────────────────────────────────────────────
+   SKY CLIMBER — Midway scoped panel. Namespaced under .sky-midway so it can't
+   leak into other games or shells. The game itself is canvas-rendered (a tall
+   sky well holding the platform tower + the bouncing jumper); this file frames
+   the stage as a recessed well with a static glass sheen, layers the start/over
+   overlay, styles the enamel game-over result plate, and honors
+   prefers-reduced-motion. Hard bevels + offset drop shadows; NOTHING GLOWS.
+   ────────────────────────────────────────────────────────────────────── */
+
+.sky-midway .sky-stage {
+  /* Recessed cabinet framing around the canvas — a hard inset bevel pair so
+     the playfield sits "in" the cabinet face, plus the offset drop shadow,
+     no blur halo. The canvas paints its own sky + tower on top. */
+  position: relative;
+  border-radius: var(--radius-well);
+  box-shadow:
+    inset 0 2px 8px #000000bb,
+    inset 0 0 26px #00000080,
+    inset 0 0 0 1px #ffffff0a,
+    0 1px 0 var(--bevel-hi),
+    0 8px 0 var(--shadow-color),
+    0 16px 30px #00000055;
+}
+
+/* Static glass sheen over the screen — fixed diagonal gradient, no motion,
+   never intercepts pointer/touch. */
+.sky-midway .sky-stage::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(
+    155deg,
+    #ffffff0e 0%,
+    #ffffff03 22%,
+    transparent 46%
+  );
+  mix-blend-mode: screen;
+}
+
+/* The canvas sits flush in the stage; its own border-2/rounded-well handles the
+   inner edge. Keep it block-level with no inline whitespace gap. */
+.sky-midway .sky-stage canvas {
+  display: block;
+}
+
+/* ── Overlay (idle / gameover / error) covering the whole stage, above the
+   sheen ── */
+.sky-midway .sky-overlay {
+  z-index: 4;
+}
+
+/* ── Game-over ceremony: an enamel-on-wood result plate ───────────────────
+   A recessed warm-dark card with a bevelled edge, a red-enamel "You fell"
+   eyebrow, big mono height/best readout and a restart prompt. Reads as a
+   Midway cabinet result panel rather than flat text on a frozen frame. */
+.sky-midway .sky-result {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  width: min(19rem, calc(100% - 1.5rem));
+  padding: 1.1rem 1.25rem 1.25rem;
+  text-align: center;
+  border-radius: var(--radius-well, 10px);
+  border: 1px solid #00000066;
+  background: radial-gradient(ellipse at 50% 0%, #221a12 0%, #16110b 62%, #100c07 100%);
+  box-shadow:
+    inset 0 1px 0 #ffffff1f,
+    inset 0 -3px 10px #00000070,
+    0 2px 0 var(--shadow-color),
+    0 10px 26px #00000070;
+}
+.sky-midway .sky-result-eyebrow {
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 0.28rem 0.85rem;
+  border-radius: var(--radius-tag, 6px);
+  color: var(--enamel-primary-on, #ffefe4);
+  background: linear-gradient(180deg, var(--enamel-primary-hi, #d34b4e), var(--enamel-primary, #c73538));
+  border: 1px solid var(--enamel-primary-edge, #7e2225);
+  box-shadow: inset 0 1px 0 #ffffff40, 0 2px 0 var(--shadow-color);
+}
+.sky-midway .sky-result-scores {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 0.15rem;
+}
+.sky-midway .sky-result-score {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
+}
+.sky-midway .sky-result-label {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted, #b8a888);
+}
+.sky-midway .sky-result-num {
+  font-family: var(--font-mono-arcade, ui-monospace, monospace);
+  font-variant-numeric: tabular-nums;
+  font-size: 2.1rem;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--text-strong);
+  text-shadow: 0 2px 0 var(--shadow-color);
+}
+.sky-midway .sky-result-num--best {
+  font-size: 1.5rem;
+  color: var(--enamel-tickets-text, #f2a33c);
+}
+.sky-midway .sky-result-div {
+  width: 1px;
+  align-self: stretch;
+  margin: 0.15rem 0;
+  background: linear-gradient(180deg, transparent, #ffffff1c, transparent);
+}
+.sky-midway .sky-result-prompt {
+  margin-top: 0.2rem;
+  font-size: 0.82rem;
+  color: var(--text-body, #d6c7a8);
+}
+
+/* Subtle entrance: the plate rises + settles once. */
+.sky-midway .sky-result-enter {
+  animation: sky-result-pop 0.34s cubic-bezier(0.2, 0.9, 0.25, 1.1) both;
+}
+@keyframes sky-result-pop {
+  0% { transform: translateY(10px) scale(0.94); opacity: 0; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sky-midway .sky-stage::after {
+    background: linear-gradient(155deg, #ffffff0a 0%, transparent 46%);
+  }
+  .sky-midway .sky-overlay {
+    transition: none;
+  }
+  .sky-midway .sky-result-enter {
+    animation: none;
+  }
+}

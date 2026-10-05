@@ -1,0 +1,117 @@
+/* ──────────────────────────────────────────────────────────────────────
+   KNIFE BOOTH — Midway scoped polish. Namespaced under .knife-booth-midway
+   so it cannot leak into other games or shared shells. The canvas paints the
+   carnival booth: a plank backdrop with enamel bunting, a spinning wooden
+   target ringed with lodged knives, and a throwing lane at the bottom. This
+   file frames the stage as a recessed booth well and lays a static glass
+   sheen. Nothing animates here; NOTHING glows.
+   ────────────────────────────────────────────────────────────────────── */
+
+.knife-booth-midway .knife-stage {
+  position: relative;
+  border-radius: var(--radius-well);
+  box-shadow:
+    inset 0 2px 8px #000000bb,
+    inset 0 0 26px #00000080,
+    inset 0 0 0 1px #ffffff0a,
+    0 1px 0 var(--bevel-hi),
+    0 6px 0 var(--shadow-color),
+    0 9px 20px #00000055;
+}
+
+/* Static glass sheen over the booth — fixed diagonal gradient, no motion,
+   never intercepts pointer/touch. */
+.knife-booth-midway .knife-stage::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(
+    155deg,
+    #ffffff0e 0%,
+    #ffffff03 22%,
+    transparent 46%
+  );
+  mix-blend-mode: screen;
+}
+
+/* The idle / game-over / error overlay must sit above the sheen. */
+.knife-booth-midway .knife-overlay {
+  z-index: 4;
+}
+
+/* The lone THROW keycap below the target — a cream enamel keycap with real
+   travel, reused as the on-screen primary control on touch + as a visual
+   affordance on desktop. Hard bevel + offset drop shadow; no glow. */
+.knife-booth-midway .knife-throw {
+  appearance: none;
+  border: none;
+  margin: 0;
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-width: clamp(160px, 42%, 280px);
+  padding: clamp(12px, 2.4vw, 18px) clamp(20px, 5vw, 36px);
+  border-radius: clamp(10px, 2.4%, 16px);
+  font-family: var(--font-mono-arcade, ui-monospace, monospace);
+  font-weight: 800;
+  font-size: clamp(15px, 4vw, 20px);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #2a1f10;
+  background: linear-gradient(180deg, #fdf6e7 0%, #ecdcbd 100%);
+  box-shadow:
+    inset 0 3px 0 rgba(255, 255, 255, 0.75),
+    inset 0 -5px 6px rgba(120, 92, 46, 0.32),
+    inset 0 0 0 2px rgba(0, 0, 0, 0.16),
+    0 5px 0 #b89b6a,
+    0 7px 10px rgba(0, 0, 0, 0.32);
+  transition:
+    transform 70ms ease,
+    box-shadow 70ms ease,
+    filter 70ms ease;
+}
+.knife-booth-midway .knife-throw:hover {
+  filter: brightness(1.04);
+}
+.knife-booth-midway .knife-throw:active,
+.knife-booth-midway .knife-throw[data-pressed='true'] {
+  transform: translateY(4px);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.6),
+    inset 0 -3px 5px rgba(120, 92, 46, 0.3),
+    inset 0 0 0 2px rgba(0, 0, 0, 0.18),
+    0 1px 0 #b89b6a,
+    0 2px 4px rgba(0, 0, 0, 0.3);
+}
+.knife-booth-midway .knife-throw:focus-visible {
+  outline: none;
+  box-shadow:
+    inset 0 0 0 3px var(--ink, #1c160d),
+    inset 0 3px 0 rgba(255, 255, 255, 0.6),
+    0 5px 0 #b89b6a,
+    0 7px 10px rgba(0, 0, 0, 0.32);
+}
+.knife-booth-midway .knife-throw:disabled {
+  cursor: default;
+  filter: grayscale(0.35) brightness(0.9);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Flatten the sheen and drop key-travel easing. The canvas loop already
+     checks reduced-motion to suppress the spark burst; the target still spins
+     (that motion IS the game). */
+  .knife-booth-midway .knife-stage::after {
+    background: linear-gradient(155deg, #ffffff0a 0%, transparent 46%);
+  }
+  .knife-booth-midway .knife-throw {
+    transition: none;
+  }
+}

@@ -1,0 +1,241 @@
+/* Plinko's board inside a machine screen: metal pegs, brass slots with
+   their values printed on them, a red ball. _plinko-board.tsx. The screen
+   is a size container, so the board fits itself with cqw and cqh. Flat
+   fills with one hard edge each, no gradient and no glow
+   (MACHINES_LOOK.md). */
+@layer components {
+  .plinko-fit {
+    --slot-h: 2.5rem;
+    --slot-gap: 0.25rem;
+    position: relative;
+    display: grid;
+    width: 100%;
+    height: 100%;
+    place-items: center;
+  }
+
+  /* The largest board that fits: limited by the width, or by the height
+     less the slot row. */
+  .plinko-machine {
+    width: min(
+      100cqw - 1rem,
+      (100cqh - 1rem - var(--slot-h) - var(--slot-gap)) * var(--plinko-aspect)
+    );
+    container: plinko / inline-size;
+  }
+
+  /* Recent hits in the screen's top right corner, beside the narrow top of
+     the board: one chip each, newest on top, red when it paid more than
+     the drop cost. */
+  .plinko-hits {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .plinko-hits > li {
+    min-width: 3.25rem;
+    padding: 4px 8px;
+    border-radius: 6px;
+    background: var(--tixy-screen-2);
+    color: var(--tixy-paper);
+    font-family: var(--tixy-font-num);
+    font-size: 0.875rem;
+    font-weight: var(--tixy-weight-num);
+    line-height: 1;
+    text-align: center;
+  }
+
+  .plinko-hits > li[data-win] {
+    background: var(--tixy-red);
+  }
+
+  /* Older hits step back. */
+  .plinko-hits > li:nth-child(n + 4) {
+    opacity: 0.55;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .plinko-hits > li:first-child {
+      animation: plinko-hit-in 260ms var(--tixy-ease-spring);
+    }
+  }
+
+  @keyframes plinko-hit-in {
+    from {
+      transform: translateY(-8px) scale(0.85);
+      opacity: 0;
+    }
+  }
+
+  .plinko-machine[data-pressable] {
+    cursor: pointer;
+  }
+
+  /* At least the classic shape; taller when the screen has the room, up
+     to 1.5 times as tall. The trajectory works in percent of the board,
+     so the ball still lands on the pegs. */
+  .plinko-board {
+    position: relative;
+    width: 100%;
+    height: min(
+      100cqh - 1rem - var(--slot-h) - var(--slot-gap),
+      100cqw / var(--plinko-aspect) * 1.9
+    );
+  }
+
+  .plinko-peg {
+    position: absolute;
+    width: max(6px, calc(100cqw / var(--plinko-cols) * 0.2));
+    aspect-ratio: 1;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: #b9bec0;
+    box-shadow: 0 1px 0 #4b5154;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .plinko-peg.is-hit {
+      animation: plinko-peg-hit 260ms var(--tixy-ease-settle);
+    }
+  }
+
+  @keyframes plinko-peg-hit {
+    30% {
+      transform: translate(-50%, -50%) scale(1.4);
+      background: var(--tixy-paper);
+    }
+  }
+
+  .plinko-ball {
+    position: absolute;
+    width: max(9px, calc(100cqw / var(--plinko-cols) * 0.42));
+    aspect-ratio: 1;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: var(--tixy-red);
+    box-shadow: 0 2px 0 rgb(0 0 0 / 0.45);
+    will-change: transform;
+    pointer-events: none;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .plinko-ball {
+      transition: opacity 320ms ease;
+    }
+  }
+
+  /* The paytable on brass. */
+  .plinko-slots {
+    display: grid;
+    grid-template-columns: repeat(var(--plinko-cols), minmax(0, 1fr));
+    gap: 2px;
+    height: var(--slot-h);
+    margin: var(--slot-gap) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .plinko-slot {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    justify-content: center;
+    border-radius: 3px;
+    background: #c9a25a;
+    box-shadow: inset 0 -3px 0 #9c7835;
+    color: var(--tixy-ink);
+    font-family: var(--tixy-font-num);
+    font-size: 0.8125rem;
+    font-weight: var(--tixy-weight-num);
+    line-height: 1;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  .plinko-slot > span {
+    display: inline-flex;
+  }
+
+  .plinko-x {
+    margin-left: 0.04em;
+  }
+
+  /* Values read across the plate while they fit: with the × from 24 px a
+     plate, without it down to 22 px (12 rows) or 20 px (16 rows, "555"),
+     and up the plate below that. The board's width is the container. */
+  @container plinko (width < 232px) {
+    .plinko-fit[data-rows='8'] .plinko-x {
+      display: none;
+    }
+  }
+
+  @container plinko (width < 336px) {
+    .plinko-fit[data-rows='12'] .plinko-x {
+      display: none;
+    }
+  }
+
+  @container plinko (width < 270px) {
+    .plinko-fit[data-rows='12'] .plinko-slot {
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+      font-size: 0.9375rem;
+    }
+  }
+
+  @container plinko (width < 440px) {
+    .plinko-fit[data-rows='16'] .plinko-x {
+      display: none;
+    }
+  }
+
+  @container plinko (width < 372px) {
+    .plinko-fit[data-rows='16'] .plinko-slot {
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+      font-size: 0.875rem;
+    }
+
+    .plinko-fit[data-rows='16'] .plinko-x {
+      display: inline;
+    }
+  }
+
+  .plinko-fit:is([data-rows='12'], [data-rows='16']) .plinko-slot {
+    letter-spacing: -0.02em;
+  }
+
+  /* The slot lights when a ball lands in it: paper for where it fell, red
+     when it pays more than the drop cost. */
+  .plinko-slot[data-lit] {
+    background: var(--tixy-paper);
+    box-shadow: inset 0 -3px 0 var(--tixy-paper-3);
+  }
+
+  .plinko-slot[data-lit][data-win] {
+    background: var(--tixy-red);
+    box-shadow: inset 0 -3px 0 #7d2117;
+    color: var(--tixy-paper);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .plinko-slot[data-lit] {
+      animation: plinko-slot-land 300ms var(--tixy-ease-spring);
+    }
+  }
+
+  @keyframes plinko-slot-land {
+    35% {
+      translate: 0 3px;
+    }
+  }
+}

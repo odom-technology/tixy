@@ -1,0 +1,9 @@
+/* Flappy bird's stage. The canvas draws the whole screen flat in the tixy
+   palette (FLAPPY.md); the shell's ink cabinet frames it. This only keeps
+   taps on the stage from selecting or zooming. */
+.flappy-midway .flappy-stage {
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}

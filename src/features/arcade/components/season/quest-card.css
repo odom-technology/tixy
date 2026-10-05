@@ -1,0 +1,146 @@
+/* A quest on the season page (quest-card.tsx), in the track's tones: a card
+   you can act on is paper on the panel, a claimed one drops into the panel.
+   Amber is the progress and the tickets. Motion only when a claim lands or
+   progress moves. */
+
+.sk-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 290px), 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sk {
+  /* Holds the number face's screen-reader copies (absolutely placed). */
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  min-width: 0;
+  padding: 12px 14px 12px 12px;
+  border-radius: var(--tixy-radius-panel-sm, 14px);
+  background: var(--tixy-paper, #f4ebdc);
+  color: var(--tixy-ink, #1f1a16);
+}
+.sk[data-state='claimed'] { background: transparent; color: var(--tixy-ink-2, #54483d); }
+.sk[data-fresh] { animation: sq-settle 420ms var(--tixy-ease-spring, ease-out) both; }
+
+.sk-top {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+}
+
+/* The game's cabinet, the same as the home's quest card draws it. */
+.sk .tx-screen {
+  position: relative;
+  display: block;
+  width: 84px;
+  aspect-ratio: 1.6;
+  border: 3px solid var(--tixy-cabinet, #1f1a16);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--tixy-screen, #2a231d);
+}
+.sk .tx-screen > img,
+.sk .tx-screen > [data-game-screen],
+.sk .tx-screen > .arc-preview-anim {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.sk[data-state='claimed'] .tx-screen > * { filter: brightness(0.6) saturate(0.6); }
+
+.sk-words {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.25;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.sk-reroll {
+  display: grid;
+  place-items: center;
+  align-self: start;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: var(--tixy-radius-button-sm, 8px);
+  background: transparent;
+  color: var(--tixy-ink-2, #54483d);
+  cursor: pointer;
+}
+.sk-reroll:hover { background: var(--tixy-paper-3, #ded0b7); color: var(--tixy-ink, #1f1a16); }
+.sk-reroll:focus-visible { outline: 3px solid var(--tixy-ticket, #f2a33c); outline-offset: 2px; }
+
+.sk-note {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--tixy-ink-2, #54483d);
+}
+
+/* Numbers over a bar, the bar drawn like the track's rail. */
+.sk-prog {
+  display: grid;
+  gap: 8px;
+}
+.sk-count {
+  font-size: 0.9375rem;
+  color: var(--tixy-ink-2, #54483d);
+}
+.sk-count .arc-digits { font-size: 1.6em; line-height: 1; color: var(--tixy-ink, #1f1a16); }
+.sk-bar {
+  display: block;
+  height: 10px;
+  background: var(--tixy-paper-3, #ded0b7);
+  overflow: hidden;
+}
+.sk-bar > i {
+  display: block;
+  height: 100%;
+  background: var(--tixy-ticket, #f2a33c);
+  transform-origin: left center;
+  transition: transform 520ms var(--tixy-ease-settle, ease-out);
+}
+.sk[data-state='claimed'] .sk-bar > i { background: var(--tixy-paper-3, #ded0b7); }
+.sk[data-state='claimed'] .sk-bar { background: transparent; }
+
+.sk-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 34px;
+}
+.sk-pay {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  white-space: nowrap;
+}
+.sk-stub { display: inline-flex; }
+.sk-xp { font-size: 0.9375rem; color: var(--tixy-ink-2, #54483d); }
+.sk-xp .arc-digits { font-size: 1.35em; line-height: 1; color: var(--tixy-ink, #1f1a16); }
+.sk[data-state='claimed'] .sk-xp .arc-digits { color: var(--tixy-ink-2, #54483d); }
+.sk-foot > button { min-width: 84px; }
+.sk-done {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.875rem;
+  color: var(--tixy-ink-2, #54483d);
+}
+
+@media (pointer: coarse) {
+  .sk-reroll { width: 44px; height: 44px; margin: -6px -8px 0 0; }
+  .sk-foot > button { min-height: 44px; }
+}

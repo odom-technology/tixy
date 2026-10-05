@@ -1,0 +1,95 @@
+/* The machines' playing card. machine-card.tsx. Every size is a fraction
+   of the card's width (--mc-w, set by the game), through font-size: 1em is
+   the card's width. Flat fills, one hard shadow, no gradient, no grain. */
+@layer components {
+  .mc-card {
+    position: relative;
+    box-sizing: border-box;
+    width: var(--mc-w, 6rem);
+    aspect-ratio: 5 / 7;
+    overflow: hidden;
+    border-radius: 0.075em;
+    font-size: var(--mc-w, 6rem);
+    box-shadow: 0 0.03em 0 rgb(0 0 0 / 0.32);
+    user-select: none;
+  }
+
+  .mc-face {
+    background: #fbf5ea;
+    color: var(--tixy-ink, #1f1a16);
+  }
+
+  .mc-face[data-red] {
+    color: var(--tixy-red, #b83627);
+  }
+
+  .mc-index {
+    position: absolute;
+    top: 0.06em;
+    left: 0.07em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 0.3em;
+  }
+
+  .mc-index b {
+    font-family: var(--tixy-font-text);
+    font-size: 0.31em;
+    font-weight: var(--tixy-weight-wordmark, 900);
+    line-height: 1;
+    letter-spacing: -0.06em;
+    white-space: nowrap;
+  }
+
+  .mc-index-suit {
+    width: 0.2em;
+    height: 0.2em;
+    margin-top: 0.02em;
+  }
+
+  .mc-big {
+    position: absolute;
+    right: 0.08em;
+    bottom: 0.08em;
+    width: 0.5em;
+    height: 0.5em;
+  }
+
+  .mc-face[data-ace] .mc-big {
+    right: 50%;
+    bottom: 50%;
+    width: 0.62em;
+    height: 0.62em;
+    transform: translate(50%, 50%);
+  }
+
+  /* The back: ink, a hard stripe inside a plain margin, a stub in the
+     middle. */
+  .mc-back {
+    display: grid;
+    place-items: center;
+    background:
+      repeating-linear-gradient(
+          135deg,
+          var(--tixy-screen-2, #3a3029) 0 0.03em,
+          transparent 0.03em 0.075em
+        )
+        0.07em 0.07em / calc(100% - 0.14em) calc(100% - 0.14em) no-repeat,
+      var(--tixy-ink, #1f1a16);
+  }
+
+  .mc-back::before {
+    content: '';
+    position: absolute;
+    inset: 0.07em;
+    border-radius: 0.04em;
+    box-shadow: 0 0 0 0.012em rgb(244 235 220 / 0.18);
+  }
+
+  .mc-back-stub {
+    position: relative;
+    width: 0.42em;
+    fill: rgb(244 235 220 / 0.24);
+  }
+}

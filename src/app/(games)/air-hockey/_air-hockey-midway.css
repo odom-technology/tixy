@@ -1,0 +1,103 @@
+/* ──────────────────────────────────────────────────────────────────────
+   AIR HOCKEY — Midway scoped polish. Namespaced under .airhockey-midway so it
+   cannot leak into other games or shared shells. The canvas paints the rink
+   itself (warm lacquered-wood frame + cream playfield); this file frames the
+   whole stage as a recessed cabinet well with a hard bevel pair + offset
+   shadow, and lays one static glass sheen so the table reads as a real
+   cabinet. Nothing animates here; NOTHING glows.
+   ────────────────────────────────────────────────────────────────────── */
+
+.airhockey-midway .airhockey-stage {
+  position: relative;
+  border-radius: var(--radius-well);
+  box-shadow:
+    inset 0 2px 8px #000000bb,
+    inset 0 0 26px #00000080,
+    inset 0 0 0 1px #ffffff0a,
+    0 1px 0 var(--bevel-hi),
+    0 6px 0 var(--shadow-color),
+    0 9px 20px #00000055;
+}
+
+/* Static glass sheen over the table — fixed diagonal gradient, no motion,
+   never intercepts pointer/touch. */
+.airhockey-midway .airhockey-stage::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(
+    155deg,
+    #ffffff0e 0%,
+    #ffffff03 22%,
+    transparent 46%
+  );
+  mix-blend-mode: screen;
+}
+
+/* The mode-select / win overlay must sit above the sheen. */
+.airhockey-midway .airhockey-overlay {
+  z-index: 4;
+}
+
+/* ── Goal-scored ceremony: the live score chip punches when its side scores.
+   The chip is React-keyed on its score, so a goal remounts it and replays this
+   one-shot. Transform/opacity only — cheap, and disabled under reduced motion. */
+@keyframes airhockey-score-punch {
+  0% { transform: scale(1); }
+  28% { transform: scale(1.55); }
+  60% { transform: scale(0.92); }
+  100% { transform: scale(1); }
+}
+.airhockey-midway .airhockey-score-punch {
+  animation: airhockey-score-punch 420ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  transform-origin: center;
+}
+
+/* ── Match-win ceremony: the headline pops in, and a short enamel-confetti
+   burst rains once over the overlay. All transform/opacity; no glow. */
+@keyframes airhockey-win-pop {
+  0% { transform: scale(0.4); opacity: 0; }
+  55% { transform: scale(1.12); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.airhockey-midway .airhockey-win-pop {
+  animation: airhockey-win-pop 520ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+.airhockey-midway .airhockey-confetti {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  border-radius: inherit;
+  z-index: 5;
+}
+.airhockey-midway .airhockey-confetti span {
+  position: absolute;
+  top: -12px;
+  width: 8px;
+  height: 12px;
+  border-radius: 2px;
+  opacity: 0;
+  animation: airhockey-confetti-fall 1500ms ease-in forwards;
+}
+@keyframes airhockey-confetti-fall {
+  0% { transform: translateY(-12px) rotate(0deg); opacity: 0; }
+  12% { opacity: 1; }
+  100% { transform: translateY(360px) rotate(300deg); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .airhockey-midway .airhockey-stage::after {
+    background: linear-gradient(155deg, #ffffff0a 0%, transparent 46%);
+  }
+  .airhockey-midway .airhockey-score-punch,
+  .airhockey-midway .airhockey-win-pop {
+    animation: none;
+  }
+  .airhockey-midway .airhockey-confetti {
+    display: none;
+  }
+}

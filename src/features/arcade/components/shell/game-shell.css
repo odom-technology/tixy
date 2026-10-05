@@ -1,0 +1,534 @@
+/* The game shell: one ink cabinet per game page. game-shell.tsx.
+   The cabinet is ink under every theme, so its colours come from the tixy
+   brand tokens, which every theme defines. The strip, the screen and the
+   hint carry data-surface="ink", which maps the semantic tokens to ink
+   under tixy; the result layer (.arc-shell-end) sits outside that scope so
+   a paper result card keeps paper buttons. In the components layer, so a
+   game's own utilities still win. */
+@layer components {
+  .arc-shell {
+    --shell-bottom: 0.75rem;
+    width: min(100% - 1rem, 72rem);
+    margin-inline: auto;
+    padding-top: 0.5rem;
+    font-family: var(--tixy-font-text);
+  }
+
+  /* Phones: the fixed dock covers the bottom 4rem. */
+  @media (max-width: 39.999rem) {
+    .arc-shell {
+      --shell-bottom: calc(4rem + env(safe-area-inset-bottom) + 0.5rem);
+      width: calc(100% - 0.75rem);
+      padding-top: 0.375rem;
+    }
+  }
+
+  /* Lobbies keep the full page width for their columns. */
+  .arc-shell:has(> .arc-shell-cabinet:not([data-stage])) {
+    width: min(100% - 2rem, 96rem);
+    padding-top: clamp(0.75rem, 1.5vw, 1.25rem);
+  }
+
+  @media (max-width: 39.999rem) {
+    .arc-shell:has(> .arc-shell-cabinet:not([data-stage])) {
+      width: calc(100% - 1rem);
+    }
+  }
+
+  .arc-shell-cabinet {
+    display: flex;
+    flex-direction: column;
+    border-radius: var(--tixy-radius-panel);
+    /* the cabinet tone: ink under the default, a colour scheme's own
+       cabinet otherwise; the screen inside keeps the default palette */
+    background: var(--tixy-cabinet);
+    color: var(--tixy-paper);
+  }
+
+  /* A stage fills the viewport under the cabinet's top edge. --shell-top
+     is measured by the shell. */
+  .arc-shell-cabinet[data-stage] {
+    height: calc(100vh - var(--shell-top, 4.5rem) - var(--shell-bottom));
+    height: calc(100dvh - var(--shell-top, 4.5rem) - var(--shell-bottom));
+    /* Small enough for a phone on its side, where the viewport is about
+       20rem tall: the stage stays on screen and shrinks instead. */
+    min-height: 12rem;
+  }
+
+  /* ── the strip: one line, always ── */
+  .arc-shell-strip {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 0.25rem;
+    min-height: 3.25rem;
+    padding: 0.25rem 0.375rem 0.25rem 0.25rem;
+    color: var(--tixy-paper);
+  }
+
+  /* The new-best slot: centred over the strip, above the stage, empty and
+     inert until a new best lands in it. */
+  .arc-shell-strip {
+    position: relative;
+  }
+
+  .arc-shell-moment {
+    pointer-events: none;
+    position: absolute;
+    z-index: 6;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+  }
+
+  .arc-shell-icon {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: var(--tixy-radius-button);
+    color: inherit;
+    transition: background-color 120ms var(--tixy-ease-settle);
+  }
+
+  .arc-shell-icon:hover {
+    background: rgb(244 235 220 / 0.1);
+  }
+
+  .arc-shell-icon:focus-visible,
+  .arc-shell-strip .arc-key:focus-visible {
+    outline: 2px solid var(--tixy-paper);
+    outline-offset: 2px;
+  }
+
+  /* ? and sound are the secondary button on the ink: a 44 px square in
+     screen 2, the button radius, a paper glyph. Back stays a bare glyph. */
+  .arc-shell-q,
+  :root[data-arcade-theme] .arc-shell-strip .arc-key[data-tone='ghost']:not([data-pressed='true']) {
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: var(--tixy-radius-button);
+    background: var(--tixy-screen-2);
+    color: var(--tixy-paper);
+  }
+
+  .arc-shell-q:hover:not(:disabled),
+  :root[data-arcade-theme] .arc-shell-strip .arc-key[data-tone='ghost']:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--tixy-screen-2), var(--tixy-paper) 8%);
+  }
+
+  .arc-shell-q:active:not(:disabled) {
+    transform: translateY(1px) scale(var(--tixy-press-scale));
+    transition-duration: var(--tixy-press-in);
+  }
+
+  .arc-shell-q:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  .arc-shell-q-dot {
+    font-size: 1.1875rem;
+    font-weight: var(--tixy-weight-heading);
+    line-height: 1;
+  }
+
+  /* The game's name is the page's title: Gabarito 800, paper, 18 px on a
+     phone and 24 px wide. */
+  .arc-shell-name {
+    flex: 0 1 auto;
+    min-width: 0;
+    margin: 0 0.5rem 0 0;
+    overflow: hidden;
+    font-family: var(--tixy-font-text);
+    font-size: 1.125rem;
+    font-weight: var(--tixy-weight-heading);
+    letter-spacing: var(--tixy-tracking-name);
+    line-height: 1.2;
+    color: var(--tixy-paper);
+    text-overflow: ellipsis;
+    text-transform: none;
+    white-space: nowrap;
+  }
+
+  /* Phones: a long name ("tin duck gallery") beside a stat takes two lines
+     rather than an ellipsis, and the right side packs closer. */
+  @media (max-width: 39.999rem) {
+    .arc-shell-name {
+      display: -webkit-box;
+      line-height: 1.1;
+      text-wrap: balance;
+      white-space: normal;
+      overflow-wrap: normal;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+    }
+
+    .arc-shell-strip .arc-shell-right {
+      gap: 0.25rem;
+    }
+
+    .arc-shell-strip .arc-shell-stat {
+      margin-right: 0.25rem;
+    }
+  }
+
+  @media (min-width: 40rem) {
+    .arc-shell-name {
+      font-size: 1.5rem;
+    }
+
+    /* The right edge of ? and sound lines up with the stage under them. */
+    .arc-shell-strip {
+      padding-right: 0.75rem;
+    }
+  }
+
+  /* A game's modes beside its name (GameModes). The lit one is paper on a
+     lighter ink; the others are quiet. One button shape, 10 px. */
+  .arc-shell-modes {
+    display: flex;
+    flex: none;
+    gap: 0.125rem;
+  }
+
+  .arc-shell-modes button {
+    min-height: 2.75rem;
+    padding: 0 0.625rem;
+    border: 0;
+    border-radius: var(--tixy-radius-button);
+    background: transparent;
+    color: var(--tixy-on-ink-2);
+    font: inherit;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    transition:
+      background-color 120ms var(--tixy-ease-settle),
+      color 120ms var(--tixy-ease-settle);
+  }
+
+  .arc-shell-modes button:hover:not([aria-pressed='true']):not([aria-disabled='true']) {
+    background: rgb(244 235 220 / 0.08);
+    color: var(--tixy-paper);
+  }
+
+  .arc-shell-modes button[aria-pressed='true'] {
+    background: rgb(244 235 220 / 0.18);
+    color: var(--tixy-paper);
+    cursor: default;
+  }
+
+  .arc-shell-modes button[aria-disabled='true'] {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  .arc-shell-modes button:focus-visible {
+    outline: 2px solid var(--tixy-paper);
+    outline-offset: -2px;
+  }
+
+  /* Phones: the modes take the name's place. The name stays in the
+     heading for screen readers. */
+  @media (max-width: 39.999rem) {
+    .arc-shell-name[data-modes] {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
+
+    .arc-shell-modes button {
+      padding: 0 0.25rem;
+    }
+
+    .arc-shell-strip:has(.arc-shell-modes) {
+      gap: 0.125rem;
+    }
+
+    .arc-shell-strip:has(.arc-shell-modes) .arc-shell-tickets {
+      margin-right: 0;
+    }
+
+    /* Back, two modes, the count, tickets, help and sound share 390 px. */
+    .arc-shell-strip:has(.arc-shell-modes) .arc-shell-stat small {
+      display: none;
+    }
+
+    .arc-shell-strip:has(.arc-shell-modes) .arc-shell-right {
+      gap: 0.25rem;
+    }
+
+    .arc-shell-strip:has(.arc-shell-modes) .arc-shell-stat {
+      margin-right: 0;
+    }
+  }
+
+  .arc-shell-right {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 0.375rem;
+    margin-left: auto;
+  }
+
+  /* The one number: Big Shoulders at 24 px (22 on a phone), its word
+     beside it at 15 px, both on the same baseline. */
+  .arc-shell-stat {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.3125rem;
+    margin-right: 0.375rem;
+    white-space: nowrap;
+  }
+
+  .arc-shell-stat .arc-digits {
+    font-family: var(--font-num);
+    font-size: 1.375rem;
+    font-weight: var(--tixy-weight-num);
+    line-height: 1;
+    color: var(--tixy-paper);
+  }
+
+  @media (min-width: 40rem) {
+    .arc-shell-stat .arc-digits {
+      font-size: 1.5rem;
+    }
+  }
+
+  .arc-shell-stat small {
+    font-size: 0.9375rem;
+    font-weight: var(--tixy-weight-button);
+    line-height: 1;
+    color: var(--tixy-on-ink-2);
+  }
+
+  .arc-shell-tickets {
+    display: inline-flex;
+    margin-right: 0.125rem;
+    transform-origin: center;
+  }
+
+  /* "Starting your run." with the loading dots before it. */
+  .arc-shell-busy {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+  }
+
+  /* The sound button is the feel kit's MuteButton (ghost); it takes the
+     same face as ? above. */
+  .arc-shell-strip .arc-key[data-tone='ghost'] {
+    border-color: transparent;
+    box-shadow: none;
+  }
+
+  /* ── the stage ── */
+  .arc-shell-stage {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+    flex-direction: column;
+  }
+
+  .arc-shell-area {
+    position: relative;
+    display: grid;
+    flex: 1;
+    min-height: 0;
+    place-items: center;
+    padding: 0 0.625rem;
+  }
+
+  /* No hint row: the cabinet's bottom edge still frames the stage. */
+  .arc-shell-stage[data-hintless] {
+    padding-bottom: 0.625rem;
+  }
+
+  @media (max-width: 39.999rem) {
+    .arc-shell-area {
+      padding: 0 0.375rem;
+    }
+  }
+
+  /* The screen: a 5 px ink bezel (border-tixy-bezel) around the game. */
+  .arc-shell-screen {
+    position: relative;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border-style: solid;
+    border-color: var(--tixy-cabinet);
+    border-radius: 0.75rem;
+    background: var(--tixy-screen);
+    touch-action: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .arc-shell-screen > canvas {
+    display: block;
+  }
+
+  .arc-shell-screen:focus {
+    outline: none;
+  }
+
+  .arc-shell-screen:focus-visible {
+    outline: 2px solid var(--tixy-paper);
+    outline-offset: 2px;
+  }
+
+  .arc-shell-controls {
+    flex: none;
+    padding: 0.5rem 0.625rem 0;
+  }
+
+  .arc-shell-end {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    display: flex;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 0.75rem;
+    background: rgb(31 26 22 / 0.6);
+    color: var(--text-strong);
+    font-family: var(--font-ui);
+  }
+
+  /* margin: auto centres the result and still lets a tall one scroll. */
+  .arc-shell-end > * {
+    margin: auto;
+  }
+
+  .arc-shell-notice {
+    width: min(100%, 22rem);
+    padding: 1.25rem;
+    border-radius: var(--radius-cabinet);
+    background: var(--surface-panel);
+    color: var(--text-body);
+    text-align: center;
+  }
+
+  .arc-shell-notice h2 {
+    margin: 0 0 0.5rem;
+    font-family: var(--tixy-font-text);
+    font-size: 1.375rem;
+    font-weight: var(--tixy-weight-heading);
+    letter-spacing: var(--tixy-tracking-name);
+    color: var(--text-strong);
+  }
+
+  .arc-shell-notice p {
+    margin: 0 0 0.5rem;
+    font-size: 1rem;
+    line-height: 1.4;
+  }
+
+  .arc-shell-notice-action {
+    display: grid;
+    margin-top: 1rem;
+  }
+
+  /* The line under the stage: what the first input does. Paper on the
+     ink, 17 px wide and 16 px on a phone, centred in a 48 px row that holds
+     its height when the line goes, so the stage never jumps. */
+  .arc-shell-hint {
+    display: grid;
+    flex: none;
+    min-height: 3rem;
+    margin: 0;
+    padding: 0.375rem 1rem 0.625rem;
+    place-items: center;
+    font-size: 1.0625rem;
+    font-weight: var(--tixy-weight-body);
+    line-height: 1.35;
+    color: var(--tixy-paper);
+    text-align: center;
+    text-wrap: balance;
+  }
+
+  @media (max-width: 39.999rem) {
+    .arc-shell-hint {
+      min-height: 2.75rem;
+      padding: 0.25rem 0.75rem 0.5rem;
+      font-size: 1rem;
+    }
+  }
+
+  .arc-shell-below {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding-bottom: 1.5rem;
+  }
+
+  /* ── how to play ── */
+  .arc-howto {
+    display: grid;
+    gap: 0.5rem;
+    font-family: var(--font-ui);
+    font-size: 1rem;
+    color: var(--text-body);
+  }
+
+  .arc-howto p {
+    margin: 0;
+  }
+
+  .arc-howto-picture {
+    position: relative;
+    display: grid;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+    border: var(--tixy-bezel) solid var(--tixy-cabinet);
+    border-radius: 0.75rem;
+    background: var(--tixy-screen);
+    place-items: center;
+    aspect-ratio: 16 / 10;
+  }
+
+  .arc-howto-picture > img,
+  .arc-howto-picture > svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* ── sign-in, in place ── */
+  .arc-signin-line {
+    margin: 0;
+    padding: 0.75rem 1rem;
+    font-size: 0.9375rem;
+    color: var(--text-muted);
+  }
+
+  .arc-signin-line a {
+    font-weight: 700;
+    color: var(--text-strong);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .arc-signin-reason {
+    margin: 0 0 1rem;
+    font-size: 1rem;
+    color: var(--text-body);
+  }
+
+  .arc-signin-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.625rem;
+  }
+}

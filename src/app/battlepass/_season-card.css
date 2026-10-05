@@ -1,0 +1,137 @@
+/* The season card (docs/design/tixy-rebrand/PLAN.md, "Design rules"). One
+   track. Numbers in Big Shoulders through <Num>. Surfaces told apart by tone,
+   no outlines, no pills, no labels over headings. Motion only when something
+   is claimed; the reduced-motion catch-all in globals.css ends every
+   animation. */
+
+.sc-head {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 20px 32px;
+  padding: 24px 28px;
+  border-radius: var(--tixy-radius-panel-lg, 22px);
+  background: var(--tixy-paper-2, #eadfcb);
+  color: var(--tixy-ink, #1f1a16);
+}
+
+.sc-tier {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.sc-tier-num {
+  font-family: var(--tixy-font-num, inherit);
+  font-weight: var(--tixy-weight-num, 800);
+  font-size: 88px;
+  line-height: 0.9;
+}
+
+.sc-tier-of {
+  font-size: 1rem;
+  color: var(--tixy-ink-2, #54483d);
+}
+
+.sc-sub .arc-digits,
+.sc-tier-of .arc-digits {
+  font-size: 1.5em;
+  line-height: 1;
+}
+
+.sc-sub {
+  margin: 8px 0 0;
+  font-size: 1rem;
+  color: var(--tixy-ink-2, #54483d);
+}
+
+.sc-collect {
+  justify-self: end;
+}
+
+.sc-collect .sc-sub {
+  margin: 0;
+}
+
+.sc-page {
+  display: grid;
+  gap: 24px;
+}
+
+.sc-next {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  font-size: 1.125rem;
+}
+/* The sentence's numbers, not the prize stubs' (direct children only). */
+.sc-next > span > .arc-digits { font-size: 1.35em; line-height: 1; }
+
+.sc-status {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: 0.9375rem;
+  color: var(--tixy-ink-2, #54483d);
+}
+.sc-status:empty { display: none; }
+.sc-status[data-error] { color: var(--tixy-red-text, #8e281d); }
+
+
+.sq-panel {
+  padding: 18px 20px 20px;
+  border-radius: var(--tixy-radius-panel-lg, 22px);
+  background: var(--tixy-paper-2, #eadfcb);
+  color: var(--tixy-ink, #1f1a16);
+}
+.sq-panel h2 {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 4px 14px;
+  font-size: 1.375rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+.sq-panel h2 small {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--tixy-ink-2, #54483d);
+}
+.sq-panel h2 small .arc-digits { font-size: 1.3em; line-height: 1; }
+
+
+@media (max-width: 47.99rem) {
+  .sc-head {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 20px;
+  }
+  .sc-tier-num {
+    font-size: 72px;
+  }
+  .sc-collect {
+    justify-self: stretch;
+  }
+  .sc-collect > button {
+    width: 100%;
+  }
+}
+
+/* ── the track ────────────────────────────────────────────────────────── */
+
+/* The track runs out to the panel's edges, so cards scroll off the panel
+   instead of stopping short of its padding. */
+.sc-track {
+  grid-column: 1 / -1;
+  margin: 4px -28px 0;
+}
+.sc-track .st-scroll { padding-inline: 24px; scroll-padding-inline: 24px; }
+.sc-track .st-page[data-dir='back'] { left: 4px; }
+.sc-track .st-page[data-dir='on'] { right: 4px; }
+
+@media (max-width: 47.99rem) {
+  .sc-track { margin-inline: -20px; }
+  .sc-track .st-scroll { padding-inline: 16px; scroll-padding-inline: 16px; }
+}

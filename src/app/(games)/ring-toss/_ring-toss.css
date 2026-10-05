@@ -1,0 +1,61 @@
+/* Ring toss: the power trail, the keyboard's power gauge and the score
+   popups over the canvas. Everything else is drawn in three.js. */
+
+.rt-field {
+  position: relative;
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.rt-field canvas {
+  display: block;
+  touch-action: none;
+}
+
+.rt-trail {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* Keyboard players set power with the up and down arrows: a thin gauge on
+   the right edge, shown once they use a key. */
+.rt-power {
+  position: absolute;
+  right: 12px;
+  bottom: 18%;
+  width: 8px;
+  height: 34%;
+  border-radius: 4px;
+  background: rgb(31 26 22 / 0.7);
+  box-shadow: 0 0 0 2px rgb(244 235 220 / 0.5);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.rt-power[data-on='true'] {
+  opacity: 1;
+}
+
+.rt-power span {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: calc(var(--rt-power, 0.45) * 100%);
+  border-radius: 4px;
+  background: #f2a33c;
+}
+
+.rt-pop {
+  /* The shared callout plate (.arc-floater in gameplay-feedback.css), parked
+     at a bottle. Pooled: the client sets left and top, flips data-run. */
+  left: 0;
+  top: 0;
+  will-change: transform, opacity;
+}

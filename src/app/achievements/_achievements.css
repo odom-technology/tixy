@@ -1,0 +1,238 @@
+/* The achievements page. Panels are told apart by tone, badges carry the
+   tier, and the only motion is a press. Colours come from the theme tokens. */
+
+.ach-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 1.25rem 2.5rem;
+}
+.ach-big {
+  font-family: var(--font-num);
+  font-weight: var(--num-weight, 800);
+  font-size: 2.5rem;
+  line-height: 1;
+  color: var(--text-strong);
+}
+.ach-big small {
+  font-size: 1.5rem;
+  color: var(--text-muted);
+}
+.ach-big-label {
+  margin-top: 0.25rem;
+  font-size: var(--text-sm, 0.875rem);
+  color: var(--text-muted);
+}
+
+.ach-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+.ach-jump {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 34px;
+  padding: 0 0.8rem;
+  border-radius: var(--tixy-radius-button-sm, 8px);
+  background: var(--surface-raised);
+  color: var(--text-strong);
+  font-weight: 700;
+  font-size: var(--text-sm, 0.875rem);
+  transition: transform 90ms var(--tixy-ease-settle, ease);
+}
+.ach-jump:active {
+  transform: scale(0.96);
+}
+.ach-jump-count {
+  font-family: var(--font-num);
+  font-weight: 800;
+  color: var(--text-muted);
+}
+.ach-hide {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+  min-height: 34px;
+  font-size: var(--text-sm, 0.875rem);
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.ach-section {
+  scroll-margin-top: 72px;
+}
+.ach-section-head {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin: 0 0 0.75rem;
+}
+.ach-section-head h2 {
+  margin: 0;
+  font-weight: 800;
+  font-size: 1.5rem;
+  letter-spacing: -0.02em;
+  color: var(--text-strong);
+}
+.ach-section-head span {
+  font-family: var(--font-num);
+  font-weight: 800;
+  color: var(--text-muted);
+}
+.ach-note {
+  margin: -0.25rem 0 0.75rem;
+  color: var(--text-muted);
+  font-size: var(--text-sm, 0.875rem);
+}
+
+.ach-grid {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
+}
+
+/* A series: five badges in a row, the selected tier's detail underneath. */
+.ach-series {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-radius: var(--tixy-radius-panel, 18px);
+  background: var(--surface-panel);
+}
+.ach-series-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.ach-series-head h3 {
+  margin: 0;
+  font-weight: 800;
+  font-size: 1.0625rem;
+  letter-spacing: -0.02em;
+  color: var(--text-strong);
+}
+.ach-series-head span {
+  font-family: var(--font-num);
+  font-weight: 800;
+  color: var(--text-muted);
+}
+.ach-tiers {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.25rem;
+}
+.ach-tier {
+  display: grid;
+  justify-items: center;
+  padding: 0.35rem 0;
+  border-radius: var(--tixy-radius-button, 10px);
+  background: transparent;
+  transition: transform 90ms var(--tixy-ease-settle, ease);
+}
+.ach-tier:active {
+  transform: scale(0.96);
+}
+.ach-tier[aria-pressed='true'] {
+  background: var(--surface-raised);
+}
+.ach-tier svg {
+  width: min(100%, 3.75rem);
+  height: auto;
+}
+.ach-detail {
+  display: grid;
+  gap: 0.4rem;
+  min-height: 5.5rem;
+  align-content: start;
+}
+.ach-detail p {
+  margin: 0;
+  color: var(--text-body);
+  font-size: var(--text-sm, 0.875rem);
+}
+.ach-detail-title {
+  font-weight: 800;
+  color: var(--text-strong);
+}
+.ach-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.75rem;
+  font-size: var(--text-sm, 0.875rem);
+  color: var(--text-muted);
+}
+.ach-meta b {
+  font-family: var(--font-num);
+  font-weight: 800;
+  color: var(--text-strong);
+}
+.ach-count {
+  font-family: var(--font-num);
+  font-weight: 800;
+  color: var(--text-strong);
+}
+
+/* A feat or a secret: one badge and its text. */
+.ach-feat {
+  display: grid;
+  grid-template-columns: 4rem minmax(0, 1fr);
+  gap: 0.25rem 0.9rem;
+  align-items: start;
+  padding: 1rem;
+  border-radius: var(--tixy-radius-panel, 18px);
+  background: var(--surface-panel);
+}
+.ach-feat > svg {
+  width: 4rem;
+  height: 4rem;
+}
+.ach-feat .ach-detail {
+  min-height: 0;
+}
+
+.ach-star {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  margin-left: auto;
+  border-radius: var(--tixy-radius-button-sm, 8px);
+  color: var(--text-muted);
+  background: transparent;
+  transition: transform 90ms var(--tixy-ease-settle, ease);
+}
+.ach-star:hover:not(:disabled) {
+  background: var(--surface-raised);
+}
+.ach-star:active:not(:disabled) {
+  transform: scale(0.92);
+}
+.ach-star:disabled {
+  opacity: 0.4;
+}
+.ach-star[aria-pressed='true'] {
+  color: var(--text-strong);
+}
+
+.ach-empty {
+  padding: 2rem 1rem;
+  text-align: center;
+  color: var(--text-muted);
+  border-radius: var(--tixy-radius-panel, 18px);
+  background: var(--surface-panel);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ach-jump,
+  .ach-tier,
+  .ach-star {
+    transition: none;
+  }
+}

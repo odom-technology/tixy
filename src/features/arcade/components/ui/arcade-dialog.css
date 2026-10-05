@@ -1,0 +1,7 @@
+/* ArcadeDialog (arcade-sheet.tsx): a close button a thumb can hit. */
+@layer components {
+  .arc-dialog-root [aria-label='close' i] {
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+  }
+}

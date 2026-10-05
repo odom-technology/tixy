@@ -1,0 +1,162 @@
+/* The level panel (XpLine in xp-gain-burst.tsx): the level badge, the xp,
+   the bar to the next level, milestone tickets and the season bar, on one
+   paper 2 panel. It is paper 2 wherever it sits, so its text is ink even on
+   an ink screen. The bar and the season bar are styled in globals.css with
+   the result card. */
+.arc-prog {
+  display: grid;
+  gap: 12px;
+  padding: 14px 16px 16px;
+  border-radius: 16px;
+  background: var(--tixy-paper-2);
+  color: var(--tixy-ink);
+  font-family: var(--tixy-font-text);
+  text-align: left;
+}
+.arc-prog-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  column-gap: 14px;
+}
+.arc-prog-badge {
+  position: relative;
+  display: block;
+  width: 68px;
+  height: 68px;
+}
+.arc-prog-badge svg {
+  display: block;
+  position: relative;
+}
+.arc-prog-main {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+}
+.arc-prog-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+.arc-prog-title {
+  font-size: 1.1875rem;
+  font-weight: var(--tixy-weight-button);
+  line-height: 1.1;
+  white-space: nowrap;
+}
+.arc-prog-title .arc-digits {
+  font-family: var(--tixy-font-num);
+  font-size: 1.375rem;
+  font-weight: var(--tixy-weight-num);
+}
+.arc-prog-up {
+  display: inline-block;
+  transform-origin: left center;
+}
+.arc-prog-xp {
+  font-family: var(--tixy-font-num);
+  font-size: 1.75rem;
+  font-weight: var(--tixy-weight-num);
+  line-height: 1;
+  white-space: nowrap;
+}
+.arc-prog-xp small {
+  font-family: var(--tixy-font-text);
+  font-size: var(--text-sm);
+  font-weight: var(--tixy-weight-button);
+  color: var(--tixy-ink-2);
+}
+.arc-prog-next {
+  font-size: var(--text-sm);
+  color: var(--tixy-ink-2);
+}
+.arc-prog-next .arc-digits,
+.arc-prog-bonus .arc-digits {
+  font-family: var(--tixy-font-num);
+  font-weight: var(--tixy-weight-num);
+}
+/* Milestone tickets: an amber stub and the line that says what it was for. */
+.arc-prog-bonus {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--tixy-ink-2);
+}
+.arc-prog-bonus:not([data-shown]) {
+  visibility: hidden;
+}
+.arc-prog-bonus > span:first-child {
+  display: inline-flex;
+  flex: none;
+}
+.arc-prog-season {
+  padding-top: 2px;
+}
+
+/* "Level up" with the new level's badge, for anything outside the panel. */
+.arc-levelup {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--tixy-ink);
+  font-family: var(--tixy-font-text);
+  font-size: 1.1875rem;
+  font-weight: var(--tixy-weight-button);
+  transform-origin: left center;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .arc-prog:not([data-instant]) {
+    animation: tx-prog-in 220ms var(--tixy-ease-settle) both;
+  }
+  .arc-prog[data-phase='wait']:not([data-instant]) {
+    animation: none;
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  /* The level up: the badge punches to the new number, a ring flashes out
+     behind it, and "Level up" lands beside it. */
+  .arc-prog-badge[data-punch] svg {
+    animation: tx-badge-punch 460ms var(--tixy-ease-spring) both;
+  }
+  .arc-prog-badge[data-punch]::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: var(--tixy-ticket);
+    animation: tx-badge-ring 520ms var(--tixy-ease-settle) both;
+  }
+  .arc-prog:not([data-instant])[data-up] .arc-prog-up {
+    animation: tx-levelup 380ms var(--tixy-ease-spring) both;
+  }
+  .arc-prog:not([data-instant]) .arc-prog-bonus[data-shown] {
+    animation: tx-prog-in 260ms var(--tixy-ease-spring) 120ms both;
+  }
+  .arc-levelup[data-play] {
+    animation: tx-levelup 420ms var(--tixy-ease-spring) both;
+  }
+}
+
+@keyframes tx-prog-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes tx-badge-punch {
+  0% { transform: scale(0.82) rotate(-8deg); }
+  45% { transform: scale(1.2) rotate(4deg); }
+  100% { transform: none; }
+}
+@keyframes tx-badge-ring {
+  from { opacity: 0.55; transform: scale(0.9); }
+  to { opacity: 0; transform: scale(1.75); }
+}
+@keyframes tx-levelup {
+  0% { opacity: 0; transform: scale(1.5); }
+  40% { opacity: 1; }
+  100% { opacity: 1; transform: none; }
+}

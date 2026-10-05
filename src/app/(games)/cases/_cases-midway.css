@@ -1,0 +1,168 @@
+/* ──────────────────────────────────────────────────────────────────────
+   CASES — Midway scoped polish. Everything is namespaced under
+   .cases-midway so it cannot leak into other games or shared shells.
+
+   The case-open carousel is painted on a <canvas> (the reel itself reads
+   the live Midway tokens via getComputedStyle, so it tracks all four
+   sub-themes). This file frames that canvas as a recessed cabinet WINDOW —
+   a dark glass well with a hard inner bevel — and styles the DOM chrome
+   around it (result plate, rarity grid, tier chip) as enamel surfaces.
+   Depth is material, not light. NOTHING glows.
+   ────────────────────────────────────────────────────────────────────── */
+
+/* ── Recessed cabinet window around the reel canvas ──────────────────── */
+.cases-midway .cases-window {
+  position: relative;
+  border-radius: var(--radius-well);
+  background: linear-gradient(180deg, #15110d, var(--screen-well));
+  border: 1px solid var(--border-ink);
+  box-shadow:
+    inset 0 2px 10px #000000bb,
+    inset 0 0 0 1px #ffffff08,
+    inset 0 0 30px #00000080,
+    0 1px 0 var(--bevel-hi);
+  overflow: hidden;
+}
+
+/* Static glass sheen across the window — fixed diagonal, never animates,
+   never intercepts pointer input. */
+.cases-midway .cases-window::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(
+    155deg,
+    #ffffff10 0%,
+    #ffffff04 20%,
+    transparent 44%
+  );
+  mix-blend-mode: screen;
+}
+
+/* The tier chip floats above the sheen. */
+.cases-midway .cases-window > .cases-tier-chip {
+  z-index: 3;
+}
+
+/* ── Enamel rarity plate (result reveal) ─────────────────────────────── */
+.cases-midway .cases-result-plate {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 22px;
+  border-radius: var(--radius-tag);
+  border: 1px solid var(--cases-tier-edge, var(--border-soft));
+  background: linear-gradient(
+    180deg,
+    var(--cases-tier-hi, var(--surface-raised)),
+    var(--cases-tier, var(--surface-panel))
+  );
+  box-shadow:
+    inset 0 1px 0 #ffffff35,
+    inset 0 -3px 5px #00000050,
+    0 5px 0 var(--shadow-color),
+    0 7px 14px #00000050;
+}
+
+/* The enamel chip carrying the multiplier inside the result plate. */
+.cases-midway .cases-result-chip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-well);
+  font-family: var(--font-mono-arcade);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  font-size: 22px;
+  color: var(--cases-tier-on, var(--text-strong));
+  background: var(--cases-tier-deep, #00000040);
+  box-shadow:
+    inset 0 2px 0 #ffffff30,
+    inset 0 -3px 4px #00000050,
+    0 1px 0 #00000060;
+}
+
+.cases-midway .cases-result-tier {
+  font-family: var(--font-display);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--cases-tier-on, var(--text-strong));
+  text-shadow: 0 2px 0 #00000050;
+}
+
+.cases-midway .cases-result-sub {
+  font-size: 12px;
+  color: var(--cases-tier-on, var(--text-body));
+  opacity: 0.78;
+}
+
+.cases-midway .cases-result-amt {
+  font-family: var(--font-mono-arcade);
+  font-variant-numeric: tabular-nums;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--cases-tier-on, var(--text-strong));
+  text-shadow: 0 1px 0 #00000060;
+}
+
+/* ── Possible-rewards grid: enamel rarity tiles with dashed perforation ─ */
+.cases-midway .cases-reward-tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 8px 4px 7px;
+  border-radius: var(--radius-tag);
+  overflow: hidden;
+  border: 1px solid var(--cases-tier-edge, var(--border-soft));
+  background: linear-gradient(
+    180deg,
+    var(--cases-tier-hi, var(--surface-raised)),
+    var(--cases-tier, var(--surface-panel))
+  );
+  box-shadow:
+    inset 0 1px 0 #ffffff28,
+    inset 0 -2px 4px #00000045,
+    0 2px 0 var(--shadow-color);
+}
+
+.cases-midway .cases-reward-mult {
+  font-family: var(--font-mono-arcade);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  font-size: 12px;
+  color: var(--cases-tier-on, var(--text-strong));
+  text-shadow: 0 1px 0 #00000050;
+}
+
+.cases-midway .cases-reward-perf {
+  width: 100%;
+  height: 1px;
+  border-top: 1.5px dashed var(--cases-tier-perf, #ffffff35);
+  opacity: 0.7;
+}
+
+.cases-midway .cases-reward-odds {
+  font-family: var(--font-mono-arcade);
+  font-variant-numeric: tabular-nums;
+  font-size: 9px;
+  color: var(--cases-tier-on, var(--text-body));
+  opacity: 0.72;
+}
+
+/* ── Reduced motion: no animation shipped here; explicit guard so any
+   future additions inherit the no-motion contract. ──────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .cases-midway .cases-window::after {
+    background: linear-gradient(155deg, #ffffff0a 0%, transparent 44%);
+  }
+}

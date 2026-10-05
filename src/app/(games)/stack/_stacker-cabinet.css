@@ -1,0 +1,102 @@
+/* Stacker's cabinet: the DOM layer over the canvas. The lamps are drawn in
+   the canvas; the prize stubs and the perfect callout are DOM so their type
+   is Gabarito and Big Shoulders. The whole stage is the button. */
+
+.stc-stage {
+  position: absolute;
+  inset: 0;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.stc-stage > canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+/* A prize stub, centred on its row. When the row is placed it pops on the
+   overshoot spring and gets a lit ring. */
+.stc-prize {
+  position: absolute;
+  translate: 0 -50%;
+  pointer-events: none;
+}
+
+.stc-prize[data-banked] .arc-ticket-stub {
+  animation: stc-bank 420ms cubic-bezier(0.2, 1.5, 0.4, 1) both;
+  box-shadow: 0 0 0 2px #f7e7c6, 0 0 18px rgb(242 163 60 / 0.65);
+}
+
+@keyframes stc-bank {
+  0% {
+    scale: 1;
+  }
+  35% {
+    scale: 1.32;
+  }
+  100% {
+    scale: 1.08;
+  }
+}
+
+.stc-callout {
+  position: absolute;
+  inset-inline: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+/* "perfect ×4": a streak, so the combo plate of the shared callout (paper,
+   ink words, the number in the number face), in on the spring in 120 ms. It
+   shows again on each step. */
+.stc-perfect {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.25rem;
+  padding: 5px 10px 6px;
+  border-radius: var(--tixy-radius-button-sm, 8px);
+  background: var(--enamel-primary, #f4ebdc);
+  color: var(--enamel-primary-on, #1f1a16);
+  font-family: var(--tixy-font-text, 'Gabarito'), system-ui, sans-serif;
+  font-size: clamp(1rem, 0.85rem + 0.6vw, 1.25rem);
+  font-weight: var(--tixy-weight-heading, 800);
+  letter-spacing: -0.01em;
+  line-height: 1;
+  animation: stc-pop 120ms cubic-bezier(0.2, 1.5, 0.4, 1) both;
+}
+
+.stc-perfect .arc-digits,
+.stc-perfect .stc-times {
+  color: inherit;
+  font-family: var(--tixy-font-num, 'Big Shoulders'), system-ui, sans-serif;
+  font-size: clamp(1.25rem, 1rem + 0.9vw, 1.625rem);
+  font-weight: var(--tixy-weight-num, 800);
+  letter-spacing: var(--tixy-tracking-num, 0.01em);
+}
+
+@keyframes stc-pop {
+  from {
+    scale: 0.86;
+    opacity: 0;
+  }
+  to {
+    scale: 1;
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stc-prize[data-banked] .arc-ticket-stub,
+  .stc-perfect {
+    animation: none;
+  }
+
+  .stc-prize[data-banked] .arc-ticket-stub {
+    scale: 1.08;
+  }
+}

@@ -1,0 +1,331 @@
+/* ──────────────────────────────────────────────────────────────────────
+   PUNCH CARD — Midway scoped polish. Namespaced under .punch-card-midway so it
+   can't leak into other games. Warm lacquered cabinet, cream paper cells,
+   punched-ink fills, engraved clue gutters. HARD bevels + offset shadows.
+   The board is a square grid: a top gutter of column clues + a left gutter of
+   row clues + the n×n cell field. Touch drag-paint + keyboard friendly.
+   Decorative motion degrades under prefers-reduced-motion.
+   ────────────────────────────────────────────────────────────────────── */
+
+.punch-card-midway .pc-stage {
+  position: relative;
+}
+
+/* The whole board is a square: (clue gutter + n cells) on each axis. A single
+   --u unit (percentage of the square's side) sizes gutters AND cells so the
+   clue numbers always line up with their rows/columns. */
+.punch-card-midway .pc-grid {
+  /* Per-axis units: the LEFT gutter is --clue-cols cells wide (longest actual
+     row clue) and the TOP gutter is --clue-rows cells tall (longest actual
+     column clue) — both set inline by the client from the dealt puzzle, so no
+     worst-case void is ever reserved. The element's aspect-ratio is also set
+     inline ((n + clue-cols) / (n + clue-rows)) to keep cells square. */
+  --uw: calc(100% / (var(--n) + var(--clue-cols)));
+  --uh: calc(100% / (var(--n) + var(--clue-rows)));
+  position: relative;
+  /* Fill the column, but never grow past what the viewport can show with the
+     header/toolbars around it — taller screens get a bigger board. */
+  width: min(100%, calc(100dvh - 20rem));
+  margin-inline: auto;
+  container-type: inline-size;
+  display: grid;
+  grid-template-columns: calc(var(--clue-cols) * var(--uw)) calc(var(--n) * var(--uw));
+  grid-template-rows: calc(var(--clue-rows) * var(--uh)) calc(var(--n) * var(--uh));
+  background: var(--pc-board-bg, #1c160d);
+  border-radius: var(--radius-well, 12px);
+  padding: 5px;
+  box-shadow:
+    inset 0 2px 6px rgba(0, 0, 0, 0.6),
+    inset 0 0 0 2px #0f0a06,
+    0 1px 0 var(--bevel-hi, #fffdf6),
+    0 6px 0 var(--shadow-color, #00000055),
+    0 10px 24px rgba(0, 0, 0, 0.45);
+  touch-action: none;
+  user-select: none;
+}
+
+/* The corner where the two clue gutters meet: styled as part of the engraved
+   clue frame (same chip paint) with a faint board-size stamp, so it never
+   reads as a dead hole. */
+.punch-card-midway .pc-corner {
+  grid-column: 1;
+  grid-row: 1;
+  display: grid;
+  place-items: center;
+  background: var(--pc-clue-bg, #e6d8b8);
+  border-radius: 6px;
+  color: color-mix(in srgb, var(--pc-clue-color, #4a3922) 50%, transparent);
+  font-family: var(--font-mono-arcade, ui-monospace, monospace);
+  font-weight: 700;
+  font-size: clamp(9px, calc(34cqw / (var(--n) + var(--clue-cols))), 14px);
+  letter-spacing: 0.04em;
+}
+
+/* Column clues — one bottom-aligned vertical stack per board column. */
+.punch-card-midway .pc-col-clues {
+  grid-column: 2;
+  grid-row: 1;
+  display: grid;
+  grid-template-columns: repeat(var(--n), 1fr);
+}
+.punch-card-midway .pc-col-clue {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 2px;
+  padding-bottom: 6%;
+  color: var(--pc-clue-color, #4a3922);
+  font-family: var(--font-mono-arcade, ui-monospace, monospace);
+  font-weight: 700;
+  /* ~0.56 of a cell, via container-query width (a raw % here would resolve
+     against the PARENT FONT SIZE and collapse to the clamp floor). */
+  font-size: clamp(10px, calc(56cqw / (var(--n) + var(--clue-cols))), 20px);
+  line-height: 1;
+}
+/* Row clues — one right-aligned horizontal row per board row. */
+.punch-card-midway .pc-row-clues {
+  grid-column: 1;
+  grid-row: 2;
+  display: grid;
+  grid-template-rows: repeat(var(--n), 1fr);
+}
+.punch-card-midway .pc-row-clue {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 5px;
+  padding-right: 7%;
+  color: var(--pc-clue-color, #4a3922);
+  font-family: var(--font-mono-arcade, ui-monospace, monospace);
+  font-weight: 700;
+  font-size: clamp(10px, calc(56cqw / (var(--n) + var(--clue-cols))), 20px);
+  line-height: 1;
+}
+/* Faint chip background on the clue gutters so they read as engraved. */
+.punch-card-midway .pc-col-clues,
+.punch-card-midway .pc-row-clues {
+  background: var(--pc-clue-bg, #e6d8b8);
+  border-radius: 6px;
+}
+.punch-card-midway .pc-col-clue[data-done],
+.punch-card-midway .pc-row-clue[data-done] {
+  color: color-mix(in srgb, var(--pc-clue-color, #4a3922) 42%, transparent);
+}
+
+/* The cell field. */
+.punch-card-midway .pc-cells {
+  grid-column: 2;
+  grid-row: 2;
+  display: grid;
+  grid-template-columns: repeat(var(--n), 1fr);
+  grid-template-rows: repeat(var(--n), 1fr);
+  gap: 1px;
+  background: var(--pc-grid-line, #d3bd93);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+/* A single cell — a small cream paper key. */
+.punch-card-midway .pc-cell {
+  position: relative;
+  appearance: none;
+  margin: 0;
+  padding: 0;
+  border: none;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1 / 1;
+  background: var(--pc-cell-bg, linear-gradient(180deg, #f4ead4 0%, #e7d9bd 100%));
+  cursor: pointer;
+  outline: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -2px 2px rgba(0, 0, 0, 0.12);
+  transition:
+    background-color 70ms ease,
+    box-shadow 70ms ease,
+    transform 60ms ease;
+}
+
+/* Thicker seams every 5 cells so 10×10 / 15×15 read in blocks. */
+.punch-card-midway .pc-cell[data-block-left] {
+  margin-left: 2px;
+}
+.punch-card-midway .pc-cell[data-block-top] {
+  margin-top: 2px;
+}
+
+/* Filled ("punched") cell — the picture pixel. Dark enamel with a hard bevel. */
+.punch-card-midway .pc-cell[data-state='1'] {
+  background: var(--pc-fill, linear-gradient(180deg, #37291a 0%, #221910 100%));
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.55),
+    inset 0 0 0 1px var(--pc-fill-edge, #120c06);
+}
+.punch-card-midway .pc-cell[data-state='1'][data-pop] {
+  animation: pc-pop 150ms ease-out;
+}
+
+/* X-marked cell (known-empty) — a faint pencil cross. */
+.punch-card-midway .pc-cell[data-state='2']::before,
+.punch-card-midway .pc-cell[data-state='2']::after {
+  content: '';
+  position: absolute;
+  width: 62%;
+  height: 12%;
+  border-radius: 2px;
+  background: var(--pc-x-color, #b0703f);
+  opacity: 0.85;
+}
+.punch-card-midway .pc-cell[data-state='2']::before {
+  transform: rotate(45deg);
+}
+.punch-card-midway .pc-cell[data-state='2']::after {
+  transform: rotate(-45deg);
+}
+
+/* Cursor / selection ring — on-theme accent, no glow by default. */
+.punch-card-midway .pc-cell[data-cursor] {
+  z-index: 2;
+  box-shadow:
+    inset 0 0 0 3px var(--pc-accent, #2fb8a6),
+    0 0 10px 1px var(--pc-solved-glow, transparent);
+}
+.punch-card-midway .pc-cell:focus-visible {
+  z-index: 3;
+  box-shadow:
+    inset 0 0 0 3px var(--bevel-hi, #fffdf6),
+    inset 0 0 0 4px var(--pc-accent, #2fb8a6);
+}
+
+/* Hovered row+column crosshair wash to help scanning (pointer only). */
+@media (hover: hover) {
+  .punch-card-midway .pc-cell[data-crosshair]:not([data-state='1']):not([data-cursor]) {
+    background: color-mix(in srgb, var(--pc-accent, #2fb8a6) 16%, var(--pc-cell-solid, #f4ead4));
+  }
+}
+
+@keyframes pc-pop {
+  0% {
+    transform: scale(0.55);
+  }
+  70% {
+    transform: scale(1.12);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Solved reveal — the picture warms up in the reveal palette. */
+.punch-card-midway .pc-grid[data-solved] .pc-cell[data-state='1'] {
+  background: var(--pc-reveal, #c8791f);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.35),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.35),
+    inset 0 0 0 1px color-mix(in srgb, var(--pc-reveal, #c8791f) 60%, #000);
+  animation: pc-reveal 420ms ease-out both;
+}
+@keyframes pc-reveal {
+  0% {
+    transform: scale(0.7);
+    opacity: 0.4;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Mode / tool bar keys reuse the sudoku enamel-key feel. */
+.punch-card-midway .pc-toolbar {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.punch-card-midway .pc-tool {
+  position: relative;
+  appearance: none;
+  border: none;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding-block: 0.7rem;
+  border-radius: clamp(8px, 1.8vw, 14px);
+  background: linear-gradient(180deg, #fbf3e3 0%, #ece0c6 100%);
+  color: var(--ink, #1c160d);
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  outline: none;
+  touch-action: manipulation;
+  box-shadow:
+    inset 0 3px 0 rgba(255, 255, 255, 0.6),
+    inset 0 -4px 4px rgba(0, 0, 0, 0.2),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.16),
+    0 4px 0 var(--shadow-color, rgba(0, 0, 0, 0.4));
+  transition:
+    transform 80ms ease,
+    box-shadow 80ms ease,
+    background-color 90ms ease;
+}
+.punch-card-midway .pc-tool:active {
+  transform: translateY(3px);
+  box-shadow:
+    inset 0 3px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.28),
+    0 1px 0 var(--shadow-color, rgba(0, 0, 0, 0.4));
+}
+/* The active paint mode (fill vs X) lights up in enamel. */
+.punch-card-midway .pc-tool[data-on='fill'] {
+  background: linear-gradient(180deg, #4a3826 0%, #2c2114 100%);
+  color: #f4ead4;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -3px 4px rgba(0, 0, 0, 0.4),
+    inset 0 0 0 2px #120c06,
+    0 2px 0 var(--shadow-color, rgba(0, 0, 0, 0.4));
+  transform: translateY(2px);
+}
+.punch-card-midway .pc-tool[data-on='x'] {
+  background: linear-gradient(180deg, #d68a5b 0%, #b0703f 100%);
+  color: #241206;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -3px 4px rgba(0, 0, 0, 0.28),
+    inset 0 0 0 2px #7c4a26,
+    0 2px 0 var(--shadow-color, rgba(0, 0, 0, 0.4));
+  transform: translateY(2px);
+}
+
+.punch-card-midway .pc-overlay {
+  z-index: 4;
+}
+
+.punch-card-midway .pc-grid[data-shake] {
+  animation: pc-shake 320ms ease-in-out;
+}
+@keyframes pc-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .punch-card-midway .pc-cell,
+  .punch-card-midway .pc-tool {
+    transition: none;
+  }
+  .punch-card-midway .pc-cell[data-state='1'][data-pop],
+  .punch-card-midway .pc-grid[data-solved] .pc-cell[data-state='1'],
+  .punch-card-midway .pc-grid[data-shake] {
+    animation: none;
+  }
+}

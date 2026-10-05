@@ -1,0 +1,4876 @@
+@import "tailwindcss";
+
+/* ── Arcade "Midway" design system ──────────────────────────────────
+   Reference: docs/design/midway/readme.md
+   Every surface is a painted wooden panel, every button a key with
+   real travel, every balance a ticket stub. Depth comes from hard
+   offset shadows and bevels — nothing glows, things sit.
+   The theme is an account setting (src/features/arcade/lib/arcade-themes.ts).
+   <html data-arcade-theme> carries the system: boardwalk (Odom's original,
+   the Midway tokens in the :root block below) or tixy, the rev. 2 brand
+   (docs/design/tixy-rebrand/PLAN.md): a light paper ground with ink
+   cabinets. Its brand tokens (--tixy-*) are defined for every theme; the
+   semantic mapping below only applies under tixy. <html data-tixy-scheme>
+   swaps the --tixy-* colours for a scheme (THEMES.md). */
+
+/* ── Color tokens ─────────────────────────────────────────────────── */
+
+:root {
+  color-scheme: dark;
+
+  /* lacquer stack */
+  --bg: #16100a;
+  --surface-panel: #261d13;
+  --surface-raised: #2f251a;
+  --surface-well: #17110a;
+  --border-ink: #0f0a06;
+  --border-soft: #3d3022;
+  --shadow-color: #0c0804;
+
+  /* cream ink */
+  --text-strong: #f6eddc;
+  --text-body: #e2d5bc;
+  --text-muted: #b3a48a;
+
+  /* enamel paints — always applied SOLID, never as an alpha tint */
+  --enamel-primary: #c73538;
+  --enamel-primary-on: #ffefe4;
+  --enamel-primary-edge: #7e2225;
+  --enamel-primary-text: #ff7a76;
+
+  --enamel-tickets: #f2a33c;
+  --enamel-tickets-on: #2a1b06;
+  --enamel-tickets-edge: #9a621a;
+  --enamel-tickets-text: #f2a33c;
+
+  --enamel-prize: #2fb8a6;
+  --enamel-prize-on: #07211d;
+  --enamel-prize-edge: #1b7466;
+  --enamel-prize-text: #3fc9b6;
+
+  --enamel-info: #6c8fe0;
+  --enamel-info-on: #0a1430;
+  --enamel-info-edge: #3d5694;
+  --enamel-info-text: #8faef0;
+
+  --enamel-danger: #a32c34;
+  --enamel-danger-on: #ffe9e4;
+  --enamel-danger-edge: #66191f;
+  --enamel-danger-text: #ff8a85;
+
+  /* the cream "key" (default button face) */
+  --key-face: #f6eddc;
+  --key-face-on: #1b140d;
+  --key-face-edge: #c4b392;
+  --key-face-hi: #fdf7ea;
+
+  --focus-ring: #f2a33c;
+
+  /* material — warm lacquer (boardwalk default) */
+  --bevel-hi: #4a382278;            /* warm semi-transparent top-edge highlight */
+  --key-side: #6b5631;              /* the solid keycap "side" block */
+  --text-faint: #a39376;            /* third ink tier: labels / meta only; 5:1 on raised */
+  /* enamel gradient TOPs — only for dark-on-color enamels (safe to lighten) */
+  --enamel-primary-hi: #d34b4e;     /* lighter red plate top (mockup cabinet badge) */
+  --enamel-tickets-hi: #f7bd5e;
+  --enamel-prize-hi: #46cdbb;
+  --enamel-info-hi: #88a6ee;
+  /* page ground — wood planks + warm vignette */
+  --page-bg:
+    repeating-linear-gradient(92deg, #1a130b 0 2px, #140e08 2px 5px, #18110a 5px 7px),
+    radial-gradient(ellipse at 50% -10%, #2a1f13 0%, #16100a 60%);
+}
+
+/* tixy: paper ground, ink text and cabinets. Maps the Midway semantic
+   tokens onto the six tixy colours so existing screens stay legible
+   before each one is rebuilt. Contrast for every text pair here is
+   checked by `node scripts/check-tixy-contrast.mjs`. The enamel jobs:
+   primary → ink (the primary button), key → paper 3 (the secondary),
+   tickets and prize → ticket (tickets and you), danger → red,
+   info → paper 3. Amber and red are fills; text on paper stays ink,
+   because ticket is 1.8:1 on paper.
+   The second selector re-declares this mapping inside a cabinet under a
+   colour scheme, where the cabinet reset (below the brand tokens) puts
+   the default palette back, so paper parts in a cabinet read as they do
+   under the default. :where keeps it under the ink mapping that follows. */
+:root[data-arcade-theme='tixy'],
+:root[data-arcade-theme='tixy'][data-tixy-scheme]
+  :where(.arc-stage, .arcade-game-stage, [data-surface='ink'], .arc-shell-cabinet, .arc-howto-picture,
+    .tx-table, .tx-screen, .tx-counter, .tp-screen, .lb-screen, .pc-head, .pc-case, .pc-shelf) {
+  color-scheme: light;
+
+  --bg: var(--tixy-paper);
+  --surface-panel: var(--tixy-paper-2);
+  --surface-raised: var(--tixy-paper-3);
+  --surface-well: var(--tixy-paper-3);
+  /* lines are ink tints: hairlines between rows, quiet edges elsewhere */
+  --border-ink: rgb(var(--tixy-line) / 0.2);
+  --border-soft: rgb(var(--tixy-line) / 0.12);
+  /* inputs and switches need a 3:1 edge (WCAG 1.4.11): ink 3 is 4.1:1 on
+     paper 3 and 4.8:1 on paper 2 */
+  --border-control: var(--tixy-ink-3);
+  --shadow-color: rgb(31 26 22 / 0.16);
+  /* Game overlays veil their stage with this. Paper, so the ink text
+     printed on them reads. The modal overlay sets its own ink dim. */
+  --scrim: var(--tixy-paper);
+
+  --text-strong: var(--tixy-ink);
+  --text-body: var(--tixy-ink);
+  --text-muted: var(--tixy-ink-2);
+  /* ink 3 is 4.1:1 on paper 3, so the faint tier stays ink 2 */
+  --text-faint: var(--tixy-ink-2);
+
+  --enamel-primary: var(--tixy-ink);
+  --enamel-primary-on: var(--tixy-paper);
+  --enamel-primary-edge: var(--tixy-ink);
+  --enamel-primary-text: var(--tixy-ink);
+  --enamel-primary-hi: var(--tixy-ink);
+
+  --enamel-tickets: var(--tixy-ticket);
+  --enamel-tickets-on: var(--tixy-on-ticket);
+  --enamel-tickets-edge: var(--tixy-ticket);
+  --enamel-tickets-text: var(--tixy-ink);
+  --enamel-tickets-hi: var(--tixy-ticket);
+
+  --enamel-prize: var(--tixy-ticket);
+  --enamel-prize-on: var(--tixy-on-ticket);
+  --enamel-prize-edge: var(--tixy-ticket);
+  --enamel-prize-text: var(--tixy-ink);
+  --enamel-prize-hi: var(--tixy-ticket);
+
+  --enamel-info: var(--tixy-paper-3);
+  --enamel-info-on: var(--tixy-ink);
+  --enamel-info-edge: var(--tixy-paper-3);
+  --enamel-info-text: var(--tixy-ink-2);
+  --enamel-info-hi: var(--tixy-paper-3);
+
+  --enamel-danger: var(--tixy-red);
+  --enamel-danger-on: var(--tixy-on-red);
+  --enamel-danger-edge: var(--tixy-red);
+  /* red is 4.4:1 on paper 2; small red text uses the deeper red */
+  --enamel-danger-text: var(--tixy-red-text);
+
+  --key-face: var(--tixy-paper-3);
+  --key-face-on: var(--tixy-ink);
+  --key-face-edge: var(--tixy-paper-3);
+  --key-face-hi: var(--tixy-paper-3);
+
+  --focus-ring: var(--tixy-ink);
+  --focus-outline: 2px solid var(--tixy-ink);
+
+  --pos: var(--tixy-ink);
+  --neg: var(--tixy-red-text);
+  --screen-well: var(--tixy-cabinet);
+
+  /* flat: surfaces are told apart by tone, not bevels or offset blocks */
+  --bevel-hi: transparent;
+  --bevel-lo: transparent;
+  --key-side: transparent;
+  --key-bevel-hi: transparent;
+  --key-bevel-lo: transparent;
+  --grain: none, none;
+  --page-bg: none;
+  --shadow-chip: none;
+  --shadow-key: none;
+  --shadow-key-pressed: none;
+  --shadow-key-enamel: none;
+  --shadow-key-enamel-pressed: none;
+  --shadow-panel: none;
+  --shadow-cabinet: none;
+  --shadow-well: none;
+  --shadow-modal: var(--tixy-shadow-lift);
+}
+
+/* Ink cabinets inside tixy: a game stage, or anything marked
+   data-surface='ink', gets the dark mapping so the light text and
+   enamels games already draw on their stage stay legible. */
+:root[data-arcade-theme='tixy'] :is(.arc-stage, .arcade-game-stage, [data-surface='ink']) {
+  color-scheme: dark;
+
+  --bg: var(--tixy-ink);
+  --surface-panel: var(--tixy-rail);
+  --surface-raised: var(--tixy-screen-2);
+  --surface-well: var(--tixy-screen);
+  --border-ink: var(--tixy-ink);
+  --border-soft: rgb(244 235 220 / 0.14);
+  --border-control: var(--tixy-on-ink-3);
+  --shadow-color: rgb(0 0 0 / 0.4);
+  --scrim: var(--tixy-ink);
+
+  --text-strong: var(--tixy-paper);
+  --text-body: var(--tixy-paper);
+  --text-muted: var(--tixy-on-ink-2);
+  --text-faint: var(--tixy-on-ink-3);
+
+  --enamel-primary: var(--tixy-paper);
+  --enamel-primary-on: var(--tixy-ink);
+  --enamel-primary-edge: var(--tixy-paper);
+  --enamel-primary-hi: var(--tixy-paper);
+  --enamel-primary-text: var(--tixy-paper);
+  --enamel-tickets-text: var(--tixy-ticket);
+  --enamel-prize-text: var(--tixy-ticket);
+  --enamel-info: var(--tixy-screen-2);
+  --enamel-info-on: var(--tixy-paper);
+  --enamel-info-edge: var(--tixy-screen-2);
+  --enamel-info-hi: var(--tixy-screen-2);
+  --enamel-info-text: var(--tixy-on-ink-2);
+  --enamel-danger-text: var(--tixy-on-ink-red);
+
+  --key-face: var(--tixy-screen-2);
+  --key-face-on: var(--tixy-paper);
+  --key-face-edge: var(--tixy-screen-2);
+  --key-face-hi: var(--tixy-screen-2);
+
+  /* paper, so ticket keeps its one job */
+  --focus-ring: var(--tixy-paper);
+  --focus-outline: 2px solid var(--tixy-paper);
+  --pos: var(--tixy-ticket);
+  --neg: var(--tixy-on-ink-red);
+  --screen-well: var(--tixy-screen);
+
+  color: var(--text-body);
+}
+
+/* ── tixy brand tokens ───────────────────────────────────────────────
+   Defined under every theme so rebuilt screens can use them directly.
+   Each colour has one job (PLAN.md, "Colour"):
+   paper: the ground · paper 2/3: panels, rows, secondary buttons ·
+   ink: text, the primary button, cabinets · ticket: tickets and you ·
+   red: the dot, your turn, a new best, destructive · felt: the pool
+   table only. */
+:root {
+  --tixy-paper: #f4ebdc;
+  --tixy-paper-2: #eadfcb;
+  --tixy-paper-3: #ded0b7;
+  --tixy-ink: #1f1a16;
+  --tixy-ink-2: #54483d; /* 7.5:1 on paper, 5.8:1 on paper 3 */
+  --tixy-ink-3: #6b5e51; /* 5.3:1 on paper, 4.8:1 on paper 2; not on paper 3 */
+  --tixy-ticket: #f2a33c;
+  --tixy-red: #b83627; /* 4.9:1 on paper; on paper 2 only 19 px bold and up */
+  --tixy-felt: #2e7566;
+
+  /* text-only shades for grounds the six colours can't reach at 4.5:1 */
+  --tixy-red-text: #9a2d20; /* red text on paper 2 and 3: 5.8:1, 5.0:1 */
+  /* roles a colour scheme can split off: text on a ticket fill, text on
+     a red fill, the cabinet outside its screen, and the r g b of hairlines */
+  --tixy-on-ticket: #1f1a16;
+  --tixy-on-red: #f4ebdc;
+  --tixy-cabinet: #1f1a16;
+  --tixy-line: 31 26 22;
+  /* ink cabinet tones (mockup rail and screens) and the text on them */
+  --tixy-rail: #2b2119;
+  --tixy-screen: #2a231d;
+  --tixy-screen-2: #3a3029;
+  --tixy-on-ink-2: #c9c1b4; /* paper 80% over ink: 7.2:1 on screen 2 */
+  --tixy-on-ink-3: #b0a89d; /* paper 68% over ink: 5.5:1 on screen 2 */
+  --tixy-on-ink-red: #dd9484; /* 5.3:1 on screen 2 */
+
+  /* shape */
+  --tixy-radius-panel-sm: 14px;
+  --tixy-radius-panel: 18px;
+  --tixy-radius-panel-lg: 22px;
+  --tixy-radius-button: 10px;
+  --tixy-radius-button-sm: 8px;
+  --tixy-bezel: 5px; /* the ink border every game screen sits in: border-tixy-bezel */
+  --tixy-shadow-lift: 0 18px 40px -24px rgb(31 26 22 / 0.45);
+
+  /* type: Gabarito for words, Big Shoulders for numbers only. Big
+     Shoulders has proportional figures and no tnum feature, so numbers
+     that count need fixed-width digit cells (the kit's job). */
+  --tixy-font-text: var(--font-gabarito, 'Gabarito'), system-ui, sans-serif;
+  --tixy-font-num: var(--font-big-shoulders, 'Big Shoulders'), var(--font-gabarito, 'Gabarito'),
+    system-ui, sans-serif;
+  --tixy-weight-body: 400;
+  --tixy-weight-button: 700;
+  --tixy-weight-heading: 800; /* names and headings */
+  --tixy-weight-wordmark: 900;
+  --tixy-weight-num: 800;
+  --tixy-tracking-name: -0.02em; /* the tightest tracking anywhere */
+  --tixy-tracking-num: 0.01em;
+
+  /* motion: things move when something happens */
+  --tixy-ease-spring: cubic-bezier(0.2, 1.5, 0.4, 1); /* overshoots a little */
+  --tixy-ease-settle: cubic-bezier(0.15, 0.8, 0.25, 1); /* slows to a stop */
+  --tixy-press-in: 40ms; /* buttons sink 1 px and shrink to 96% */
+  --tixy-press-out: 90ms;
+  --tixy-press-scale: 0.96;
+  --tixy-panel-fast: 120ms; /* panels move on one axis, 120 to 180 ms */
+  --tixy-panel-slow: 180ms;
+}
+
+/* ── Colour schemes ──────────────────────────────────────────────────
+   Each scheme swaps the --tixy-* colours on <html data-tixy-scheme>; the
+   layout, type and shapes stay. The values match
+   src/features/arcade/lib/arcade-themes.ts, and `npm run test:themes`
+   checks both the match and the contrast of every pair
+   (docs/design/tixy-rebrand/THEMES.md). The jobs don't move: ticket is
+   tickets and you, red is your turn, a new best, a loss or destructive,
+   felt is the pool table. Cabinets keep the default palette inside (the
+   cabinet reset below), so game screens and their art never change. */
+
+/* night shift: the floor after close. A dark scheme, so ink and paper
+   trade places: ink is the light text and the primary button, paper the
+   dark ground. Red is lifted so it reads on the dark, and text on red is
+   paper. Cabinets go darker than the floor so they still stand out. */
+:root[data-tixy-scheme='night-shift'] {
+  color-scheme: dark;
+
+  --tixy-paper: #191512;
+  --tixy-paper-2: #241e19;
+  --tixy-paper-3: #302822;
+  --tixy-ink: #f4ebdc;
+  --tixy-ink-2: #cdc1af;
+  --tixy-ink-3: #ab9d8a;
+  --tixy-ticket: #f2a33c;
+  --tixy-red: #e8705c;
+  --tixy-red-text: #f08f7d;
+  --tixy-felt: #2e7566;
+  --tixy-on-ticket: #1f1a16;
+  --tixy-on-red: #191512;
+  --tixy-cabinet: #0d0b09;
+  --tixy-line: 244 235 220;
+  --tixy-shadow-lift: 0 18px 40px -24px rgb(0 0 0 / 0.8);
+  --shadow-color: rgb(0 0 0 / 0.4);
+}
+
+/* seaside: sea glass panels, harbour blue ink and cabinets. */
+:root[data-tixy-scheme='seaside'] {
+  --tixy-paper: #e4efea;
+  --tixy-paper-2: #d5e6df;
+  --tixy-paper-3: #c4dad1;
+  --tixy-ink: #102a30;
+  --tixy-ink-2: #304a4f;
+  --tixy-ink-3: #465f63;
+  --tixy-ticket: #f2a33c;
+  --tixy-red: #b0322a;
+  --tixy-red-text: #922820;
+  --tixy-felt: #2e7566;
+  --tixy-on-ticket: #102a30;
+  --tixy-on-red: #f6fbf9;
+  --tixy-cabinet: #102a30;
+  --tixy-line: 16 42 48;
+  --tixy-shadow-lift: 0 18px 40px -24px rgb(16 42 48 / 0.45);
+  --shadow-color: rgb(16 42 48 / 0.16);
+}
+
+/* cotton candy: pink paper, plum ink and cabinets. */
+:root[data-tixy-scheme='cotton-candy'] {
+  --tixy-paper: #fbeaf0;
+  --tixy-paper-2: #f5dbe6;
+  --tixy-paper-3: #ecc9d9;
+  --tixy-ink: #2c1632;
+  --tixy-ink-2: #5a3c5f;
+  --tixy-ink-3: #6e5173;
+  --tixy-ticket: #f2a33c;
+  --tixy-red: #b3263c;
+  --tixy-red-text: #951f33;
+  --tixy-felt: #2e7566;
+  --tixy-on-ticket: #2c1632;
+  --tixy-on-red: #fff6f9;
+  --tixy-cabinet: #2c1632;
+  --tixy-line: 44 22 50;
+  --tixy-shadow-lift: 0 18px 40px -24px rgb(44 22 50 / 0.45);
+  --shadow-color: rgb(44 22 50 / 0.16);
+}
+
+/* high contrast: black on white, darker greys, lines twice as firm. */
+:root[data-tixy-scheme='high-contrast'] {
+  --tixy-paper: #ffffff;
+  --tixy-paper-2: #efefef;
+  --tixy-paper-3: #e0e0e0;
+  --tixy-ink: #000000;
+  --tixy-ink-2: #262626;
+  --tixy-ink-3: #3d3d3d;
+  --tixy-ticket: #f2a33c;
+  --tixy-red: #a8141a;
+  --tixy-red-text: #8c1015;
+  --tixy-felt: #2e7566;
+  --tixy-on-ticket: #000000;
+  --tixy-on-red: #ffffff;
+  --tixy-cabinet: #000000;
+  --tixy-line: 0 0 0;
+  --border-ink: rgb(0 0 0 / 0.5);
+  --border-soft: rgb(0 0 0 / 0.3);
+}
+
+/* boardwalk: Odom's original floor runs on the Midway tokens above. The
+   parts built in tixy tokens (the season track, the board-game lobbies,
+   the people pages) take the lacquer colours here instead of paper, so
+   they sit on the wood as Midway panels. */
+:root[data-tixy-scheme='boardwalk'] {
+  --tixy-paper: #16100a;
+  --tixy-paper-2: #261d13;
+  --tixy-paper-3: #30261b;
+  --tixy-ink: #f6eddc;
+  --tixy-ink-2: #d4c6ac;
+  --tixy-ink-3: #b3a48a;
+  --tixy-ticket: #f2a33c;
+  --tixy-red: #e65a50;
+  --tixy-red-text: #ff8a85;
+  --tixy-felt: #2e7566;
+  --tixy-on-ticket: #2a1b06;
+  --tixy-on-red: #16100a;
+  --tixy-cabinet: #1f1a16;
+  --tixy-line: 246 237 220;
+  --tixy-shadow-lift: 0 18px 40px -24px rgb(0 0 0 / 0.8);
+}
+
+/* The cabinet reset: inside a cabinet (a game stage, the shell, anything
+   marked data-surface='ink', and the floor's own cabinets: the 8-ball
+   table, the tile and row screens, the prize counters), every scheme puts
+   the default palette back, so a game and the paper parts printed on its
+   screen look the same under every scheme. Only the cabinet chrome (the
+   shell and the bezels, drawn in --tixy-cabinet) follows the scheme.
+   Keep this list and the :where list on the tixy mapping the same. */
+:root[data-tixy-scheme] :is(.arc-stage, .arcade-game-stage, [data-surface='ink'], .arc-shell-cabinet, .arc-howto-picture,
+    .tx-table, .tx-screen, .tx-counter, .tp-screen, .lb-screen, .pc-head, .pc-case, .pc-shelf) {
+  --tixy-paper: #f4ebdc;
+  --tixy-paper-2: #eadfcb;
+  --tixy-paper-3: #ded0b7;
+  --tixy-ink: #1f1a16;
+  --tixy-ink-2: #54483d;
+  --tixy-ink-3: #6b5e51;
+  --tixy-ticket: #f2a33c;
+  --tixy-red: #b83627;
+  --tixy-red-text: #9a2d20;
+  --tixy-felt: #2e7566;
+  --tixy-on-ticket: #1f1a16;
+  --tixy-on-red: #f4ebdc;
+  --tixy-line: 31 26 22;
+  --tixy-shadow-lift: 0 18px 40px -24px rgb(31 26 22 / 0.45);
+}
+
+/* Dark schemes fill a pressed filter with light ink, where ticket amber
+   can't be read: its count takes the button's own colour. */
+:root:is([data-tixy-scheme='night-shift'], [data-tixy-scheme='boardwalk'])
+  .pc-filter button[aria-pressed='true'] .arc-digits {
+  color: inherit;
+}
+
+/* ── Typography · spacing · motion tokens ─────────────────────────── */
+
+:root {
+  --font-display: var(--font-bungee, 'Bungee'), 'Rubik', system-ui, sans-serif;
+  --font-ui: var(--font-rubik, 'Rubik'), system-ui, -apple-system, sans-serif;
+  --font-mono-arcade: var(--font-spline-mono, 'Spline Sans Mono'), ui-monospace,
+    'SF Mono', monospace;
+  /* numbers that count: scores, tickets, prices, timers. tixy swaps in
+     Big Shoulders 800; Num (ui/num.tsx) sets each digit in a 1ch cell */
+  --font-num: var(--font-mono-arcade);
+
+  /* tracking */
+  --tracking-kicker: 0.16em;
+  --tracking-display: 0.01em;
+  --tracking-mono: 0.02em;
+
+  /* line heights */
+  --leading-tight: 1.1;
+  --leading-snug: 1.3;
+  --leading-body: 1.55;
+
+  /* numerals: apply to every score/balance/timer */
+  --numeric-features: 'tnum' 1, 'lnum' 1;
+
+  /* ── material globals (theme-neutral) ──────────────────────────────
+     Depth is material, not light — a hard offset BLOCK plus one inset
+     bevel pair plus one soft ambient drop. Grain + bevel-hi/key-side are
+     tinted per theme above; these inputs are theme-neutral alphas. */
+  --bevel-lo: #00000060;            /* inset bottom shade (neutral) */
+  --key-bevel-hi: #fffaf0;          /* keycap top highlight */
+  --key-bevel-lo: #c9b791;          /* keycap underside shade (warm default) */
+  --grain:
+    radial-gradient(circle at 20% 10%, #ffffff05 0 1px, transparent 1px),
+    radial-gradient(circle at 70% 60%, #00000020 0 1px, transparent 1px);
+  --screen-well: #0f1512;           /* cool recessed "screen" for game/card art wells */
+  /* veil a game overlay lays over its stage: color-mix(var(--scrim) N%,
+     transparent). Dark here; tixy makes it paper. */
+  --scrim: var(--shadow-color);
+  /* the edge of an input or switch; tixy needs a darker one than panels */
+  --border-control: var(--border-ink);
+
+  /* positive / negative deltas (credits, leaderboard movement) */
+  --pos: #5fc06a;
+  --neg: #d8585b;
+
+  /* tetris / piece palette — bright enamel paints, read on any dark panel */
+  --piece-1: #38c6d4; /* I cyan   */
+  --piece-2: #f2a33c; /* O amber  */
+  --piece-3: #9a52d6; /* T violet */
+  --piece-4: #5fc06a; /* S green  */
+  --piece-5: #c73538; /* Z red    */
+  --piece-6: #3b6fd4; /* J blue   */
+  --piece-7: #e8a23a; /* L orange */
+
+  /* radius — deliberately non-uniform, by role */
+  --radius-hero: 16px;
+  --radius-cabinet: 14px;
+  --radius-panel: 12px;
+  --radius-key: 9px;
+  --radius-well: 8px;
+  --radius-tag: 6px;
+  --radius-stub: 8px;
+  --radius-round: 999px;
+
+  /* borders */
+  --border-w: 2px;
+  --border-w-hairline: 1px;
+
+  /* elevation — lacquered cabinet depth: inset bevel pair + hard offset
+     BLOCK + one soft ambient drop. Nothing glows; light comes from above. */
+  --shadow-chip: inset 0 1px 0 var(--bevel-hi), 0 2px 0 var(--shadow-color);
+  --shadow-key:
+    inset 0 1px 0 var(--key-bevel-hi),
+    inset 0 -3px 5px var(--key-bevel-lo),
+    0 5px 0 var(--key-side),
+    0 7px 12px #00000050;
+  --shadow-key-pressed:
+    inset 0 1px 0 var(--key-bevel-hi),
+    inset 0 -2px 4px var(--key-bevel-lo),
+    0 1px 0 var(--key-side),
+    0 2px 6px #00000050;
+  --shadow-panel:
+    inset 0 1px 0 var(--bevel-hi),
+    inset 0 -2px 4px var(--bevel-lo),
+    0 6px 0 var(--shadow-color),
+    0 8px 18px #00000055;
+  --shadow-cabinet:
+    inset 0 1px 0 var(--bevel-hi),
+    inset 0 -6px 14px #00000070,
+    0 8px 0 var(--shadow-color),
+    0 12px 28px #00000060;
+  --shadow-modal:
+    inset 0 1px 0 var(--bevel-hi),
+    inset 0 -6px 14px #00000070,
+    0 10px 0 var(--shadow-color),
+    0 16px 34px #00000066;
+  --shadow-well:
+    inset 0 2px 6px #000000aa,
+    inset 0 0 0 1px #ffffff0a,
+    0 1px 0 var(--bevel-hi);
+  /* enamel keys: white gloss sheen + the tone's own edge as the side block
+     (each tone sets --_key-edge; falls back to the ink shadow) */
+  --shadow-key-enamel:
+    inset 0 1px 0 #ffffff38,
+    inset 0 -3px 5px #00000055,
+    0 5px 0 var(--_key-edge, var(--shadow-color)),
+    0 7px 12px #00000050;
+  --shadow-key-enamel-pressed:
+    inset 0 1px 0 #ffffff30,
+    inset 0 -2px 4px #00000055,
+    0 1px 0 var(--_key-edge, var(--shadow-color)),
+    0 2px 6px #00000050;
+
+  /* focus — always visible, never glow */
+  --focus-outline: 2px solid var(--focus-ring);
+  --focus-offset: 2px;
+
+  /* motion — mechanical snap; idle UI is still, motion is feedback.
+     Durations mirror transitions.dev / animations.dev product-UI scale. */
+  --motion-press: 90ms;
+  --motion-snap: 140ms;
+  --motion-settle: 220ms;
+  --motion-payout: 600ms;
+  --motion-reveal: 320ms;
+  --motion-exit: 160ms;
+  --motion-sheet: 280ms;
+  --motion-shake: 420ms;
+
+  --ease-snap: cubic-bezier(0.2, 0.9, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.55, 0, 1, 0.45);
+  --ease-emphasized: cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* tixy faces, tracking and type scale. 13 px is the floor and 16 px is
+   body. Nothing is tracked wider than normal, and nothing tighter than
+   -0.02em. The Tailwind text and tracking scales read these variables,
+   so `text-xs` is 13 px and `tracking-widest` is 0 under tixy. */
+:root[data-arcade-theme='tixy'] {
+  --font-display: var(--tixy-font-text);
+  --font-ui: var(--tixy-font-text);
+  /* font-mono is used for ids, codes and mixed text, so it stays in
+     Gabarito with tabular figures; numbers opt into Big Shoulders */
+  --font-mono-arcade: var(--tixy-font-text);
+  --font-num: var(--tixy-font-num);
+  --num-weight: var(--tixy-weight-num);
+
+  --tracking-kicker: 0;
+  --tracking-display: -0.01em;
+  --tracking-mono: var(--tixy-tracking-num);
+  --tracking-tighter: -0.02em;
+  --tracking-tight: -0.02em;
+  --tracking-wide: 0;
+  --tracking-wider: 0;
+  --tracking-widest: 0;
+
+  --leading-tight: 1.05;
+  --leading-snug: 1.25;
+  --leading-body: 1.45;
+
+  --text-xs: 0.8125rem; /* 13 */
+  --text-xs--line-height: 1.4;
+  --text-sm: 0.875rem; /* 14 */
+  --text-sm--line-height: 1.45;
+  --text-base: 1rem; /* 16 */
+  --text-base--line-height: 1.45;
+  --text-lg: 1.0625rem; /* 17: panel headings, names in rows */
+  --text-lg--line-height: 1.3;
+  --text-xl: 1.5rem; /* 24 */
+  --text-xl--line-height: 1.15;
+  --text-2xl: 1.875rem; /* 30: screen titles */
+  --text-2xl--line-height: 1.1;
+  --text-3xl: 2.75rem; /* 44 */
+  --text-3xl--line-height: 1;
+  --text-4xl: 3.25rem; /* 52 */
+  --text-4xl--line-height: 0.95;
+  --text-5xl: 4.75rem; /* 76: the marquee name */
+  --text-5xl--line-height: 0.9;
+
+  --radius-hero: var(--tixy-radius-panel-lg);
+  --radius-cabinet: var(--tixy-radius-panel);
+  --radius-panel: var(--tixy-radius-panel-sm);
+  --radius-key: var(--tixy-radius-button);
+  --radius-well: var(--tixy-radius-button);
+
+  --motion-press: var(--tixy-press-out);
+  --motion-snap: var(--tixy-panel-fast);
+  --motion-exit: var(--tixy-panel-fast);
+  --motion-sheet: var(--tixy-panel-slow);
+  --ease-spring: var(--tixy-ease-spring);
+  --ease-out: var(--tixy-ease-settle);
+}
+
+/* ── Tailwind theme mapping ───────────────────────────────────────── */
+
+@theme inline {
+  /* page background + primary enamel */
+  --color-background: var(--bg);
+  --color-primary: var(--enamel-primary);
+
+  /* lacquer stack */
+  --color-panel: var(--surface-panel);
+  --color-raised: var(--surface-raised);
+  --color-well: var(--surface-well);
+  --color-ink: var(--border-ink);
+  --color-soft: var(--border-soft);
+  --color-shadow: var(--shadow-color);
+
+  /* cream ramp */
+  --color-strong: var(--text-strong);
+  --color-body: var(--text-body);
+  --color-muted: var(--text-muted);
+  --color-faint: var(--text-faint);
+
+  /* delta paints */
+  --color-pos: var(--pos);
+  --color-neg: var(--neg);
+
+  /* enamels — fill / on / edge / text */
+  --color-primary-on: var(--enamel-primary-on);
+  --color-primary-edge: var(--enamel-primary-edge);
+  --color-primary-text: var(--enamel-primary-text);
+  --color-tickets: var(--enamel-tickets);
+  --color-tickets-on: var(--enamel-tickets-on);
+  --color-tickets-edge: var(--enamel-tickets-edge);
+  --color-tickets-text: var(--enamel-tickets-text);
+  --color-prize: var(--enamel-prize);
+  --color-prize-on: var(--enamel-prize-on);
+  --color-prize-edge: var(--enamel-prize-edge);
+  --color-prize-text: var(--enamel-prize-text);
+  --color-info: var(--enamel-info);
+  --color-info-on: var(--enamel-info-on);
+  --color-info-edge: var(--enamel-info-edge);
+  --color-info-text: var(--enamel-info-text);
+  --color-danger: var(--enamel-danger);
+  --color-danger-on: var(--enamel-danger-on);
+  --color-danger-edge: var(--enamel-danger-edge);
+  --color-danger-text: var(--enamel-danger-text);
+
+  /* the cream key */
+  --color-key-face: var(--key-face);
+  --color-key-face-on: var(--key-face-on);
+  --color-key-face-edge: var(--key-face-edge);
+
+  --color-focus-ring: var(--focus-ring);
+
+  /* fonts */
+  --font-sans: var(--font-ui);
+  --font-display: var(--font-display);
+  --font-ui: var(--font-ui);
+  --font-mono: var(--font-mono-arcade);
+
+  /* radius by role */
+  --radius-cabinet: var(--radius-cabinet);
+  --radius-panel: var(--radius-panel);
+  --radius-key: var(--radius-key);
+  --radius-well: var(--radius-well);
+  --radius-tag: var(--radius-tag);
+  --radius-stub: var(--radius-stub);
+
+  /* hard offset shadows */
+  --shadow-chip: var(--shadow-chip);
+  --shadow-key: var(--shadow-key);
+  --shadow-key-pressed: var(--shadow-key-pressed);
+  --shadow-panel: var(--shadow-panel);
+  --shadow-cabinet: var(--shadow-cabinet);
+  --shadow-modal: var(--shadow-modal);
+  --shadow-well: var(--shadow-well);
+  --inset-shadow-well: inset 0 2px 6px rgb(0 0 0 / 0.66);
+
+  /* tixy brand: bg-tixy-paper, text-tixy-ink-2, rounded-tixy-button,
+     font-tixy, font-tixy-num, ease-tixy-spring, shadow-tixy-lift … */
+  --color-tixy-paper: var(--tixy-paper);
+  --color-tixy-paper-2: var(--tixy-paper-2);
+  --color-tixy-paper-3: var(--tixy-paper-3);
+  --color-tixy-ink: var(--tixy-ink);
+  --color-tixy-ink-2: var(--tixy-ink-2);
+  --color-tixy-ink-3: var(--tixy-ink-3);
+  --color-tixy-ticket: var(--tixy-ticket);
+  --color-tixy-red: var(--tixy-red);
+  --color-tixy-red-text: var(--tixy-red-text);
+  --color-tixy-felt: var(--tixy-felt);
+  --color-tixy-rail: var(--tixy-rail);
+  --color-tixy-screen: var(--tixy-screen);
+  --color-tixy-screen-2: var(--tixy-screen-2);
+  --color-tixy-on-ink-2: var(--tixy-on-ink-2);
+  --color-tixy-on-ink-3: var(--tixy-on-ink-3);
+  --color-tixy-on-ink-red: var(--tixy-on-ink-red);
+  --radius-tixy-panel-sm: var(--tixy-radius-panel-sm);
+  --radius-tixy-panel: var(--tixy-radius-panel);
+  --radius-tixy-panel-lg: var(--tixy-radius-panel-lg);
+  --radius-tixy-button: var(--tixy-radius-button);
+  --radius-tixy-button-sm: var(--tixy-radius-button-sm);
+  --font-tixy: var(--tixy-font-text);
+  --font-tixy-num: var(--tixy-font-num);
+  --ease-tixy-spring: var(--tixy-ease-spring);
+  --ease-tixy-settle: var(--tixy-ease-settle);
+  --shadow-tixy-lift: var(--tixy-shadow-lift);
+}
+
+/* the 5 px ink bezel around a game screen */
+@utility border-tixy-bezel {
+  border-width: var(--tixy-bezel);
+}
+
+@theme {
+  /* Midway type scale: 11 → 56px */
+  --text-xs: 0.6875rem;
+  --text-xs--line-height: 1.45;
+  --text-sm: 0.8125rem;
+  --text-sm--line-height: 1.5;
+  --text-base: 0.9375rem;
+  --text-base--line-height: 1.55;
+  --text-lg: 1.125rem;
+  --text-lg--line-height: 1.3;
+  --text-xl: 1.5rem;
+  --text-xl--line-height: 1.2;
+  --text-2xl: 2rem;
+  --text-2xl--line-height: 1.1;
+  --text-3xl: 2.625rem;
+  --text-3xl--line-height: 1.1;
+  --text-4xl: 3.5rem;
+  --text-4xl--line-height: 1.05;
+  --text-5xl: 4rem;
+  --text-5xl--line-height: 0.95;
+}
+
+/* ── Base ─────────────────────────────────────────────────────────── */
+
+/* Base element styles live in @layer base so component classes
+   (@layer components) can override them — an unlayered `a { color }`
+   rule would beat every layered .arc-* color. */
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html,
+  body {
+    min-height: 100%;
+    margin: 0;
+  }
+
+  /* lacquered cabinet ground — subtle wood-plank striping + a top vignette.
+     Material/depth only; nothing glows. Themes retint via --page-bg. */
+  body {
+    background: var(--page-bg);
+    background-color: var(--bg);
+    color: var(--text-body);
+    font-family: var(--font-ui);
+    font-size: var(--text-base);
+    line-height: var(--leading-body);
+  }
+
+  a {
+    color: inherit;
+  }
+
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+  }
+
+  :focus-visible {
+    outline: var(--focus-outline);
+    outline-offset: var(--focus-offset);
+  }
+
+  /* Root scrollbar picks up the theme instead of the UA default. */
+  html {
+    scrollbar-color: var(--border-soft) transparent;
+  }
+}
+
+@layer components {
+  /* ── Scroll regions ─────────────────────────────────────────────── */
+
+  /* Themed thin scrollbar for panel-internal scroll regions (sidebar nav,
+     modal bodies). Standard properties only — Chrome 121+/Firefox/Safari
+     18.2+; older engines keep their default scrollbar. */
+  .arcade-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-soft) transparent;
+  }
+
+  /* ── Text utilities ─────────────────────────────────────────────── */
+
+  /* uppercase eyebrow label */
+  .arcade-kicker {
+    font-family: var(--font-ui);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: var(--tracking-kicker);
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  /* any number that matters: scores, balances, timers, odds */
+  .arcade-num {
+    font-family: var(--font-num);
+    font-feature-settings: var(--numeric-features);
+    letter-spacing: var(--tracking-mono);
+    font-weight: var(--num-weight, inherit);
+  }
+
+  /* display/signage text — Bungee, caps only, never paragraphs */
+  .arcade-display {
+    font-family: var(--font-display);
+    letter-spacing: var(--tracking-display);
+    line-height: var(--leading-tight);
+  }
+
+  /* ── Skip link (keyboard jump straight to page content) ──────────── */
+
+  /* Parked above the top bar until focused, then drops in like a key press. */
+  .arc-skiplink {
+    position: fixed;
+    top: 0.75rem;
+    left: 0.75rem;
+    z-index: 100;
+    transform: translateY(-300%);
+    transition: transform var(--motion-quick) var(--ease-out);
+  }
+  .arc-skiplink:focus-visible {
+    transform: none;
+  }
+
+  /* ── Shell bars (wooden planks) ─────────────────────────────────── */
+
+  .arc-topbar {
+    background: var(--grain), linear-gradient(180deg, var(--surface-raised), var(--surface-panel));
+    background-size: 80px 80px, 80px 80px, auto;
+    border-bottom: var(--border-w) solid var(--border-ink);
+    box-shadow:
+      inset 0 1px 0 var(--bevel-hi),
+      0 4px 0 var(--shadow-color),
+      0 6px 16px #00000055;
+  }
+
+  .arc-dock {
+    background: var(--grain), linear-gradient(0deg, var(--surface-raised), var(--surface-panel));
+    background-size: 80px 80px, 80px 80px, auto;
+    border-top: var(--border-w) solid var(--border-ink);
+    box-shadow:
+      inset 0 1px 0 var(--bevel-hi),
+      0 -4px 0 var(--shadow-color),
+      0 -6px 16px #00000055;
+  }
+
+  /* ── Hero (full-bleed marquee banner) ───────────────────────────── */
+  .arc-hero {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--radius-hero);
+    border: var(--border-w) solid var(--border-soft);
+    background:
+      var(--grain),
+      radial-gradient(130% 90% at 82% 8%, color-mix(in srgb, var(--enamel-tickets) 14%, transparent) 0%, transparent 58%),
+      linear-gradient(118deg, var(--surface-raised) 0%, var(--surface-panel) 52%, var(--bg) 100%);
+    background-size: 130px 130px, 130px 130px, auto, auto;
+    box-shadow: var(--shadow-cabinet);
+  }
+  /* marquee bulb rail along the hero top edge — matte studs, no glow */
+  .arc-hero-bulbs {
+    position: absolute;
+    inset: 10px 16px auto 16px;
+    height: 8px;
+    pointer-events: none;
+    background: radial-gradient(circle at 6px 50%, var(--enamel-tickets) 0 2.4px, transparent 2.8px);
+    background-size: 26px 8px;
+    opacity: 0.55;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+  }
+
+  /* ── Layout shells ──────────────────────────────────────────────── */
+
+  .page-shell {
+    /* keep a small horizontal gutter so content never sits flush against the
+       raw viewport edge, and so full-bleed children (e.g. the dashboard hero's
+       -mx-4) land at the edge instead of overflowing past it on mobile */
+    width: min(100% - 2rem, 96rem);
+    margin-inline: auto;
+    /* tighter top so the title sits close under the nav; roomier bottom for
+       the mobile dock */
+    padding-top: clamp(1rem, 1.8vw, 1.5rem);
+    padding-bottom: clamp(1.5rem, 3vw, 2.5rem);
+  }
+
+  /* Shared play-page rhythm. Skill games and wager cabinets use these two
+     shells so phone safe areas, short viewports, and horizontal containment
+     no longer drift across dozens of copied wrapper class lists. */
+  .arc-game-flow {
+    display: flex;
+    min-height: 100%;
+    width: 100%;
+    min-width: 0;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    overflow-x: clip;
+    padding: 0.75rem 0.5rem calc(5.5rem + env(safe-area-inset-bottom));
+  }
+
+  .arc-wager-page {
+    width: 100%;
+    max-width: 72rem;
+    min-width: 0;
+    margin-inline: auto;
+    padding: 0.75rem 0.75rem calc(5.5rem + env(safe-area-inset-bottom));
+  }
+
+  .arc-game-page {
+    min-width: 0;
+    scroll-padding-bottom: calc(5.5rem + env(safe-area-inset-bottom));
+  }
+
+  @media (min-width: 40rem) {
+    .arc-game-flow {
+      justify-content: center;
+      padding: 1.25rem 1rem;
+    }
+
+    .arc-wager-page {
+      padding: 1.25rem 1rem 2.5rem;
+    }
+  }
+
+  @media (max-width: 39.999rem) and (max-height: 44rem) {
+    .arc-game-flow,
+    .arc-wager-page {
+      padding-top: 0.5rem;
+    }
+  }
+
+  .arcade-page {
+    min-height: 100vh;
+    background: transparent;
+    color: var(--text-body);
+    padding: clamp(1rem, 1.8vw, 1.5rem) 1rem clamp(1.5rem, 3vw, 2.5rem);
+  }
+
+  .arcade-container {
+    width: min(100%, 72rem);
+    margin-inline: auto;
+  }
+
+  .arcade-container-narrow {
+    width: min(100%, 30rem);
+    margin-inline: auto;
+  }
+
+  /* ── The key (button with real travel) ──────────────────────────── */
+
+  .arc-key {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5em;
+    font-family: var(--font-ui);
+    font-weight: 700;
+    text-decoration: none;
+    border: var(--border-w) solid var(--border-ink);
+    border-radius: var(--radius-key);
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+    transition:
+      transform var(--motion-press) var(--ease-snap),
+      box-shadow var(--motion-press) var(--ease-snap),
+      filter var(--motion-snap) var(--ease-snap);
+  }
+
+  .arc-key[data-size='xs'] { font-size: 0.75rem; padding: 6px 10px 5px; }
+  .arc-key[data-size='sm'] { font-size: 0.8125rem; padding: 8px 13px 7px; }
+  .arc-key[data-size='md'] { font-size: 0.875rem; padding: 10px 17px 9px; }
+  .arc-key[data-size='lg'] { font-size: 1rem; padding: 13px 24px 12px; }
+  .arc-key[data-icononly='true'][data-size='xs'] { padding: 6px; }
+  .arc-key[data-icononly='true'][data-size='sm'] { padding: 8px; }
+  .arc-key[data-icononly='true'][data-size='md'] { padding: 10px; }
+  .arc-key[data-icononly='true'][data-size='lg'] { padding: 13px; }
+
+  /* cream KEY — light text? no: dark text on a light face. Lighten the top
+     stop; dark text stays >13:1. Border is the warm key edge, not ink. */
+  .arc-key[data-tone='key'] { background: linear-gradient(180deg, var(--key-face-hi), var(--key-face)); color: var(--key-face-on); border-color: var(--key-face-edge); box-shadow: var(--shadow-key); }
+  /* light-on-color enamels (primary/danger) DARKEN downward so the tested
+     base color stays the lightest stop and AA holds (≈4.7:1). */
+  .arc-key[data-tone='primary'] { --_key-edge: var(--enamel-primary-edge); background: linear-gradient(180deg, var(--enamel-primary), var(--enamel-primary-edge)); color: var(--enamel-primary-on); box-shadow: var(--shadow-key-enamel); }
+  .arc-key[data-tone='danger'] { --_key-edge: var(--enamel-danger-edge); background: linear-gradient(180deg, var(--enamel-danger), var(--enamel-danger-edge)); color: var(--enamel-danger-on); box-shadow: var(--shadow-key-enamel); }
+  /* dark-on-color enamels (tickets/prize/info) LIGHTEN upward (sheen). */
+  .arc-key[data-tone='tickets'] { --_key-edge: var(--enamel-tickets-edge); background: linear-gradient(180deg, var(--enamel-tickets-hi), var(--enamel-tickets)); color: var(--enamel-tickets-on); box-shadow: var(--shadow-key-enamel); }
+  .arc-key[data-tone='prize'] { --_key-edge: var(--enamel-prize-edge); background: linear-gradient(180deg, var(--enamel-prize-hi), var(--enamel-prize)); color: var(--enamel-prize-on); box-shadow: var(--shadow-key-enamel); }
+  .arc-key[data-tone='info'] { --_key-edge: var(--enamel-info-edge); background: linear-gradient(180deg, var(--enamel-info-hi), var(--enamel-info)); color: var(--enamel-info-on); box-shadow: var(--shadow-key-enamel); }
+  .arc-key[data-tone='ghost'] { background: transparent; color: var(--text-body); border-color: var(--border-soft); box-shadow: inset 0 1px 0 var(--bevel-hi), 0 4px 0 var(--shadow-color), 0 6px 10px #00000040; }
+
+  .arc-key:hover:not(:disabled):not([data-pressed='true']) {
+    filter: brightness(1.06);
+  }
+
+  /* press: 4px travel, side block collapses to 1px — the keycap bottoms out */
+  .arc-key:active:not(:disabled),
+  .arc-key[data-pressed='true'] {
+    transform: translateY(4px);
+    box-shadow: var(--shadow-key-pressed);
+  }
+
+  .arc-key[data-tone='primary']:active:not(:disabled),
+  .arc-key[data-tone='primary'][data-pressed='true'],
+  .arc-key[data-tone='tickets']:active:not(:disabled),
+  .arc-key[data-tone='tickets'][data-pressed='true'],
+  .arc-key[data-tone='prize']:active:not(:disabled),
+  .arc-key[data-tone='prize'][data-pressed='true'],
+  .arc-key[data-tone='info']:active:not(:disabled),
+  .arc-key[data-tone='info'][data-pressed='true'],
+  .arc-key[data-tone='danger']:active:not(:disabled),
+  .arc-key[data-tone='danger'][data-pressed='true'] { box-shadow: var(--shadow-key-enamel-pressed); }
+  .arc-key[data-tone='ghost']:active:not(:disabled),
+  .arc-key[data-tone='ghost'][data-pressed='true'] { box-shadow: inset 0 1px 0 var(--bevel-hi), 0 1px 0 var(--shadow-color); }
+
+  .arc-key:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    filter: saturate(0.7);
+  }
+
+  /* tixy: one button shape. The fill is the button, with no edge or
+     bevel: ink is the primary, paper 3 the secondary, red destroys, and a
+     tickets or prize button (one that pays or spends tickets) is amber with
+     ink text. A press sinks 1 px and shrinks to 96%, 40 ms in and 90 ms
+     out. Inside an ink cabinet the enamel tokens flip, so the primary turns
+     paper. The admin console's module sets these tones' fills itself, and
+     the text colours here hold on them. */
+  :root[data-arcade-theme='tixy'] .arc-key {
+    border: 0;
+    border-radius: var(--tixy-radius-button);
+    box-shadow: none;
+    background: var(--key-face);
+    color: var(--key-face-on);
+    font-family: var(--tixy-font-text);
+    font-weight: var(--tixy-weight-button);
+    line-height: 1;
+    transition:
+      transform var(--tixy-press-out) ease-out,
+      filter var(--tixy-panel-fast) ease-out,
+      background-color var(--tixy-panel-fast) ease-out;
+  }
+  :root[data-arcade-theme='tixy'] .arc-key[data-size='xs'] { min-height: 30px; padding: 0 10px; font-size: var(--text-xs); border-radius: var(--tixy-radius-button-sm); }
+  :root[data-arcade-theme='tixy'] .arc-key[data-size='sm'] { min-height: 34px; padding: 0 13px; font-size: var(--text-sm); border-radius: var(--tixy-radius-button-sm); }
+  :root[data-arcade-theme='tixy'] .arc-key[data-size='md'] { min-height: 44px; padding: 0 18px; font-size: var(--text-base); }
+  :root[data-arcade-theme='tixy'] .arc-key[data-size='lg'] { min-height: 52px; padding: 0 22px; font-size: var(--text-lg); }
+  :root[data-arcade-theme='tixy'] .arc-key[data-icononly='true'] { padding: 0; aspect-ratio: 1; }
+  :root[data-arcade-theme='tixy'] .arc-key:is([data-tone='primary'], [data-pressed='true']) {
+    background: var(--enamel-primary);
+    color: var(--enamel-primary-on);
+  }
+  :root[data-arcade-theme='tixy'] .arc-key:is([data-tone='tickets'], [data-tone='prize']):not([data-pressed='true']) {
+    background: var(--enamel-tickets);
+    color: var(--enamel-tickets-on);
+  }
+  :root[data-arcade-theme='tixy'] .arc-key[data-tone='danger'] { background: var(--enamel-danger); color: var(--enamel-danger-on); }
+  :root[data-arcade-theme='tixy'] .arc-key[data-tone='ghost']:not([data-pressed='true']) { background: transparent; color: var(--text-body); }
+  :root[data-arcade-theme='tixy'] .arc-key:hover:not(:disabled) { filter: brightness(0.95); }
+  :root[data-arcade-theme='tixy'] .arc-key:is([data-tone='primary'], [data-tone='danger']):hover:not(:disabled) { filter: brightness(1.18); }
+  :root[data-arcade-theme='tixy'] .arc-key[data-tone='ghost']:hover:not(:disabled) { filter: none; background: var(--key-face); }
+  :root[data-arcade-theme='tixy'] .arc-key:is(:active, [data-pressed='true']) { box-shadow: none; }
+  :root[data-arcade-theme='tixy'] .arc-key[data-pressed='true']:not(:active) { transform: none; }
+  :root[data-arcade-theme='tixy'] .arc-key:active:not(:disabled) {
+    transform: translateY(1px) scale(var(--tixy-press-scale));
+    transition-duration: var(--tixy-press-in);
+  }
+  :root[data-arcade-theme='tixy'] .arc-key:disabled { opacity: 0.45; filter: none; }
+
+  /* ── Panels (painted surfaces) ──────────────────────────────────── */
+
+  .arc-panel {
+    border: var(--border-w) solid var(--border-ink);
+    min-width: 0;
+  }
+
+  .arc-panel[data-variant='panel'] {
+    background: var(--grain), linear-gradient(180deg, var(--surface-raised), var(--surface-panel));
+    background-size: 80px 80px, 80px 80px, auto;
+    border-color: var(--border-soft);
+    border-radius: var(--radius-panel);
+    box-shadow: var(--shadow-panel);
+  }
+
+  .arc-panel[data-variant='cabinet'] {
+    background: var(--grain), linear-gradient(155deg, var(--surface-raised) 0%, var(--surface-panel) 70%);
+    background-size: 90px 90px, 90px 90px, auto;
+    border-color: var(--border-soft);
+    border-radius: var(--radius-cabinet);
+    box-shadow: var(--shadow-cabinet);
+  }
+
+  .arc-panel[data-variant='raised'] {
+    background: var(--grain), linear-gradient(180deg, var(--surface-raised), color-mix(in srgb, var(--surface-raised) 78%, var(--surface-panel)));
+    background-size: 80px 80px, 80px 80px, auto;
+    border-color: var(--border-soft);
+    border-radius: var(--radius-panel);
+    box-shadow: var(--shadow-panel);
+  }
+
+  .arc-panel[data-variant='well'] {
+    background: linear-gradient(180deg, var(--surface-well), #060505);
+    border-radius: var(--radius-well);
+    box-shadow: var(--shadow-well);
+  }
+
+  /* tixy: surfaces are told apart by tone, with no outline. Wells are
+     paper 3 (screen 2 in a cabinet). */
+  :root[data-arcade-theme='tixy'] .arc-panel { border-color: transparent; }
+  :root[data-arcade-theme='tixy'] .arc-panel:is([data-variant='panel'], [data-variant='cabinet']) { background: var(--surface-panel); }
+  :root[data-arcade-theme='tixy'] .arc-panel[data-variant='panel'] { border-radius: var(--tixy-radius-panel); }
+  :root[data-arcade-theme='tixy'] .arc-panel[data-variant='cabinet'] { border-radius: var(--tixy-radius-panel-lg); }
+  :root[data-arcade-theme='tixy'] .arc-panel[data-variant='raised'] { background: var(--surface-raised); border-radius: var(--tixy-radius-panel-sm); }
+  :root[data-arcade-theme='tixy'] .arc-panel[data-variant='well'] { background: var(--surface-well); border-radius: var(--tixy-radius-button); box-shadow: none; }
+
+  /* ── Marquee (signage band) ─────────────────────────────────────── */
+
+  .arc-marquee {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    font-family: var(--font-display);
+    letter-spacing: var(--tracking-display);
+    border-bottom: var(--border-w) solid var(--border-ink);
+    padding: 12px 14px 10px;
+  }
+
+  .arc-marquee[data-tone='primary'] { background: var(--enamel-primary); color: var(--enamel-primary-on); }
+  .arc-marquee[data-tone='tickets'] { background: var(--enamel-tickets); color: var(--enamel-tickets-on); }
+  .arc-marquee[data-tone='prize'] { background: var(--enamel-prize); color: var(--enamel-prize-on); }
+  .arc-marquee[data-tone='info'] { background: var(--enamel-info); color: var(--enamel-info-on); }
+  .arc-marquee[data-tone='danger'] { background: var(--enamel-danger); color: var(--enamel-danger-on); }
+  .arc-marquee[data-tone='cream'] { background: var(--key-face); color: var(--key-face-on); }
+
+  .arc-marquee[data-size='sm'] { font-size: 0.9375rem; }
+  .arc-marquee[data-size='md'] { font-size: 1.125rem; padding: 14px 18px 12px; }
+  .arc-marquee[data-size='lg'] { font-size: 1.5rem; padding: 16px 20px 14px; }
+
+  /* tixy (r-kit): a heading, not a sign band. Ink on the panel's own tone,
+     no fill, no rule under it; the tone prop no longer paints. */
+  :root[data-arcade-theme='tixy'] .arc-marquee {
+    border-bottom: 0;
+    background: transparent;
+    color: var(--text-strong);
+    font-family: var(--tixy-font-text);
+    font-weight: var(--tixy-weight-heading);
+    letter-spacing: -0.01em;
+    line-height: 1.15;
+    padding: 16px 18px 4px;
+  }
+  :root[data-arcade-theme='tixy'] .arc-marquee[data-size='sm'] { font-size: 1.0625rem; padding: 14px 16px 2px; }
+  :root[data-arcade-theme='tixy'] .arc-marquee[data-size='md'] { font-size: 1.25rem; }
+  :root[data-arcade-theme='tixy'] .arc-marquee[data-size='lg'] { font-size: 1.5rem; padding: 20px 20px 6px; }
+
+  /* ── Game card (cabinet front) ──────────────────────────────────── */
+
+  .arc-gamecard {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    background: var(--grain), linear-gradient(180deg, var(--surface-raised), var(--surface-panel));
+    background-size: 70px 70px, 70px 70px, auto;
+    border: var(--border-w) solid var(--border-soft);
+    border-radius: var(--radius-cabinet);
+    box-shadow: var(--shadow-panel);
+    overflow: hidden;
+    height: 100%;
+    text-align: left;
+    transition:
+      transform var(--motion-snap) var(--ease-snap),
+      box-shadow var(--motion-snap) var(--ease-snap);
+  }
+
+  .arc-gamecard-shell {
+    position: relative;
+    min-width: 0;
+    height: 100%;
+  }
+
+  .arc-gamecard-favorite {
+    position: absolute;
+    z-index: 3;
+    top: 3.75rem;
+    right: 0.75rem;
+    display: inline-grid;
+    width: 2rem;
+    height: 2rem;
+    place-items: center;
+    border: var(--border-w-hairline) solid var(--border-soft);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--surface-panel) 92%, transparent);
+    color: var(--text-body);
+    box-shadow: var(--shadow-chip);
+    transition:
+      transform var(--motion-snap) var(--ease-snap),
+      background var(--motion-snap) var(--ease-snap),
+      color var(--motion-snap) var(--ease-snap);
+  }
+
+  .arc-gamecard-favorite:hover:not(:disabled) {
+    transform: translateY(-1px);
+    color: var(--tickets-text);
+  }
+
+  .arc-gamecard-favorite[data-active='true'] {
+    border-color: var(--border-ink);
+    background: var(--enamel-tickets);
+    color: var(--enamel-tickets-on);
+  }
+
+  .arc-gamecard-favorite:focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 2px;
+  }
+
+  .arc-gamecard-favorite:disabled {
+    cursor: wait;
+    opacity: 0.65;
+  }
+
+  /* recessed cabinet "screen" for the card thumbnail — a faint grid mesh in
+     a deep inset well; the generated poster (and hover preview) sits inside. */
+  .arc-gamecard-art {
+    position: relative;
+    aspect-ratio: 1.45;
+    border-radius: var(--radius-well);
+    overflow: hidden;
+    display: grid;
+    place-items: center;
+    background:
+      repeating-linear-gradient(0deg, #0000 0 11px, #00000028 11px 12px),
+      repeating-linear-gradient(90deg, #0000 0 11px, #00000028 11px 12px),
+      var(--screen-well);
+    border: var(--border-w-hairline) solid #00000060;
+    box-shadow: inset 0 2px 8px #000000aa, inset 0 0 0 1px #ffffff08;
+  }
+
+  /* Painted placeholder fill: until the lazy poster loads (below-fold cards),
+     wash the recessed well in the aisle's enamel so it reads as intentional
+     art instead of flashing an empty black screen. The opaque poster covers
+     this the moment it paints. */
+  .arc-gamecard-art[data-tone='primary'] { --art-tint: var(--enamel-primary); }
+  .arc-gamecard-art[data-tone='prize'] { --art-tint: var(--enamel-prize); }
+  .arc-gamecard-art[data-tone='info'] { --art-tint: var(--enamel-info); }
+  .arc-gamecard-art[data-tone='tickets'] { --art-tint: var(--enamel-tickets); }
+  .arc-gamecard-art[data-tone='danger'] { --art-tint: var(--enamel-danger); }
+
+  /* Unmapped/future tones fall back to the plain well so color-mix never
+     receives an undefined color (which would void the whole background). */
+  .arc-gamecard-art[data-tone] {
+    background:
+      repeating-linear-gradient(0deg, #0000 0 11px, #00000028 11px 12px),
+      repeating-linear-gradient(90deg, #0000 0 11px, #00000028 11px 12px),
+      linear-gradient(
+        155deg,
+        color-mix(in srgb, var(--art-tint, var(--screen-well)) 26%, var(--screen-well)),
+        var(--screen-well) 72%
+      );
+  }
+
+  .arc-gamecard-art > img,
+  .arc-gamecard-art > video,
+  .arc-gamecard-art > svg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* ── Game preview (poster → hover CSS animation, CoolMathGames-style) ── */
+  .arc-preview-poster {
+    grid-area: 1 / 1;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition:
+      transform var(--motion-settle) var(--ease-out),
+      opacity var(--motion-snap) var(--ease-snap);
+  }
+
+  /* the per-game animated scene covers the recessed card screen on hover */
+  .arc-preview-anim {
+    grid-area: 1 / 1;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: var(--screen-well);
+    animation: arc-preview-fade var(--motion-snap) var(--ease-out) both;
+  }
+
+  .arc-gamecard-art[data-playing='true'] .arc-preview-poster { opacity: 0; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    /* when no gameplay clip exists, the poster gives a gentle push-in so the
+       hover still reads as alive */
+    a:hover > .arc-gamecard-art:not([data-playing='true']) .arc-preview-poster,
+    .arc-gamecard:hover .arc-gamecard-art:not([data-playing='true']) .arc-preview-poster {
+      transform: scale(1.05);
+    }
+  }
+
+  a.arc-gamecard {
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  a.arc-gamecard:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-cabinet);
+  }
+
+  a.arc-gamecard:active {
+    transform: translateY(1px);
+    box-shadow: var(--shadow-chip);
+  }
+
+  .arc-gamecard-body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 14px 14px 15px;
+    flex: 1;
+    min-height: 7.25rem;
+  }
+
+  .arc-gamecard-desc {
+    margin: 0;
+    font-size: var(--text-sm);
+    line-height: var(--leading-body);
+    color: var(--text-body);
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+  }
+
+  .arc-game-grid > * {
+    min-width: 0;
+    height: 100%;
+  }
+
+  .arc-gamecard > .arc-marquee {
+    min-height: 3rem;
+  }
+
+  .arc-gamecard-stat {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+    border-top: var(--border-w-hairline) dashed var(--border-soft);
+    padding-top: 9px;
+    font-family: var(--font-mono-arcade);
+    font-feature-settings: var(--numeric-features);
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+  }
+
+  .arc-gamecard-stat span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .arc-gamecard-stat b {
+    color: var(--text-strong);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .arc-gamecard-stat b::after {
+    margin-left: 0.25rem;
+    content: '\2192';
+  }
+
+  /* The all-games landing view shows a curated row from each aisle. These
+     cards keep the same cabinet hierarchy while reducing scroll depth; full
+     category and search results retain the roomier card treatment. */
+  .arc-gamecard[data-compact='true'] .arc-gamecard-art {
+    aspect-ratio: 1.7;
+  }
+
+  .arc-gamecard[data-compact='true'] .arc-gamecard-body {
+    min-height: 6.25rem;
+    padding-block: 11px 12px;
+  }
+
+  .arc-gamecard[data-compact='true'] .arc-gamecard-desc {
+    -webkit-line-clamp: 2;
+  }
+
+  @media (max-width: 39.999rem) {
+    .arc-gamecard > .arc-marquee {
+      min-height: 2.75rem;
+      padding: 10px 11px 8px;
+      font-size: 0.8125rem;
+    }
+
+    .arc-gamecard-body {
+      min-height: 6.35rem;
+      gap: 8px;
+      padding: 10px 11px 11px;
+    }
+
+    .arc-gamecard-desc {
+      font-size: 0.75rem;
+      -webkit-line-clamp: 2;
+    }
+
+    .arc-gamecard-stat {
+      gap: 0.4rem;
+      padding-top: 7px;
+      font-size: 0.625rem;
+    }
+  }
+
+  /* ── Chip (status pill) ─────────────────────────────────────────── */
+
+  .arc-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-ui);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    border-radius: var(--radius-round);
+    padding: 4px 11px 3px;
+    white-space: nowrap;
+    border: var(--border-w-hairline) solid var(--border-soft);
+    background: linear-gradient(180deg, var(--surface-raised), var(--surface-panel));
+    color: var(--text-body);
+    box-shadow: var(--shadow-chip);
+  }
+
+  .arc-chip[data-tone='primary'] { background: linear-gradient(180deg, var(--enamel-primary), var(--enamel-primary-edge)); color: var(--enamel-primary-on); border-color: var(--border-ink); box-shadow: inset 0 1px 0 #ffffff30, 0 2px 0 var(--shadow-color); }
+  .arc-chip[data-tone='tickets'] { background: linear-gradient(180deg, var(--enamel-tickets-hi), var(--enamel-tickets)); color: var(--enamel-tickets-on); border-color: var(--border-ink); box-shadow: inset 0 1px 0 #ffffff40, 0 2px 0 var(--shadow-color); }
+  .arc-chip[data-tone='prize'] { background: linear-gradient(180deg, var(--enamel-prize-hi), var(--enamel-prize)); color: var(--enamel-prize-on); border-color: var(--border-ink); box-shadow: inset 0 1px 0 #ffffff35, 0 2px 0 var(--shadow-color); }
+  .arc-chip[data-tone='info'] { background: linear-gradient(180deg, var(--enamel-info-hi), var(--enamel-info)); color: var(--enamel-info-on); border-color: var(--border-ink); box-shadow: inset 0 1px 0 #ffffff35, 0 2px 0 var(--shadow-color); }
+  .arc-chip[data-tone='danger'] { background: linear-gradient(180deg, var(--enamel-danger), var(--enamel-danger-edge)); color: var(--enamel-danger-on); border-color: var(--border-ink); box-shadow: inset 0 1px 0 #ffffff30, 0 2px 0 var(--shadow-color); }
+
+  /* filter-chip active state (amber key), for All/Casual/Wager/etc. toggles */
+  .arc-chip[data-active='true'] {
+    background: linear-gradient(180deg, var(--enamel-tickets-hi), var(--enamel-tickets));
+    color: var(--enamel-tickets-on);
+    border-color: var(--enamel-tickets-edge);
+    box-shadow: inset 0 1px 0 #ffe3ad, inset 0 -2px 3px #b46a13, 0 2px 0 var(--shadow-color);
+  }
+
+  button.arc-chip,
+  a.arc-chip { cursor: pointer; transition: filter var(--motion-snap) var(--ease-snap); }
+  button.arc-chip:hover:not([data-active='true']),
+  a.arc-chip:hover:not([data-active='true']) { filter: brightness(1.1); }
+
+  /* ── Segmented control (one well, active key — replaces tab cabinets) ── */
+  .arc-seg {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 4px;
+    border-radius: var(--radius-key);
+    background: linear-gradient(180deg, var(--surface-well), #060505);
+    border: var(--border-w) solid var(--border-ink);
+    box-shadow: var(--shadow-well);
+    max-width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .arc-seg::-webkit-scrollbar { display: none; }
+
+  .arc-seg-item {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    font-family: var(--font-ui);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    padding: 7px 14px 6px;
+    border-radius: calc(var(--radius-key) - 3px);
+    cursor: pointer;
+    white-space: nowrap;
+    transition:
+      color var(--motion-snap) var(--ease-snap),
+      background var(--motion-snap) var(--ease-snap),
+      box-shadow var(--motion-snap) var(--ease-snap);
+  }
+  .arc-seg-item:hover:not([data-active='true']) { color: var(--text-strong); }
+  .arc-seg-item[data-active='true'] {
+    color: var(--key-face-on);
+    background: linear-gradient(180deg, var(--key-face-hi), var(--key-face));
+    box-shadow: inset 0 1px 0 var(--key-bevel-hi), 0 2px 0 var(--shadow-color);
+  }
+  .arc-seg-item[data-active='true'][data-tone='primary'] { color: var(--enamel-primary-on); background: linear-gradient(180deg, var(--enamel-primary), var(--enamel-primary-edge)); box-shadow: inset 0 1px 0 #ffffff30, 0 2px 0 var(--shadow-color); }
+  .arc-seg-item[data-active='true'][data-tone='tickets'] { color: var(--enamel-tickets-on); background: linear-gradient(180deg, var(--enamel-tickets-hi), var(--enamel-tickets)); box-shadow: inset 0 1px 0 #ffe3ad, 0 2px 0 var(--shadow-color); }
+
+  /* tixy: chips are small tags, not pills: tone only, 6 px corners. The
+     segmented control is a paper 3 well with an ink key. */
+  :root[data-arcade-theme='tixy'] .arc-chip {
+    border: 0;
+    border-radius: 6px;
+    padding: 3px 9px;
+    background: var(--surface-raised);
+    color: var(--text-body);
+    box-shadow: none;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+  :root[data-arcade-theme='tixy'] .arc-chip:is([data-tone='primary'], [data-active='true']) { background: var(--enamel-primary); color: var(--enamel-primary-on); box-shadow: none; }
+  :root[data-arcade-theme='tixy'] .arc-chip:is([data-tone='tickets'], [data-tone='prize']) { background: var(--enamel-tickets); color: var(--enamel-tickets-on); }
+  :root[data-arcade-theme='tixy'] .arc-chip[data-tone='info'] { background: var(--key-face); color: var(--key-face-on); }
+  :root[data-arcade-theme='tixy'] .arc-chip[data-tone='danger'] { background: var(--enamel-danger); color: var(--enamel-danger-on); }
+  :root[data-arcade-theme='tixy'] :is(button, a).arc-chip:hover:not([data-active='true']) { filter: brightness(0.95); }
+
+  /* tabs (r-kit): the mockup's filter row. No well: the words sit on the
+     panel, hover lifts a paper 3 tone, the chosen one is ink, a press
+     shrinks to 95%. */
+  :root[data-arcade-theme='tixy'] .arc-seg {
+    gap: 4px;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+  :root[data-arcade-theme='tixy'] .arc-seg-item {
+    min-height: 36px;
+    padding: 0 12px;
+    border-radius: var(--tixy-radius-button-sm);
+    color: var(--text-muted);
+    font-family: var(--tixy-font-text);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    transition:
+      background-color var(--tixy-panel-fast) ease-out,
+      color var(--tixy-panel-fast) ease-out,
+      transform var(--tixy-press-out) ease-out;
+  }
+  :root[data-arcade-theme='tixy'] .arc-seg-item:hover:not([data-active='true']) { background: var(--surface-raised); color: var(--text-strong); }
+  :root[data-arcade-theme='tixy'] .arc-seg-item:active { transform: scale(0.95); transition-duration: var(--tixy-press-in); }
+  :root[data-arcade-theme='tixy'] .arc-seg-item:focus-visible { outline: var(--focus-outline); outline-offset: 2px; }
+  :root[data-arcade-theme='tixy'] .arc-seg-item[data-active='true'] { background: var(--enamel-primary); color: var(--enamel-primary-on); box-shadow: none; }
+  :root[data-arcade-theme='tixy'] .arc-seg-item[data-active='true'][data-tone='tickets'] { background: var(--enamel-tickets); color: var(--enamel-tickets-on); }
+
+  /* ── Flat stat group — ONE inset well, divided cells (kills tile soup) ── */
+  .arc-statgrid {
+    display: grid;
+    background: linear-gradient(180deg, var(--surface-well), #060505);
+    border: var(--border-w) solid var(--border-ink);
+    border-radius: var(--radius-panel);
+    box-shadow: var(--shadow-well);
+    overflow: hidden;
+  }
+  .arc-statgrid > * {
+    padding: 12px 14px;
+    border-top: var(--border-w-hairline) solid color-mix(in srgb, var(--border-soft) 55%, transparent);
+    border-left: var(--border-w-hairline) solid color-mix(in srgb, var(--border-soft) 55%, transparent);
+    min-width: 0;
+  }
+  .arc-statgrid[data-cols='2'] > :nth-child(-n+2),
+  .arc-statgrid[data-cols='3'] > :nth-child(-n+3),
+  .arc-statgrid[data-cols='4'] > :nth-child(-n+4) { border-top: none; }
+  .arc-statgrid[data-cols='2'] > :nth-child(2n+1),
+  .arc-statgrid[data-cols='3'] > :nth-child(3n+1),
+  .arc-statgrid[data-cols='4'] > :nth-child(4n+1) { border-left: none; }
+
+  /* tixy: one paper 3 well; the cells keep their hairlines. */
+  :root[data-arcade-theme='tixy'] .arc-statgrid { background: var(--surface-well); border-color: transparent; box-shadow: none; }
+
+  /* ── Stat tile (inset well + big tabular number) ────────────────── */
+
+  .arc-stat {
+    background: var(--surface-well);
+    border: var(--border-w) solid var(--border-ink);
+    border-radius: var(--radius-panel);
+    box-shadow: var(--shadow-well);
+    padding: 12px 14px 11px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  .arc-stat-value {
+    font-family: var(--font-num);
+    font-feature-settings: var(--numeric-features);
+    font-weight: var(--num-weight, 600);
+    font-size: var(--text-xl);
+    line-height: var(--leading-tight);
+    color: var(--text-strong);
+  }
+
+  .arc-stat[data-tone='tickets'] .arc-stat-value { color: var(--enamel-tickets-text); }
+  .arc-stat[data-tone='prize'] .arc-stat-value { color: var(--enamel-prize-text); }
+  .arc-stat[data-tone='primary'] .arc-stat-value { color: var(--enamel-primary-text); }
+  .arc-stat[data-tone='info'] .arc-stat-value { color: var(--enamel-info-text); }
+  .arc-stat[data-tone='danger'] .arc-stat-value { color: var(--enamel-danger-text); }
+
+  .arc-stat-sub {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+  }
+
+  :root[data-arcade-theme='tixy'] .arc-stat { border-color: transparent; box-shadow: none; }
+  :root[data-arcade-theme='tixy'] .arc-stat .arcade-kicker { font-size: var(--text-xs); font-weight: 600; }
+  :root[data-arcade-theme='tixy'] .arc-stat-value { font-size: 1.75rem; line-height: 1; }
+
+  /* ── Ticket stub (the wallet) ───────────────────────────────────── */
+
+  .arc-stub {
+    display: inline-flex;
+    align-items: stretch;
+    background: linear-gradient(180deg, var(--enamel-tickets-hi), var(--enamel-tickets));
+    color: var(--enamel-tickets-on);
+    border: var(--border-w) solid var(--enamel-tickets-edge);
+    border-radius: var(--radius-stub);
+    box-shadow:
+      inset 0 1px 0 #ffe3ad,
+      inset 0 -2px 3px #b46a1380,
+      0 3px 0 var(--shadow-color),
+      0 5px 10px #00000050;
+    overflow: hidden;
+  }
+
+  .arc-stub-no {
+    padding: 8px 13px 7px;
+    font-family: var(--font-num);
+    font-feature-settings: var(--numeric-features);
+    font-weight: var(--num-weight, 700);
+    font-size: var(--text-base);
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .arc-stub-label {
+    padding: 8px 11px 7px;
+    font-family: var(--font-display);
+    font-size: 0.5625rem;
+    letter-spacing: 0.06em;
+    display: flex;
+    align-items: center;
+    border-left: 2px dashed color-mix(in srgb, var(--enamel-tickets-on) 55%, transparent);
+  }
+
+  .arc-stub[data-size='sm'] .arc-stub-no { padding: 5px 10px 4px; font-size: var(--text-sm); }
+  .arc-stub[data-size='sm'] .arc-stub-label { padding: 5px 9px 4px; }
+
+  .arc-stub-delta {
+    font-family: var(--font-num);
+    font-feature-settings: var(--numeric-features);
+    font-size: var(--text-xs);
+    font-weight: var(--num-weight, 700);
+  }
+
+  .arc-stub-delta[data-up='true'] { color: var(--enamel-prize-text); }
+  .arc-stub-delta[data-up='false'] { color: var(--enamel-danger-text); }
+
+  /* Num: under tixy each digit sits in a 1ch cell, so a number holds its
+     width while it counts (Big Shoulders has no tabular figures). The
+     Midway themes keep whatever face the number already had. */
+  .arc-digits {
+    white-space: nowrap;
+  }
+  :root[data-arcade-theme='tixy'] .arc-digits {
+    font-family: var(--font-num);
+    font-weight: var(--num-weight);
+    font-feature-settings: var(--numeric-features);
+    letter-spacing: var(--tracking-mono);
+  }
+  :root[data-arcade-theme='tixy'] .arc-digits [data-d] {
+    display: inline-block;
+    width: 1ch;
+    text-align: center;
+  }
+
+  /* The stub: the mark's outline, a rounded ticket with a half-circle
+     notch on each short end, cut with a mask so it sits on any ground. The
+     notches are tixy only; the Midway themes get a plain amber tag.
+     Only tickets get it: balances, prices, bet values, the result strip.
+     ArcadeStub in ui/arcade-ui.tsx. --n is the notch radius. */
+  .arc-ticket-stub {
+    --n: 6px;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 32px;
+    padding: 0 14px;
+    border-radius: 5px;
+    background: var(--enamel-tickets);
+    color: var(--enamel-tickets-on);
+    font-family: var(--font-num);
+    font-weight: var(--num-weight, 700);
+    font-size: 1.1875rem;
+    line-height: 1;
+    white-space: nowrap;
+  }
+  .arc-ticket-stub[data-size='sm'] { --n: 5px; height: 26px; padding: 0 11px; font-size: 1rem; }
+  .arc-ticket-stub[data-size='lg'] { --n: 7px; height: 46px; padding: 0 22px; font-size: 1.625rem; }
+  .arc-ticket-stub[data-perf] { padding-right: 30px; }
+  .arc-ticket-stub[data-perf]::after {
+    content: '';
+    position: absolute;
+    top: 5px;
+    right: 15px;
+    bottom: 5px;
+    border-left: 2px dashed color-mix(in srgb, currentColor 55%, transparent);
+  }
+  .arc-ticket-stub[data-muted] { background: var(--surface-raised); color: var(--text-muted); }
+  :root[data-arcade-theme='tixy'] .arc-ticket-stub {
+    -webkit-mask:
+      radial-gradient(circle var(--n) at 0 50%, #0000 97%, #000) 0 0 / 51% 100% no-repeat,
+      radial-gradient(circle var(--n) at 100% 50%, #0000 97%, #000) 100% 0 / 51% 100% no-repeat;
+    mask:
+      radial-gradient(circle var(--n) at 0 50%, #0000 97%, #000) 0 0 / 51% 100% no-repeat,
+      radial-gradient(circle var(--n) at 100% 50%, #0000 97%, #000) 100% 0 / 51% 100% no-repeat;
+  }
+
+  /* tixy: the wallet is the stub. Count, perforation, label. */
+  :root[data-arcade-theme='tixy'] .arc-stub {
+    --n: 6px;
+    align-items: center;
+    height: 34px;
+    padding: 0 12px 0 14px;
+    border: 0;
+    border-radius: 5px;
+    background: var(--enamel-tickets);
+    color: var(--enamel-tickets-on);
+    box-shadow: none;
+    overflow: visible;
+    -webkit-mask:
+      radial-gradient(circle var(--n) at 0 50%, #0000 97%, #000) 0 0 / 51% 100% no-repeat,
+      radial-gradient(circle var(--n) at 100% 50%, #0000 97%, #000) 100% 0 / 51% 100% no-repeat;
+    mask:
+      radial-gradient(circle var(--n) at 0 50%, #0000 97%, #000) 0 0 / 51% 100% no-repeat,
+      radial-gradient(circle var(--n) at 100% 50%, #0000 97%, #000) 100% 0 / 51% 100% no-repeat;
+  }
+  :root[data-arcade-theme='tixy'] .arc-stub[data-size='sm'] { --n: 5px; height: 30px; }
+  :root[data-arcade-theme='tixy'] .arc-stub-no { padding: 0; gap: 6px; font-size: 1.3125rem; line-height: 1; }
+  :root[data-arcade-theme='tixy'] .arc-stub[data-size='sm'] .arc-stub-no { padding: 0; font-size: 1.1875rem; }
+  :root[data-arcade-theme='tixy'] .arc-stub-label {
+    align-self: stretch;
+    margin: 5px 0 5px 12px;
+    padding: 0 0 0 10px;
+    border-left: 2px dashed rgb(31 26 22 / 0.55);
+    font-family: var(--tixy-font-text);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+  :root[data-arcade-theme='tixy'] .arc-stub[data-size='sm'] .arc-stub-label { padding: 0 0 0 9px; margin-left: 10px; }
+  :root[data-arcade-theme='tixy'] .arc-stub-delta { font-size: var(--text-xs); }
+
+  /* ── Cabinet badge (red enamel plate, star-flanked) ─────────────── */
+
+  .arc-cabinet-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-ui);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    padding: 9px 18px;
+    border-radius: 7px;
+    background: linear-gradient(180deg, var(--enamel-primary-hi), var(--enamel-primary-edge));
+    color: var(--enamel-primary-on);
+    border: var(--border-w-hairline) solid var(--enamel-primary-edge);
+    box-shadow:
+      inset 0 1px 0 #ffffff35,
+      inset 0 -2px 4px #00000050,
+      0 3px 0 var(--shadow-color),
+      0 5px 10px #00000050;
+  }
+  .arc-cabinet-badge[data-tone='tickets'] {
+    background: linear-gradient(180deg, var(--enamel-tickets-hi), var(--enamel-tickets));
+    color: var(--enamel-tickets-on);
+    border-color: var(--enamel-tickets-edge);
+  }
+  .arc-cabinet-badge[data-tone='prize'] {
+    background: linear-gradient(180deg, var(--enamel-prize-hi), var(--enamel-prize));
+    color: var(--enamel-prize-on);
+    border-color: var(--enamel-prize-edge);
+  }
+  .arc-cabinet-badge[data-tone='info'] {
+    background: linear-gradient(180deg, var(--enamel-info-hi), var(--enamel-info));
+    color: var(--enamel-info-on);
+    border-color: var(--enamel-info-edge);
+  }
+  .arc-cabinet-badge[data-tone='danger'] {
+    background: linear-gradient(180deg, var(--enamel-danger), var(--enamel-danger-edge));
+    color: var(--enamel-danger-on);
+    border-color: var(--enamel-danger-edge);
+  }
+  .arc-cabinet-star {
+    display: inline-flex;
+    color: var(--enamel-tickets);
+  }
+
+  /* tixy: a plain name tag, tone only. The stars go. */
+  :root[data-arcade-theme='tixy'] .arc-cabinet-badge {
+    padding: 6px 12px;
+    border: 0;
+    border-radius: var(--tixy-radius-button-sm);
+    background: var(--enamel-primary);
+    color: var(--enamel-primary-on);
+    box-shadow: none;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+  :root[data-arcade-theme='tixy'] .arc-cabinet-badge:is([data-tone='tickets'], [data-tone='prize']) { background: var(--enamel-tickets); color: var(--enamel-tickets-on); }
+  :root[data-arcade-theme='tixy'] .arc-cabinet-badge[data-tone='info'] { background: var(--key-face); color: var(--key-face-on); }
+  :root[data-arcade-theme='tixy'] .arc-cabinet-badge[data-tone='danger'] { background: var(--enamel-danger); color: var(--enamel-danger-on); }
+  :root[data-arcade-theme='tixy'] .arc-cabinet-star { display: none; }
+
+  /* ── Ticket dispenser (balance panel + slot + raffle ticket) ────── */
+
+  .arc-balance {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 22px;
+    background:
+      var(--grain),
+      linear-gradient(180deg,
+        color-mix(in srgb, var(--enamel-tickets) 22%, var(--surface-raised)),
+        var(--surface-panel));
+    border: var(--border-w) solid var(--enamel-tickets-edge);
+    border-radius: var(--radius-panel);
+    box-shadow:
+      inset 0 1px 0 #ffe3ad40,
+      inset 0 -3px 8px #00000060,
+      0 6px 0 var(--shadow-color),
+      0 9px 18px #00000055;
+  }
+
+  .arc-balance-head {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    font-family: var(--font-display);
+    font-size: var(--text-sm);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--enamel-tickets-text);
+    margin: 0 0 16px;
+    text-shadow: 0 2px 0 var(--shadow-color);
+  }
+  .arc-balance-star {
+    display: inline-flex;
+    color: var(--enamel-tickets);
+  }
+
+  .arc-balance-num {
+    font-family: var(--font-num);
+    font-feature-settings: var(--numeric-features);
+    font-size: var(--text-5xl);
+    font-weight: var(--num-weight, 600);
+    line-height: 1;
+    color: var(--enamel-tickets-text);
+    text-shadow: 0 4px 0 var(--shadow-color), 0 0 1px #00000080;
+  }
+  .arc-balance-unit {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin: 6px 0 18px;
+  }
+  .arc-balance-claim {
+    width: auto;
+  }
+
+  /* tixy: a paper 2 panel with the count in Big Shoulders. */
+  :root[data-arcade-theme='tixy'] .arc-balance {
+    border-color: transparent;
+    border-radius: var(--tixy-radius-panel);
+    background: var(--surface-panel);
+    box-shadow: none;
+  }
+  :root[data-arcade-theme='tixy'] .arc-balance-head {
+    font-family: var(--tixy-font-text);
+    font-size: var(--text-lg);
+    font-weight: var(--tixy-weight-heading);
+    letter-spacing: 0;
+    text-transform: none;
+    text-shadow: none;
+    color: var(--text-strong);
+  }
+  :root[data-arcade-theme='tixy'] .arc-balance-star { display: none; }
+  :root[data-arcade-theme='tixy'] .arc-balance-num { color: var(--text-strong); text-shadow: none; }
+  :root[data-arcade-theme='tixy'] .arc-balance-unit { font-weight: 600; letter-spacing: 0; text-transform: none; }
+
+  .arc-dispenser {
+    position: relative;
+    width: 100%;
+    height: 130px;
+    margin-top: 24px;
+    display: flex;
+    justify-content: center;
+  }
+  .arc-slot {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    height: 18px;
+    border-radius: 5px;
+    background: linear-gradient(180deg, #0a0705, #16100a);
+    border: var(--border-w-hairline) solid var(--border-ink);
+    box-shadow: inset 0 3px 6px #000000cc, 0 1px 0 var(--bevel-hi);
+    z-index: 3;
+  }
+  .arc-ticket {
+    position: absolute;
+    top: 4px;
+    width: 240px;
+    height: auto;
+    z-index: 2;
+    transform: translateY(28px);
+    opacity: 1;
+  }
+  /* ticket hidden until claimed */
+  .arc-dispenser:not([data-claimed]) .arc-ticket {
+    opacity: 0;
+  }
+  .arc-ticket-body {
+    fill: #e8d9b8;
+    stroke: #b29a6b;
+    stroke-width: 2;
+  }
+  .arc-ticket-inner {
+    fill: none;
+    stroke: #c0a878;
+    stroke-width: 1.5;
+    stroke-dasharray: 3 3;
+  }
+  .arc-ticket-perf {
+    stroke: #b29a6b;
+    stroke-width: 2;
+    stroke-dasharray: 4 4;
+  }
+  .arc-ticket-name {
+    fill: #8a2a1e;
+    font-family: var(--font-display);
+    font-size: 20px;
+    text-anchor: middle;
+    letter-spacing: 0.05em;
+  }
+  .arc-ticket-side {
+    fill: #8a2a1e;
+    font-family: var(--font-mono-arcade);
+    font-feature-settings: var(--numeric-features);
+    font-size: 18px;
+    font-weight: 600;
+    text-anchor: middle;
+  }
+  .arc-ticket-serial {
+    fill: #9a8052;
+    font-family: var(--font-mono-arcade);
+    font-feature-settings: var(--numeric-features);
+    font-size: 9px;
+    text-anchor: middle;
+    writing-mode: vertical-rl;
+  }
+
+  /* ── Progress (enamel paint in an inset track) ──────────────────── */
+
+  .arc-progress {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 0;
+  }
+
+  .arc-progress-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .arc-progress-count {
+    font-family: var(--font-num);
+    font-feature-settings: var(--numeric-features);
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    font-weight: var(--num-weight, inherit);
+  }
+
+  .arc-progress-track {
+    height: 10px;
+    border-radius: var(--radius-round);
+    background: var(--surface-well);
+    border: var(--border-w-hairline) solid var(--border-ink);
+    box-shadow: var(--shadow-well);
+    overflow: hidden;
+  }
+
+  .arc-progress-fill {
+    height: 100%;
+    border-radius: var(--radius-round);
+    background: linear-gradient(180deg, var(--enamel-tickets-hi), var(--enamel-tickets));
+    border-right: 2px solid var(--enamel-tickets-edge);
+    box-shadow: inset 0 1px 0 #ffffff45;
+    transition: width var(--motion-payout) var(--ease-out);
+  }
+
+  .arc-progress[data-tone='prize'] .arc-progress-fill { background: var(--enamel-prize); border-right-color: var(--enamel-prize-edge); }
+  .arc-progress[data-tone='primary'] .arc-progress-fill { background: var(--enamel-primary); border-right-color: var(--enamel-primary-edge); }
+  .arc-progress[data-tone='info'] .arc-progress-fill { background: var(--enamel-info); border-right-color: var(--enamel-info-edge); }
+
+  /* Opt-in visible empty rail: a defined pill even at 0%. Same material fix the
+     battlepass quests use (hard ink border + inner soft ring + deep inset), but
+     shared here as a utility so profiles get it without importing scoped CSS. */
+  .arc-progress--railed .arc-progress-track {
+    box-shadow:
+      inset 0 2px 4px #000000aa,
+      inset 0 0 0 1px var(--border-soft);
+  }
+
+  /* tixy: a flat paper 3 track with a flat fill. Amber is tickets. */
+  :root[data-arcade-theme='tixy'] .arc-progress-track,
+  :root[data-arcade-theme='tixy'] .arc-progress--railed .arc-progress-track {
+    height: 8px;
+    border: 0;
+    border-radius: 4px;
+    background: var(--surface-raised);
+    box-shadow: none;
+  }
+  :root[data-arcade-theme='tixy'] .arc-progress-fill { border: 0; border-radius: 4px; background: var(--enamel-tickets); box-shadow: none; }
+  :root[data-arcade-theme='tixy'] .arc-progress[data-tone='primary'] .arc-progress-fill { background: var(--enamel-primary); }
+  :root[data-arcade-theme='tixy'] .arc-progress[data-tone='info'] .arc-progress-fill { background: var(--tixy-ink-3); }
+  :root[data-arcade-theme='tixy'] .arc-progress-head .arcade-kicker { font-size: var(--text-sm); font-weight: 600; color: var(--text-body); }
+  :root[data-arcade-theme='tixy'] .arc-progress-count { font-size: var(--text-base); color: var(--text-strong); }
+
+  /* ── Notice (inset strip with enamel badge) ─────────────────────── */
+
+  .arc-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: var(--surface-well);
+    border: var(--border-w-hairline) solid var(--border-soft);
+    border-radius: var(--radius-well);
+    padding: 11px 14px 10px;
+    font-size: var(--text-sm);
+    line-height: var(--leading-body);
+    color: var(--text-body);
+  }
+
+  .arc-notice-dot {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+    margin-top: 1px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-tag);
+    border: var(--border-w-hairline) solid var(--border-ink);
+    background: var(--surface-raised);
+    color: var(--text-muted);
+  }
+
+  .arc-notice[data-tone='prize'] .arc-notice-dot { background: var(--enamel-prize); color: var(--enamel-prize-on); }
+  .arc-notice[data-tone='tickets'] .arc-notice-dot { background: var(--enamel-tickets); color: var(--enamel-tickets-on); }
+  .arc-notice[data-tone='danger'] .arc-notice-dot { background: var(--enamel-danger); color: var(--enamel-danger-on); }
+  .arc-notice[data-tone='info'] .arc-notice-dot { background: var(--enamel-info); color: var(--enamel-info-on); }
+
+  .arc-notice b,
+  .arc-notice strong {
+    color: var(--text-strong);
+  }
+
+  /* tixy (r-kit): a paper 3 line with a round dot. Ink text in every tone;
+     the dot carries it: red for an error, amber for tickets, ink for done,
+     paper 2 for a note. */
+  :root[data-arcade-theme='tixy'] .arc-notice {
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border-color: transparent;
+    border-radius: var(--tixy-radius-button);
+    background: var(--surface-raised);
+    font-size: 0.9375rem;
+  }
+  :root[data-arcade-theme='tixy'] .arc-notice-dot {
+    width: 22px;
+    height: 22px;
+    margin-top: 0;
+    border: 0;
+    border-radius: 50%;
+    background: var(--surface-panel);
+    color: var(--text-strong);
+  }
+  :root[data-arcade-theme='tixy'] .arc-notice[data-tone='prize'] .arc-notice-dot { background: var(--enamel-primary); color: var(--enamel-primary-on); }
+  :root[data-arcade-theme='tixy'] .arc-notice-dot svg { stroke-linecap: square; }
+
+  /* ── Leaderboard (columnar grid table) ──────────────────────────── */
+  /* Row + header share a column template via --lb-cols so they stay
+     aligned. The template is set per-row from the cells that are present
+     (tier / record are optional → dual-mode: Elo boards add them, score /
+     speed boards omit them and the row collapses cleanly). */
+
+  .arc-lbrow {
+    display: grid;
+    grid-template-columns: var(--lb-cols, 44px 1fr auto auto);
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    background: var(--surface-panel);
+    border-bottom: var(--border-w-hairline) solid var(--border-soft);
+    min-width: 0;
+  }
+
+  .arc-lbrow:last-child {
+    border-bottom: none;
+  }
+
+  /* podium rows get a warm amber wash (token-tinted, theme-safe) */
+  .arc-lbrow[data-podium='true']:not([data-you='true']) {
+    background: linear-gradient(180deg,
+      color-mix(in srgb, var(--enamel-tickets) 12%, var(--surface-panel)),
+      var(--surface-panel));
+  }
+
+  /* the "you" row — teal enamel gradient + border + bevel */
+  .arc-lbrow[data-you='true'] {
+    background: linear-gradient(180deg,
+      color-mix(in srgb, var(--enamel-prize) 30%, var(--surface-well)),
+      color-mix(in srgb, var(--enamel-prize) 18%, var(--surface-well)));
+    border: var(--border-w-hairline) solid var(--enamel-prize-edge);
+    box-shadow: inset 0 1px 0 var(--bevel-hi), 0 2px 0 var(--shadow-color);
+  }
+
+  /* header row — uppercase faint column labels */
+  .arc-lbrow-head {
+    background: transparent;
+    border-bottom: var(--border-w-hairline) solid var(--border-soft);
+    padding-top: 6px;
+    padding-bottom: 12px;
+  }
+  .arc-lbrow-head > span {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    white-space: nowrap;
+  }
+  .arc-lbrow-head .arc-lbcol-num { text-align: right; }
+
+  /* square rank badge with gold/silver/bronze gradients for 1/2/3 */
+  .arc-lbrow-rank {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+    font-family: var(--font-num);
+    font-feature-settings: var(--numeric-features);
+    font-weight: var(--num-weight, 600);
+    font-size: var(--text-sm);
+    border-radius: 7px;
+    border: var(--border-w-hairline) solid var(--border-soft);
+    background: linear-gradient(180deg, var(--surface-raised), var(--surface-well));
+    color: var(--text-muted);
+  }
+
+  .arc-lbrow[data-rank='1'] .arc-lbrow-rank {
+    background: linear-gradient(180deg, #f7d35e, #c79a1f);
+    color: #2a1c08;
+    border-color: #a07c12;
+    box-shadow: inset 0 1px 0 #ffffff45, 0 1px 0 var(--shadow-color);
+  }
+  .arc-lbrow[data-rank='2'] .arc-lbrow-rank {
+    background: linear-gradient(180deg, #d6d6d6, #9a9a9a);
+    color: #1a1a1a;
+    border-color: #7a7a7a;
+    box-shadow: inset 0 1px 0 #ffffff60, 0 1px 0 var(--shadow-color);
+  }
+  .arc-lbrow[data-rank='3'] .arc-lbrow-rank {
+    background: linear-gradient(180deg, #d99a5e, #a96a2f);
+    color: #2a1408;
+    border-color: #884e1f;
+    box-shadow: inset 0 1px 0 #ffffff35, 0 1px 0 var(--shadow-color);
+  }
+
+  /* player cell: avatar + name (+ optional sub) */
+  .arc-lbrow-player {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    min-width: 0;
+  }
+  .arc-lbrow-avatar {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface-well);
+    color: var(--text-body);
+    border: var(--border-w-hairline) solid var(--border-soft);
+    border-radius: var(--radius-round);
+    font-family: var(--font-display);
+    font-size: 0.625rem;
+    overflow: hidden;
+  }
+
+  .arc-lbrow-name {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+  .arc-lbrow-name b {
+    color: var(--text-strong);
+    font-weight: 600;
+    font-size: var(--text-base);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .arc-lbrow-name span {
+    color: var(--text-muted);
+    font-size: var(--text-xs);
+  }
+  /* "you" pill next to the name */
+  .arc-lbrow-youtag {
+    align-self: flex-start;
+    margin-top: 2px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--enamel-prize-on);
+    padding: 2px 7px;
+    border-radius: 4px;
+    background: var(--enamel-prize);
+  }
+
+  /* score cell (Elo / score / time / turns) */
+  .arc-lbrow-score {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 1px;
+    white-space: nowrap;
+  }
+  .arc-lbrow-score b {
+    font-family: var(--font-num);
+    font-feature-settings: var(--numeric-features);
+    font-weight: var(--num-weight, 600);
+    font-size: var(--text-base);
+    color: var(--text-strong);
+  }
+  .arc-lbrow[data-rank='1'] .arc-lbrow-score b {
+    color: var(--enamel-tickets-text);
+  }
+  .arc-lbrow-score span {
+    color: var(--text-muted);
+    font-size: var(--text-xs);
+    font-family: var(--font-mono-arcade);
+  }
+
+  /* tier badge cell (optional) */
+  .arc-lbrow-tier {
+    display: flex;
+    justify-content: flex-start;
+    min-width: 0;
+  }
+  .arc-lbtier {
+    display: inline-flex;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 5px;
+    box-shadow: inset 0 1px 0 #ffffff25, 0 1px 0 #00000060;
+    white-space: nowrap;
+  }
+  .arc-lbtier[data-tier='grandmaster'] { background: var(--enamel-primary-edge); color: var(--enamel-primary-on); }
+  .arc-lbtier[data-tier='master'] { background: #5a2e94; color: #ecddff; }
+  .arc-lbtier[data-tier='diamond'] { background: var(--enamel-prize-edge); color: var(--enamel-prize-on); }
+  .arc-lbtier[data-tier='platinum'] { background: var(--enamel-info-edge); color: var(--enamel-info-on); }
+  .arc-lbtier[data-tier='gold'],
+  .arc-lbtier { background: var(--enamel-tickets-edge); color: var(--enamel-tickets-on); }
+
+  /* record (W-L) cell (optional) */
+  .arc-lbrow-record {
+    font-family: var(--font-num);
+    font-feature-settings: var(--numeric-features);
+    color: var(--text-muted);
+    white-space: nowrap;
+    font-weight: var(--num-weight, inherit);
+  }
+
+  /* delta cell */
+  .arc-lbrow-delta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 4px;
+    font-family: var(--font-num);
+    font-feature-settings: var(--numeric-features);
+    font-size: var(--text-xs);
+    font-weight: var(--num-weight, 700);
+  }
+  .arc-lbrow-delta[data-dir='up'] { color: var(--pos); }
+  .arc-lbrow-delta[data-dir='down'] { color: var(--neg); }
+
+  /* footer summary band */
+  .arc-lbfoot {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 22px;
+    justify-content: space-between;
+    padding: 14px 20px;
+    border-radius: var(--radius-panel);
+    background: var(--grain), linear-gradient(180deg, var(--surface-raised), var(--surface-panel));
+    border: var(--border-w-hairline) solid var(--border-soft);
+    box-shadow: inset 0 1px 0 var(--bevel-hi), 0 2px 0 var(--shadow-color);
+  }
+  .arc-lbfoot-item {
+    font-family: var(--font-mono-arcade);
+    font-feature-settings: var(--numeric-features);
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+  }
+
+  /* ── Input (an inset well the player types into) ────────────────── */
+
+  .arc-input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-width: 0;
+  }
+
+  .arc-input-icon {
+    position: absolute;
+    left: 13px;
+    color: var(--text-muted);
+    pointer-events: none;
+    display: flex;
+  }
+
+  .arc-input {
+    width: 100%;
+    background: var(--surface-well);
+    color: var(--text-strong);
+    border: var(--border-w) solid var(--border-ink);
+    border-radius: var(--radius-well);
+    box-shadow: var(--shadow-well);
+    font-family: var(--font-ui);
+    font-size: var(--text-base);
+    padding: 10px 13px 9px;
+    transition: border-color var(--motion-snap) var(--ease-snap);
+  }
+
+  .arc-input[data-mono='true'] {
+    font-family: var(--font-mono-arcade);
+    font-feature-settings: var(--numeric-features);
+  }
+
+  .arc-input::placeholder {
+    color: var(--text-muted);
+  }
+
+  .arc-input:focus {
+    outline: var(--focus-outline);
+    outline-offset: var(--focus-offset);
+  }
+
+  .arc-input:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  .arc-input[data-hasicon='true'] {
+    padding-left: 38px;
+  }
+
+  .arc-input[data-size='lg'] {
+    font-size: 1rem;
+    padding-top: 13px;
+    padding-bottom: 12px;
+  }
+
+  .arc-input[data-invalid='true'] {
+    border-color: var(--enamel-danger);
+  }
+
+  .arc-input[data-invalid='true'].arc-shake,
+  .arc-field[data-invalid='true'] .arc-input {
+    animation: arc-shake var(--motion-shake) var(--ease-snap) both;
+  }
+
+  /* ── Switch (cream key thumb in an inset track) ─────────────────── */
+
+  .arc-switch {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    width: 52px;
+    height: 28px;
+    flex-shrink: 0;
+    background: var(--surface-well);
+    border: var(--border-w) solid var(--border-ink);
+    border-radius: var(--radius-round);
+    box-shadow: var(--shadow-well);
+    cursor: pointer;
+    padding: 0;
+    transition: background var(--motion-snap) var(--ease-snap);
+  }
+
+  .arc-switch[aria-checked='true'] {
+    background: var(--enamel-prize);
+  }
+
+  .arc-switch-thumb {
+    position: absolute;
+    left: 2px;
+    top: 50%;
+    width: 22px;
+    height: 22px;
+    transform: translateY(-50%);
+    background: var(--key-face);
+    border: var(--border-w) solid var(--border-ink);
+    border-radius: var(--radius-round);
+    box-shadow: 0 2px 0 var(--key-face-edge);
+    transition: left var(--motion-snap) var(--ease-spring);
+  }
+
+  .arc-switch[aria-checked='true'] .arc-switch-thumb {
+    left: 24px;
+  }
+
+  .arc-switch:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  /* tixy: controls keep a 3:1 edge (WCAG 1.4.11). :where keeps the
+     invalid state's red border ahead of this. */
+  :where(:root[data-arcade-theme='tixy']) :is(.arc-input, .arcade-input, .arc-switch) {
+    border-color: var(--border-control);
+  }
+
+  /* tixy (r-kit): an input is the ground colour inside a 1.5 px ink 3 edge,
+     44 px tall, 10 px corners. Focus darkens the edge to ink and rings it.
+     Invalid is red (the :where above keeps that ahead). */
+  :root[data-arcade-theme='tixy'] .arc-input {
+    min-height: 44px;
+    border-width: 1.5px;
+    border-radius: var(--tixy-radius-button);
+    background: var(--bg);
+    box-shadow: none;
+    font-family: var(--tixy-font-text);
+    padding: 0 13px;
+    transition: border-color var(--tixy-panel-fast) ease-out;
+  }
+  :root[data-arcade-theme='tixy'] .arc-input[data-size='lg'] { min-height: 52px; font-size: 1.0625rem; }
+  :root[data-arcade-theme='tixy'] .arc-input[data-hasicon='true'] { padding-left: 40px; }
+  :root[data-arcade-theme='tixy'] .arc-input[data-mono='true'] { font-family: var(--tixy-font-num); font-size: 1.125rem; letter-spacing: 0.04em; }
+  :root[data-arcade-theme='tixy'] .arc-input::placeholder { color: var(--border-control); }
+  :root[data-arcade-theme='tixy'] .arc-input:focus { border-color: var(--text-strong); outline: 2px solid var(--text-strong); outline-offset: 1px; }
+  :root[data-arcade-theme='tixy'] .arc-input:disabled { opacity: 1; background: var(--surface-raised); color: var(--text-muted); border-color: transparent; }
+  :root[data-arcade-theme='tixy'] .arc-field-label { margin-bottom: 6px; color: var(--text-strong); font-size: var(--text-sm); font-weight: var(--tixy-weight-button); }
+
+  /* tixy (r-kit): a switch is a paper 3 track with an ink 3 thumb; on, the
+     track is ink and the thumb paper. The thumb slides on the spring and
+     stretches while pressed. */
+  :root[data-arcade-theme='tixy'] .arc-switch {
+    width: 46px;
+    height: 28px;
+    border-width: 1.5px;
+    background: var(--surface-raised);
+    box-shadow: none;
+    transition:
+      background-color var(--tixy-panel-fast) ease-out,
+      border-color var(--tixy-panel-fast) ease-out;
+  }
+  :root[data-arcade-theme='tixy'] .arc-switch[aria-checked='true'] { border-color: var(--enamel-primary); background: var(--enamel-primary); }
+  :root[data-arcade-theme='tixy'] .arc-switch-thumb {
+    left: 3px;
+    width: 19px;
+    height: 19px;
+    border: 0;
+    background: var(--border-control);
+    box-shadow: none;
+    transition:
+      left 180ms var(--tixy-ease-spring),
+      width var(--tixy-press-out) ease-out,
+      background-color var(--tixy-panel-fast) ease-out;
+  }
+  :root[data-arcade-theme='tixy'] .arc-switch[aria-checked='true'] .arc-switch-thumb { left: calc(100% - 22px); background: var(--enamel-primary-on); }
+  :root[data-arcade-theme='tixy'] .arc-switch:active:not(:disabled) .arc-switch-thumb { width: 23px; }
+  :root[data-arcade-theme='tixy'] .arc-switch[aria-checked='true']:active:not(:disabled) .arc-switch-thumb { left: calc(100% - 26px); }
+  :root[data-arcade-theme='tixy'] .arc-switch:disabled { opacity: 0.45; }
+  :root[data-arcade-theme='tixy'] .arc-switch:focus-visible { outline: var(--focus-outline); outline-offset: 2px; }
+
+  /* ── Bet selector (Ticket Pit wager picker) ─────────────────────── */
+
+  .arc-bet-readout {
+    background: var(--surface-well);
+    border: var(--border-w) solid var(--border-ink);
+    border-radius: var(--radius-well);
+    box-shadow: var(--shadow-well);
+    padding: 7px 12px 6px;
+    color: var(--text-strong);
+    font-family: var(--font-mono-arcade);
+    font-feature-settings: var(--numeric-features);
+    font-weight: 600;
+    font-size: var(--text-base);
+  }
+
+  .arc-bet-pill {
+    font-family: var(--font-mono-arcade);
+    font-feature-settings: var(--numeric-features);
+    font-size: var(--text-xs);
+    font-weight: 500;
+    background: var(--surface-raised);
+    color: var(--text-body);
+    border: var(--border-w-hairline) solid var(--border-soft);
+    border-radius: var(--radius-tag);
+    padding: 5px 9px 4px;
+    cursor: pointer;
+    box-shadow: var(--shadow-chip);
+    transition: filter var(--motion-snap) var(--ease-snap);
+  }
+
+  .arc-bet-pill:hover:not(:disabled) {
+    filter: brightness(1.12);
+  }
+
+  .arc-bet-pill[data-active='true'] {
+    background: var(--enamel-tickets);
+    color: var(--enamel-tickets-on);
+    border-color: var(--border-ink);
+    font-weight: 700;
+  }
+
+  .arc-bet-pill:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .arc-bet-options {
+    min-width: 0;
+    flex-wrap: wrap;
+  }
+
+  .arc-wager-nav a,
+  .arc-wager-nav button,
+  .arc-wager-rail .arc-key,
+  .arc-game-flow .arc-key,
+  .arc-bet-pill {
+    touch-action: manipulation;
+  }
+
+  @media (max-width: 39.999rem) {
+    .arc-wager-nav {
+      min-height: 2.75rem;
+    }
+
+    .arc-wager-nav > a,
+    .arc-wager-nav > span:last-child > button {
+      min-height: 2.75rem;
+    }
+
+    .arc-wager-grid {
+      gap: 0.75rem;
+    }
+
+    .arc-wager-cabinet > .arc-marquee {
+      padding: 10px 12px 8px;
+      font-size: 1rem;
+    }
+
+    .arc-wager-stage-pad {
+      padding: 0.5rem;
+    }
+
+    .arc-wager-rail {
+      gap: 0.625rem;
+    }
+
+    .arc-wager-rail .arc-key,
+    .arc-game-flow .arc-key {
+      min-height: 2.75rem;
+    }
+
+    /* Large wallets can generate many legal wager tiers. Keep them one thumb-
+       scrollable row on phones instead of letting presets push the primary
+       action several screens below the stage. */
+    .arc-bet-options {
+      margin-inline: -0.25rem;
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      flex-wrap: nowrap;
+      scroll-padding-inline: 0.25rem;
+      scroll-snap-type: x proximity;
+      padding: 0.125rem 0.25rem 0.5rem;
+      scrollbar-width: none;
+    }
+
+    .arc-bet-options::-webkit-scrollbar {
+      display: none;
+    }
+
+    .arc-bet-options .arc-bet-pill {
+      min-width: 3rem;
+      min-height: 2.5rem;
+      flex: none;
+      scroll-snap-align: start;
+    }
+
+    .arc-bet-all-in .arc-key {
+      width: 100%;
+    }
+  }
+
+  /* ── Modal (a small cabinet) ────────────────────────────────────── */
+
+  .arc-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    /* the only alpha in the system: ink dim at 78% */
+    background: color-mix(in srgb, var(--scrim) 78%, transparent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+  }
+
+  .arc-modal-overlay[data-state='closed'] {
+    pointer-events: none;
+  }
+
+  .arc-modal {
+    background: var(--surface-panel);
+    border: var(--border-w) solid var(--border-ink);
+    border-radius: var(--radius-cabinet);
+    box-shadow: var(--shadow-modal);
+    width: 100%;
+    max-width: 480px;
+    max-height: 88vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* tixy: --scrim is paper (game overlays print ink on it), so the modal
+     and sheet dim with ink instead. No outline on the box. */
+  :root[data-arcade-theme='tixy'] :is(.arc-modal-overlay, .arc-sheet-overlay) { background: rgb(31 26 22 / 0.55); }
+  :root[data-arcade-theme='tixy'] :is(.arc-modal, .arc-sheet) { border-color: transparent; }
+  :root[data-arcade-theme='tixy'] .arc-modal { border-radius: var(--tixy-radius-panel-lg); }
+  /* tixy (r-kit): the title is a heading on the panel with the close button
+     beside it, the foot has no rule, the sheet's handle is a flat tab. */
+  :root[data-arcade-theme='tixy'] :is(.arc-modal, .arc-sheet) > .arc-marquee { padding: 18px 12px 4px 20px; }
+  :root[data-arcade-theme='tixy'] :is(.arc-modal, .arc-sheet) > .arc-marquee .arc-key[data-icononly='true'] { min-width: 44px; min-height: 44px; color: var(--text-muted); }
+  :root[data-arcade-theme='tixy'] :is(.arc-modal, .arc-sheet) > .arc-marquee .arc-key[data-icononly='true']:hover { color: var(--text-strong); }
+  :root[data-arcade-theme='tixy'] .arc-modal-body { padding: 8px 20px 20px; }
+  :root[data-arcade-theme='tixy'] .arc-sheet-body { padding: 8px 20px 20px; }
+  :root[data-arcade-theme='tixy'] .arc-modal-foot { border-top: 0; padding: 0 20px 20px; }
+  :root[data-arcade-theme='tixy'] .arc-sheet { border-radius: var(--tixy-radius-panel-lg) var(--tixy-radius-panel-lg) 0 0; }
+  :root[data-arcade-theme='tixy'] .arc-sheet > .arc-sheet-handle::before { border: 0; background: var(--border-ink); }
+
+  /* ── Bottom sheet (Vaul-style, Midway chrome) ───────────────────── */
+
+  .arc-sheet-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    background: color-mix(in srgb, var(--scrim) 78%, transparent);
+  }
+
+  .arc-sheet {
+    position: fixed;
+    inset-inline: 0;
+    bottom: 0;
+    z-index: 61;
+    max-height: min(92vh, 40rem);
+    display: flex;
+    flex-direction: column;
+    background: var(--surface-panel);
+    border: var(--border-w) solid var(--border-ink);
+    border-bottom: 0;
+    border-radius: var(--radius-cabinet) var(--radius-cabinet) 0 0;
+    box-shadow: var(--shadow-modal);
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+
+  .arc-sheet-handle {
+    display: flex;
+    justify-content: center;
+    padding: 0.55rem 0 0.25rem;
+  }
+
+  .arc-sheet-handle::before {
+    content: '';
+    width: 2.5rem;
+    height: 0.25rem;
+    border-radius: 999px;
+    background: var(--border-soft);
+    border: 1px solid var(--border-ink);
+  }
+
+  .arc-sheet-body {
+    overflow-y: auto;
+    padding: 0.75rem 1.25rem 1.25rem;
+    min-height: 0;
+    flex: 1;
+  }
+
+  .arc-modal-body {
+    padding: 1.25rem;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-soft) transparent;
+  }
+
+  .arc-modal-foot {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    padding: 1rem 1.25rem;
+    border-top: var(--border-w-hairline) solid var(--border-soft);
+  }
+
+  /* ── Legacy class re-skins ──────────────────────────────────────
+     Pre-Midway pages use these; they get the flat panel treatment so
+     every surface drops its gradients/glows before its dedicated pass. */
+
+  .arcade-card {
+    border: var(--border-w) solid var(--border-soft);
+    border-radius: var(--radius-panel);
+    background: var(--grain), linear-gradient(180deg, var(--surface-raised), var(--surface-panel));
+    background-size: 80px 80px, 80px 80px, auto;
+    box-shadow: var(--shadow-panel);
+  }
+
+  .arcade-card-inset {
+    border: var(--border-w) solid var(--border-ink);
+    border-radius: var(--radius-well);
+    background: linear-gradient(180deg, var(--surface-well), #060505);
+    box-shadow: var(--shadow-well);
+  }
+
+  :root[data-arcade-theme='tixy'] .arcade-card { border-color: transparent; }
+  :root[data-arcade-theme='tixy'] .arcade-card-inset { border-color: transparent; background: var(--surface-well); box-shadow: none; }
+
+  /* Horizontal scroll affordance: fade the leading/trailing edges of an
+     overflow-x-auto strip (leaderboard category + mode tab rails on mobile) so a
+     clipped row reads as "scroll for more" instead of a hard cut. */
+  .arc-scroll-fade {
+    -webkit-mask-image: linear-gradient(
+      90deg,
+      transparent 0,
+      #000 18px,
+      #000 calc(100% - 18px),
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      90deg,
+      transparent 0,
+      #000 18px,
+      #000 calc(100% - 18px),
+      transparent 100%
+    );
+  }
+
+  .arcade-marquee {
+    position: relative;
+    overflow: hidden;
+    border: var(--border-w) solid var(--border-soft);
+    border-radius: var(--radius-cabinet);
+    background: var(--grain), linear-gradient(155deg, var(--surface-raised) 0%, var(--surface-panel) 70%);
+    background-size: 90px 90px, 90px 90px, auto;
+    box-shadow: var(--shadow-cabinet);
+  }
+
+  .arcade-game-surface {
+    position: relative;
+    overflow: hidden;
+    border: var(--border-w) solid var(--border-soft);
+    border-radius: var(--radius-cabinet);
+    background: var(--grain), linear-gradient(155deg, var(--surface-raised) 0%, var(--surface-panel) 70%);
+    background-size: 90px 90px, 90px 90px, auto;
+    box-shadow: var(--shadow-cabinet);
+  }
+
+  .arcade-game-stage {
+    border: var(--border-w) solid var(--border-ink);
+    border-radius: var(--radius-well);
+    background: linear-gradient(180deg, var(--surface-well), #060505);
+    box-shadow: var(--shadow-well);
+  }
+
+  .arcade-modal {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    max-height: 92vh;
+    width: 100%;
+    flex-direction: column;
+    overflow: hidden;
+    border: var(--border-w) solid var(--border-ink);
+    border-radius: var(--radius-cabinet);
+    background: var(--surface-panel);
+    box-shadow: var(--shadow-modal);
+  }
+
+  .arcade-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    border: var(--border-w-hairline) solid var(--border-soft);
+    border-radius: var(--radius-round);
+    background: var(--surface-raised);
+    box-shadow: var(--shadow-chip);
+  }
+
+  .arcade-link {
+    color: var(--text-strong);
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-color: var(--border-soft);
+    text-underline-offset: 3px;
+    transition: text-decoration-color var(--motion-snap) var(--ease-snap);
+  }
+
+  .arcade-link:hover {
+    text-decoration-color: var(--focus-ring);
+  }
+
+  .arcade-input {
+    width: 100%;
+    background: var(--surface-well);
+    color: var(--text-strong);
+    border: var(--border-w) solid var(--border-ink);
+    border-radius: var(--radius-well);
+    box-shadow: var(--shadow-well);
+    outline: none;
+    transition: border-color var(--motion-snap) var(--ease-snap);
+  }
+
+  .arcade-input::placeholder {
+    color: var(--text-muted);
+  }
+
+  .arcade-input:focus {
+    outline: var(--focus-outline);
+    outline-offset: var(--focus-offset);
+  }
+}
+
+/* ── tixy: neutralise the Midway habits the tokens can't reach ───────
+   Shared classes that hardcode uppercase, wide tracking, sub-13 px type,
+   dark gradient stops or bevel shadows. One block per component, each
+   tagged with the topic that rebuilds it; delete the block when that
+   topic lands. Same layer as the classes they override, so a
+   component's own utilities still win. */
+@layer components {
+  /* page type: body weight, headings, eyebrow labels. tixy/2-shell took
+     the header off game pages, but home, lobbies, settings and 48 other
+     screens still use these classes. Retire after the phase 8 cleanup;
+     the body weight then moves into the tixy theme block. */
+  :root[data-arcade-theme='tixy'] body {
+    font-weight: var(--tixy-weight-body);
+  }
+
+  :root[data-arcade-theme='tixy'] :is(.arcade-display, .arc-marquee) {
+    font-weight: var(--tixy-weight-heading);
+    letter-spacing: -0.01em;
+    text-transform: none;
+  }
+
+  :root[data-arcade-theme='tixy'] .arcade-kicker {
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  /* in-run HUD, callouts and the game stage well. The shell draws its own
+     stage, but games not yet moved into it still use these, and so do
+     callouts inside the shell. Retire when the last game moves (the
+     tixy/2-floor-* pull requests). */
+  :root[data-arcade-theme='tixy'] :is(
+    .arc-game-hud-label,
+    .arc-game-hud-detail,
+    .arc-game-hud-status,
+    .arc-game-callout-detail
+  ) {
+    font-size: var(--text-xs);
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  :root[data-arcade-theme='tixy'] .arc-game-callout-label {
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  :root[data-arcade-theme='tixy'] .arc-game-hud-status-dot {
+    box-shadow: none;
+  }
+
+  :root[data-arcade-theme='tixy'] .arcade-game-stage {
+    background: var(--surface-well);
+  }
+
+  /* leaderboard rows. retire with the scores page rebuild (no topic yet) */
+  :root[data-arcade-theme='tixy'] :is(.arc-lbrow-head > span, .arc-lbrow-youtag, .arc-lbtier) {
+    font-size: var(--text-xs);
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  :root[data-arcade-theme='tixy'] .arc-lbrow-avatar {
+    font-size: var(--text-xs);
+  }
+
+  :root[data-arcade-theme='tixy'] :is(.arc-lbrow[data-you='true'], .arc-lbrow-rank, .arc-lbtier, .arc-lbfoot) {
+    box-shadow: none;
+  }
+
+  /* top bar and dock. retire with the nav rebuild (no topic yet) */
+  :root[data-arcade-theme='tixy'] :is(.arc-topbar, .arc-dock) {
+    box-shadow: none;
+  }
+}
+
+/* Tailwind utilities in components: caps, wide tracking and 9 to 11 px
+   arbitrary sizes. :where keeps these at the utilities' own specificity,
+   so they only beat the utility they neutralise (they come later in the
+   layer) and lose to anything more specific. Playing cards set their
+   ranks as literal capitals, so they keep them.
+   retire after every screen is rebuilt (phase 8 cleanup) */
+@layer utilities {
+  :where(:root[data-arcade-theme='tixy']) .uppercase {
+    text-transform: none;
+  }
+
+  :where(:root[data-arcade-theme='tixy']) [class*='tracking-[0.'] {
+    letter-spacing: 0;
+  }
+
+  :where(:root[data-arcade-theme='tixy']) :is(.text-\[9px\], .text-\[10px\], .text-\[11px\]) {
+    font-size: var(--text-xs);
+  }
+
+  :where(:root[data-arcade-theme='tixy']) .font-display {
+    font-weight: var(--tixy-weight-heading);
+  }
+}
+
+/* tixy: the wallet card is a paper 2 panel with no outline. Its border
+   and fill are Tailwind utilities, so this sits in that layer. */
+@layer utilities {
+  :root[data-arcade-theme='tixy'] .arc-wallet {
+    border-color: transparent;
+    border-radius: var(--tixy-radius-panel);
+    background: var(--surface-panel);
+  }
+}
+
+/* ── View Transitions (shell navigations) ───────────────────────────
+   Browser-native cross-document transitions where supported. Pure CSS;
+   no-op in unsupported browsers. Keep playfields free of named transitions. */
+
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: var(--motion-settle);
+  animation-timing-function: var(--ease-emphasized);
+}
+
+::view-transition-old(root) {
+  animation-name: arc-vt-fade-out;
+}
+
+::view-transition-new(root) {
+  animation-name: arc-vt-fade-in;
+}
+
+@keyframes arc-vt-fade-out {
+  to { opacity: 0; }
+}
+
+@keyframes arc-vt-fade-in {
+  from { opacity: 0; }
+}
+
+/* Main landmark morphs slightly on soft navigations that name it. */
+#main-content {
+  view-transition-name: arcade-main;
+}
+
+::view-transition-old(arcade-main),
+::view-transition-new(arcade-main) {
+  animation-duration: var(--motion-settle);
+  animation-timing-function: var(--ease-out);
+}
+
+/* ── Motion kit (transitions.dev-inspired, Midway tokens) ───────────
+   Feedback only: nothing loops in the shell. Idle UI is still.
+   Reduced-motion collapses every effect to the final state. */
+
+/* Enter utilities — apply on mount / when data-state="open" */
+.arc-enter-up,
+.arc-enter-scale,
+.arc-enter-fade,
+.arc-enter-pop {
+  --_enter-delay: calc(var(--i, 0) * 40ms);
+}
+
+.arc-toast {
+  will-change: transform, opacity;
+}
+
+.arc-skeleton {
+  position: relative;
+  overflow: hidden;
+  background: var(--surface-well);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-well);
+  min-height: 0.75rem;
+}
+
+.arc-skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--key-face) 12%, transparent) 50%,
+    transparent 100%
+  );
+  transform: translateX(-100%);
+}
+
+/* Number / chip pop — use on delta badges */
+.arc-num-pop {
+  display: inline-block;
+  transform-origin: center bottom;
+}
+
+/* Success check — wrap an SVG/path or use as class on a drawn mark */
+.arc-success-pop {
+  display: inline-flex;
+  transform-origin: center;
+}
+
+/* Tooltip surface */
+.arc-tooltip {
+  pointer-events: none;
+  transform-origin: var(--_origin, center top);
+}
+
+/* ── Game juice (stage settle feedback — transform/opacity only) ─────
+   Use via ArcadeStageWell juice={...} from useGameJuice(). Idle UI still. */
+
+.arc-stage {
+  position: relative;
+  isolation: isolate;
+}
+
+/* Game canvases: layout containment so reflow outside the stage is cheap.
+   Avoid content-visibility here — it can freeze live rAF surfaces. */
+.arcade-game-canvas,
+canvas.pc-canvas,
+.flappy-stage canvas {
+  contain: layout style;
+}
+
+.arc-stage[data-juice] {
+  will-change: transform;
+}
+
+.arc-result-plate {
+  transform-origin: center;
+}
+
+.arc-score-burst {
+  transform-origin: center;
+}
+
+/* Shared end-of-run reward ceremony. Ticket particles are capped at twelve
+   fixed DOM nodes and use transform/opacity only. */
+.arc-run-result {
+  position: relative;
+  isolation: isolate;
+}
+
+.arc-run-result[data-tone='win'],
+.arc-run-result[data-tone='best'] {
+  border-color: var(--enamel-prize-edge);
+}
+
+.arc-run-result[data-tone='loss'] {
+  border-color: var(--enamel-danger-edge);
+}
+
+.arc-ticket-payout {
+  min-height: 4.25rem;
+  transform-origin: center;
+}
+
+.arc-ticket-payout-number,
+.arc-ticket-payout-icon {
+  transform-origin: center;
+}
+
+.arc-ticket-particle {
+  --_ticket-x: calc((var(--ticket-i) - 5.5) * 8%);
+  position: absolute;
+  left: calc(50% + var(--_ticket-x));
+  top: 50%;
+  color: currentColor;
+  opacity: 0;
+}
+
+.arc-achievement-reveal {
+  transform-origin: center left;
+}
+
+/* ── tixy: the shared result ────────────────────────────────────────
+   ArcadeRunResult, the ticket strip and the wager receipt. Components
+   render these only under tixy, so they use the tixy colours directly.
+   Look and timing: the mockup's .res, .strip and .receipt and its d-res
+   and d-slip sequences. Times come from result-sequence.tsx as --at. In
+   the components layer so a game's own utilities (width, margins) win. */
+@layer components {
+  .arc-result-card {
+    --result-pad-x: 20px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 26rem;
+    /* The shell's result layer gives this a height; a card taller than the
+       stage scrolls in its body and keeps the actions under it. */
+    max-height: 100%;
+    overflow: hidden;
+    border-radius: var(--tixy-radius-panel-lg);
+    background: var(--tixy-paper);
+    color: var(--tixy-ink);
+    box-shadow: var(--tixy-shadow-lift);
+    font-family: var(--tixy-font-text);
+    text-align: left;
+  }
+  /* Everything above the actions. When it is taller than the card it
+     scrolls, so nothing sits under the action row. One column: the outcome,
+     then the rewards (strip, level, achievements), then the stats. The
+     rewards wrapper is display: contents, so its parts take their own
+     place in the order. */
+  .arc-result-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow-x: clip;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 20px var(--result-pad-x) 4px;
+  }
+  .arc-result-outcome {
+    order: 0;
+    display: grid;
+    gap: 8px;
+  }
+  .arc-result-body > .arc-run-rewards {
+    display: contents;
+  }
+  .arc-result-body .arc-run-rewards-note {
+    order: 1;
+  }
+  .arc-result-body .arc-run-rewards-strip {
+    order: 2;
+  }
+  .arc-result-body .arc-run-rewards-extras {
+    order: 3;
+  }
+  .arc-result-body > .arc-result-stats {
+    order: 4;
+    margin-top: 0;
+  }
+  /* A wide stage: the outcome, the stats and the strip on the left, the
+     level panel and the achievements filling the right. */
+  @media (min-width: 52rem) {
+    .arc-result-card[data-wide] {
+      max-width: 46rem;
+    }
+    .arc-result-card[data-wide] .arc-result-body {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.08fr);
+      /* the last row is flexible, so the right column spans it and never
+         stretches the rows on the left */
+      grid-template-rows: repeat(5, min-content) 1fr;
+      grid-auto-flow: row;
+      column-gap: 28px;
+      row-gap: 12px;
+      align-content: start;
+      padding-top: 22px;
+    }
+    .arc-result-card[data-wide] .arc-result-body > :not(.arc-run-rewards),
+    .arc-result-card[data-wide] .arc-run-rewards > :not(.arc-run-rewards-extras) {
+      grid-column: 1;
+    }
+    .arc-result-card[data-wide] .arc-result-outcome {
+      grid-row: 1;
+    }
+    .arc-result-card[data-wide] .arc-result-body > .arc-result-stats {
+      grid-row: 2;
+    }
+    .arc-result-card[data-wide] .arc-run-rewards-extras {
+      grid-column: 2;
+      grid-row: 1 / -1;
+      align-self: start;
+    }
+    .arc-result-card[data-wide] .arc-run-rewards-strip {
+      overflow: clip;
+      overflow-clip-margin: 24px;
+    }
+  }
+  .arc-result-title {
+    margin: 0;
+    font-size: clamp(2rem, 9vw, 2.75rem);
+    font-weight: var(--tixy-weight-wordmark);
+    letter-spacing: var(--tixy-tracking-name);
+    line-height: 0.95;
+    transform-origin: left center;
+  }
+  /* A new best is red: the one colour for it. */
+  .arc-result-card[data-tone='best'] .arc-result-title {
+    color: var(--tixy-red);
+  }
+  .arc-result-stats {
+    display: grid;
+    gap: 8px;
+  }
+  .arc-result-stats > div {
+    min-width: 0;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: var(--tixy-paper-2);
+  }
+  .arc-result-stats b {
+    display: block;
+    overflow: hidden;
+    font-family: var(--tixy-font-num);
+    font-size: 1.625rem;
+    font-weight: var(--tixy-weight-num);
+    line-height: 1.1;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .arc-result-stats small {
+    display: block;
+    overflow: hidden;
+    font-size: var(--text-xs);
+    color: var(--tixy-ink-2);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  /* a new best is red; red on paper 2 is fine at 26 px bold */
+  .arc-result-stats [data-highlight] b {
+    color: var(--tixy-red);
+  }
+  .arc-result-extra {
+    font-size: var(--text-sm);
+  }
+  /* Rematch renders first and is live from the first frame; the rest
+     wait for the reveal (ResultActions in arcade-run-result.tsx). The row is
+     the card's last child, outside the scrolling body, so it never covers
+     a line above it. */
+  .arc-result-actions {
+    flex: none;
+    display: grid;
+    grid-auto-columns: minmax(0, 1fr);
+    grid-auto-flow: column;
+    align-items: center;
+    gap: 10px;
+    padding: 12px var(--result-pad-x) 18px;
+    background: var(--tixy-paper);
+    text-align: center;
+  }
+  .arc-result-actions-rest {
+    display: contents;
+  }
+  .arc-result-actions-rest:not([data-shown]) > * {
+    opacity: 0;
+  }
+  :is(.arc-result-actions, .arc-result-actions-rest) > .arc-key {
+    width: 100%;
+  }
+
+  /* The host walks in from 110 px to the right. Clip that so it can't add
+     a scrollbar, with room for where it stops. */
+  .arc-run-rewards {
+    overflow: clip;
+    overflow-clip-margin: 24px;
+    display: grid;
+    justify-items: center;
+    gap: 10px;
+    width: 100%;
+    margin-top: 12px;
+    font-family: var(--tixy-font-text);
+    color: var(--tixy-ink);
+  }
+  .arc-run-rewards-strip {
+    width: 100%;
+  }
+  .arc-run-rewards-note {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--tixy-ink-2);
+    text-align: center;
+  }
+  .arc-run-rewards-note[data-tone='danger'] {
+    color: var(--tixy-red-text);
+  }
+  .arc-run-rewards-extras {
+    display: grid;
+    gap: 10px;
+    width: 100%;
+  }
+  .arc-run-rewards-extras:empty {
+    display: none;
+  }
+
+  /* The bar to the next level, in the level panel. */
+  .arc-xp-bar {
+    height: 10px;
+    border-radius: 5px;
+    background: var(--tixy-paper-3);
+    overflow: hidden;
+  }
+  .arc-xp-bar > div {
+    height: 100%;
+    border-radius: 5px;
+    background: var(--tixy-ink);
+  }
+  /* Season tier: a second, thinner bar under the level. */
+  .arc-season {
+    display: grid;
+    gap: 6px;
+  }
+  .arc-season-line {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: var(--text-sm);
+    color: var(--tixy-ink-2);
+  }
+  .arc-season-line > span:first-child {
+    font-weight: var(--tixy-weight-button);
+    color: var(--tixy-ink);
+  }
+  .arc-season-line .arc-digits {
+    font-family: var(--tixy-font-num);
+    font-weight: var(--tixy-weight-num);
+  }
+  .arc-season-bar {
+    height: 6px;
+    border-radius: 3px;
+    background: var(--tixy-paper-3);
+    overflow: hidden;
+  }
+  .arc-season-bar > div {
+    height: 100%;
+    border-radius: 3px;
+    background: var(--tixy-ink);
+  }
+
+  /* Achievements earned: one row each, the badge with its tier, the name
+     and line, the XP. Each lands on its own beat (--at). */
+  .arc-run-ach {
+    display: grid;
+    gap: 8px;
+    width: 100%;
+  }
+  .arc-run-ach-row {
+    display: grid;
+    grid-template-columns: 52px minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: 12px;
+    padding: 10px 14px 10px 10px;
+    border-radius: 14px;
+    background: var(--tixy-paper-2);
+    color: var(--tixy-ink);
+  }
+  .arc-run-ach-medal {
+    display: block;
+    width: 52px;
+    height: 52px;
+  }
+  .arc-run-ach-medal svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  /* Beside the strip on a wide stage the rows are a step tighter, so three
+     fit on a short stage (word grid's, with the keyboard under it). */
+  @media (min-width: 52rem) {
+    .arc-result-card[data-wide] .arc-run-ach-row {
+      grid-template-columns: 44px minmax(0, 1fr) auto;
+      padding: 8px 14px 8px 8px;
+    }
+    .arc-result-card[data-wide] .arc-run-ach-medal {
+      width: 44px;
+      height: 44px;
+    }
+  }
+  .arc-run-ach-text {
+    display: grid;
+    min-width: 0;
+  }
+  .arc-run-ach-text b {
+    font-weight: var(--tixy-weight-button);
+    line-height: 1.2;
+  }
+  .arc-run-ach-text small {
+    font-size: var(--text-sm);
+    line-height: 1.3;
+    color: var(--tixy-ink-2);
+  }
+  .arc-run-ach-xp {
+    font-family: var(--tixy-font-num);
+    font-size: 1.375rem;
+    font-weight: var(--tixy-weight-num);
+    white-space: nowrap;
+  }
+  .arc-run-ach-xp small {
+    font-family: var(--tixy-font-text);
+    font-size: var(--text-sm);
+    font-weight: var(--tixy-weight-button);
+    color: var(--tixy-ink-2);
+  }
+
+  /* The strip: stubs joined at a perforation, turned 3 degrees, the total
+     in ink. A strip that pays leaves room for the host on its right. */
+  .arc-strip-wrap {
+    position: relative;
+    width: max-content;
+    max-width: 100%;
+    margin-inline: auto;
+    padding: 6px 0 14px;
+  }
+  .arc-strip-wrap[data-pays] {
+    padding: 6px calc(70px + var(--lean, 0px)) 34px 0;
+  }
+  .arc-strip {
+    display: flex;
+    flex-direction: column;
+    width: 206px;
+    max-width: 100%;
+    transform: rotate(-3deg);
+    transform-origin: 50% 0;
+    filter: drop-shadow(0 6px 10px rgb(31 26 22 / 0.22));
+  }
+  .arc-strip-stub {
+    --n: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    height: 62px;
+    padding: 0 26px;
+    background: var(--tixy-ticket);
+    color: var(--tixy-on-ticket);
+    font-size: 1.125rem;
+    font-weight: var(--tixy-weight-button);
+    -webkit-mask:
+      radial-gradient(circle var(--n) at 0 50%, #0000 97%, #000) 0 0 / 51% 100% no-repeat,
+      radial-gradient(circle var(--n) at 100% 50%, #0000 97%, #000) 100% 0 / 51% 100% no-repeat;
+    mask:
+      radial-gradient(circle var(--n) at 0 50%, #0000 97%, #000) 0 0 / 51% 100% no-repeat,
+      radial-gradient(circle var(--n) at 100% 50%, #0000 97%, #000) 100% 0 / 51% 100% no-repeat;
+  }
+  .arc-strip-stub + .arc-strip-stub {
+    border-top: 2px dashed rgb(31 26 22 / 0.45);
+  }
+  .arc-strip-stub .arc-digits {
+    font-family: var(--tixy-font-num);
+    font-size: 2rem;
+    font-weight: var(--tixy-weight-num);
+  }
+  .arc-strip-stub:first-child {
+    border-radius: 6px 6px 0 0;
+  }
+  .arc-strip-stub[data-total] {
+    border-radius: 0 0 6px 6px;
+    background: var(--tixy-ink);
+    color: var(--tixy-ticket);
+  }
+  .arc-strip-stub:only-child {
+    border-radius: 6px;
+  }
+  /* A strip that pays nothing prints void: paper 3, no host. */
+  .arc-strip-wrap:not([data-pays]) .arc-strip-stub {
+    background: var(--tixy-paper-3);
+    color: var(--tixy-ink-2);
+  }
+  .arc-strip-host {
+    position: absolute;
+    right: -18px;
+    bottom: 0;
+  }
+  .arc-strip-host [data-host-part] {
+    transform-box: view-box;
+  }
+  .arc-strip-host [data-host-part='arm-right'] {
+    transform-origin: 128px 74px;
+  }
+  .arc-strip-host [data-host-part='leg-left'] {
+    transform-origin: 58px 104px;
+  }
+  .arc-strip-host [data-host-part='leg-right'] {
+    transform-origin: 88px 106px;
+  }
+
+  /* The receipt: a printer slot, then the slip with a torn bottom edge.
+     #fbf6ec is the mockup's receipt stock, a shade off paper so the slip
+     reads on a paper ground. */
+  .arc-receipt {
+    width: min(280px, 100%);
+    margin-inline: auto;
+    font-family: var(--tixy-font-text);
+    color: var(--tixy-ink);
+  }
+  .arc-receipt[data-compact] {
+    width: min(240px, 100%);
+  }
+  .arc-receipt-printer {
+    position: relative;
+    z-index: 1;
+    height: 22px;
+    margin: 0 -8px;
+    border-radius: 8px 8px 3px 3px;
+    background: var(--tixy-ink);
+  }
+  .arc-receipt-printer::after {
+    content: '';
+    position: absolute;
+    right: 10px;
+    bottom: 5px;
+    left: 10px;
+    height: 3px;
+    border-radius: 2px;
+    background: #000;
+  }
+  .arc-receipt-shadow {
+    margin-top: -6px;
+    filter: drop-shadow(0 8px 14px rgb(31 26 22 / 0.18));
+  }
+  .arc-receipt-slip {
+    padding: 22px 20px 30px;
+    background: #fbf6ec;
+    font-size: var(--text-base);
+    -webkit-mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / 16px 100%;
+    mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / 16px 100%;
+  }
+  .arc-receipt-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .arc-receipt-head h3 {
+    margin: 0;
+    font-size: 1.375rem;
+    font-weight: var(--tixy-weight-wordmark);
+    letter-spacing: var(--tixy-tracking-name);
+    line-height: 1.1;
+  }
+  .arc-receipt-headline {
+    font-family: var(--tixy-font-num);
+    font-size: 1.375rem;
+    font-weight: var(--tixy-weight-num);
+    white-space: nowrap;
+  }
+  .arc-receipt-meta {
+    margin-top: 2px;
+    font-size: var(--text-sm);
+    color: var(--tixy-ink-2);
+  }
+  .arc-receipt-slip dl {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: baseline;
+    row-gap: 6px;
+    margin: 14px 0 0;
+  }
+  .arc-receipt-slip dt {
+    color: var(--tixy-ink-2);
+  }
+  .arc-receipt-slip dd {
+    margin: 0;
+    font-size: 1.375rem;
+    text-align: right;
+  }
+  .arc-receipt-slip .arc-digits {
+    font-family: var(--tixy-font-num);
+    font-weight: var(--tixy-weight-num);
+  }
+  .arc-receipt-net {
+    margin-top: 4px;
+    padding-top: 8px;
+    border-top: 2px dashed rgb(31 26 22 / 0.3);
+  }
+  /* one dashed rule across the net row, so both cells start at its top */
+  .arc-receipt-slip .arc-receipt-net {
+    align-self: stretch;
+    margin-top: 4px;
+  }
+  dt.arc-receipt-net {
+    display: flex;
+    align-items: flex-end;
+    padding-bottom: 4px;
+    font-weight: var(--tixy-weight-button);
+    color: var(--tixy-ink);
+  }
+  dd.arc-receipt-net {
+    font-size: 1.875rem;
+    line-height: 1.1;
+  }
+  dd.arc-receipt-net .arc-digits {
+    display: inline-block;
+    transform-origin: right center;
+  }
+  .arc-receipt-proof {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 16px 0 0;
+    font-size: var(--text-sm);
+    color: var(--tixy-ink-2);
+  }
+  .arc-receipt-proof .arc-digits {
+    font-family: var(--tixy-font-num);
+    font-size: 0.9375rem;
+    font-weight: var(--tixy-weight-num);
+    color: var(--tixy-ink);
+  }
+  .arc-receipt-proof .arc-key {
+    margin-left: auto;
+  }
+  .arc-receipt-footer {
+    margin-top: 12px;
+  }
+  /* Several rounds on one receipt: multiplier, seed, paid. */
+  .arc-receipt-rounds {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    column-gap: 10px;
+    margin: 14px 0 0;
+    padding: 8px 0 0;
+    border-top: 1px solid rgb(31 26 22 / 0.15);
+    list-style: none;
+    font-size: var(--text-sm);
+  }
+  .arc-receipt-rounds li {
+    display: contents;
+  }
+  .arc-receipt-rounds .arc-digits {
+    font-family: var(--tixy-font-num);
+    font-weight: var(--tixy-weight-num);
+  }
+  .arc-receipt-round-x {
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+  .arc-receipt-round-seed {
+    align-self: center;
+    color: var(--tixy-ink-3);
+  }
+  .arc-receipt-round-paid {
+    font-size: 1rem;
+    line-height: 1.5;
+    text-align: right;
+  }
+  .arc-receipt-more {
+    min-height: 44px;
+    padding: 0;
+    font-size: var(--text-sm);
+    font-weight: var(--tixy-weight-button);
+    color: var(--tixy-ink);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .arc-receipt-more:focus-visible {
+    outline: 2px solid var(--tixy-ink);
+    outline-offset: 2px;
+  }
+}
+
+/* The sequences. Only with motion allowed; under reduced motion the
+   components also start at the end (data-state='done'). Stubs, the host
+   and the tear wait for their --at with fill-mode both, so nothing shows
+   before its turn. */
+@media (prefers-reduced-motion: no-preference) {
+  .arc-result-card[data-sequence='running'] .arc-result-title {
+    animation: arc-result-stamp 320ms var(--tixy-ease-spring) both;
+  }
+  .arc-result-actions-rest > * {
+    transition: opacity 300ms ease-out;
+  }
+  .arc-xp-bar > div {
+    transition: width 600ms var(--tixy-ease-settle);
+  }
+  .arc-season-bar > div {
+    transition: width 600ms var(--tixy-ease-settle) var(--season-delay, 120ms);
+  }
+  .arc-season[data-instant] .arc-season-bar > div {
+    transition: none;
+  }
+  /* Each achievement lands on its beat: the row rises in, the badge pops. */
+  .arc-run-ach:not([data-instant]) .arc-run-ach-row {
+    animation: arc-ach-in 220ms var(--tixy-ease-settle) var(--at, 0ms) both;
+  }
+  .arc-run-ach:not([data-instant]) .arc-run-ach-medal {
+    animation: arc-ach-pop 420ms var(--tixy-ease-spring) var(--at, 0ms) both;
+  }
+  .arc-strip-wrap[data-state='run'] .arc-strip-stub {
+    animation: arc-strip-drop 300ms var(--tixy-ease-spring) var(--at) both;
+  }
+  .arc-strip-wrap[data-state='run'] .arc-strip {
+    animation: arc-strip-tear 520ms var(--tixy-ease-spring) var(--tear-at) both;
+  }
+  .arc-strip-wrap[data-state='run'] .arc-strip-host {
+    animation: arc-host-walkin 620ms var(--tixy-ease-settle) var(--at) both;
+  }
+  .arc-strip-wrap[data-state='run'] .arc-strip-host [data-host-part='leg-left'] {
+    animation: arc-host-step 200ms linear var(--at) 3 both;
+  }
+  .arc-strip-wrap[data-state='run'] .arc-strip-host [data-host-part='leg-right'] {
+    animation: arc-host-step 200ms linear calc(var(--at) + 100ms) 3 both;
+  }
+  .arc-strip-wrap[data-state='run'] .arc-strip-host [data-host-part='arm-right'] {
+    animation: arc-host-hold 300ms var(--tixy-ease-spring) calc(var(--at) + 550ms) both;
+  }
+  /* The receipt: the paper feeds out on one eased curve (only its clip
+     moves, so the slip's box is final from the first frame), each line
+     types in on its beat (--at), and the net lands last with one settle. */
+  .arc-receipt[data-state='run'] .arc-receipt-slip {
+    animation: arc-receipt-feed var(--feed, 720ms) cubic-bezier(0.3, 0.55, 0.25, 1) both;
+  }
+  .arc-receipt[data-state='run'] [data-line] {
+    animation: arc-receipt-type 150ms ease-out var(--at, 0ms) both;
+  }
+  .arc-receipt[data-state='run'] dd.arc-receipt-net .arc-digits {
+    animation: arc-receipt-land var(--net, 300ms) var(--tixy-ease-spring) var(--at, 0ms) both;
+  }
+}
+
+@keyframes arc-ach-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes arc-ach-pop {
+  0% { transform: scale(0.4) rotate(-20deg); }
+  60% { transform: scale(1.14) rotate(4deg); }
+  100% { transform: none; }
+}
+@keyframes arc-result-stamp {
+  from { opacity: 0; transform: scale(1.7); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes arc-strip-drop {
+  from { opacity: 0; transform: translateY(-34px) rotate(3deg); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes arc-strip-tear {
+  0% { transform: rotate(-3deg); }
+  30% { transform: rotate(-7deg) translateY(7px); }
+  60% { transform: rotate(-1.5deg) translateY(-2px); }
+  100% { transform: rotate(-3deg); }
+}
+@keyframes arc-host-walkin {
+  from { opacity: 0; transform: translateX(110px); }
+  25% { opacity: 1; }
+  to { opacity: 1; transform: none; }
+}
+@keyframes arc-host-step {
+  0%, 100% { transform: rotate(0); }
+  25% { transform: rotate(16deg); }
+  75% { transform: rotate(-16deg); }
+}
+@keyframes arc-host-hold {
+  from { transform: rotate(30deg); }
+  to { transform: none; }
+}
+@keyframes arc-receipt-feed {
+  from { clip-path: inset(0 0 100% 0); }
+  to { clip-path: inset(0 0 -20px 0); }
+}
+@keyframes arc-receipt-type {
+  from { opacity: 0; transform: translateY(2px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes arc-receipt-land {
+  from { opacity: 0; transform: scale(1.14); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes arc-receipt-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+/* Reduced motion: no feed, no beat, the whole receipt fades in. */
+.arc-receipt[data-motion='reduce'] {
+  animation: arc-receipt-fade var(--fade, 180ms) ease-out both;
+}
+
+/* Shared in-run HUD. The surface is a single shallow cabinet rail so metrics
+   remain legible above both DOM and canvas games without competing with the
+   game-specific art direction. */
+.arc-game-hud {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: stretch;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.arc-game-hud-metrics {
+  display: flex;
+  min-width: 0;
+  flex: 0 1 auto;
+  overflow: hidden;
+  border: 2px solid var(--border-ink);
+  border-radius: var(--radius-key);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-chip);
+}
+
+.arc-game-hud-metric {
+  position: relative;
+  display: grid;
+  min-width: 5.25rem;
+  align-content: center;
+  justify-items: start;
+  gap: 0.05rem;
+  padding: 0.4rem 0.75rem;
+}
+
+.arc-game-hud-metric + .arc-game-hud-metric {
+  border-left: 1px solid var(--border-soft);
+}
+
+.arc-game-hud-label,
+.arc-game-hud-detail {
+  color: var(--text-muted);
+  font-size: 0.625rem;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.arc-game-hud-value {
+  color: var(--text-strong);
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
+  transform-origin: left center;
+}
+
+.arc-game-hud-detail {
+  margin-top: 0.1rem;
+  font-size: 0.5625rem;
+  letter-spacing: 0.04em;
+  text-transform: none;
+}
+
+.arc-game-hud-metric[data-tone='prize'] .arc-game-hud-value,
+.arc-game-hud-status[data-tone='prize'] {
+  color: var(--enamel-prize-text);
+}
+
+.arc-game-hud-metric[data-tone='tickets'] .arc-game-hud-value,
+.arc-game-hud-status[data-tone='tickets'] {
+  color: var(--enamel-tickets-text);
+}
+
+.arc-game-hud-metric[data-tone='danger'] .arc-game-hud-value,
+.arc-game-hud-status[data-tone='danger'] {
+  color: var(--enamel-danger-text);
+}
+
+.arc-game-hud-metric[data-tone='info'] .arc-game-hud-value,
+.arc-game-hud-status[data-tone='info'] {
+  color: var(--enamel-info-text);
+}
+
+.arc-game-hud-metric[data-emphasis='true']::after {
+  position: absolute;
+  inset: auto 0 0;
+  height: 3px;
+  background: currentColor;
+  content: '';
+}
+
+.arc-game-hud-status {
+  display: inline-flex;
+  min-height: 2.8rem;
+  align-items: center;
+  gap: 0.45rem;
+  border: 2px solid var(--border-ink);
+  border-radius: var(--radius-key);
+  background: var(--surface-panel);
+  padding: 0.5rem 0.75rem;
+  box-shadow: var(--shadow-chip);
+  color: var(--text-body);
+  font-size: 0.6875rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.arc-game-hud-status-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  flex: none;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  background: currentColor;
+  box-shadow: 0 2px 0 var(--shadow-color);
+}
+
+.arc-game-hud-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.arc-game-hud[data-compact='true'] .arc-game-hud-metric {
+  min-width: 4.5rem;
+  padding: 0.32rem 0.6rem;
+}
+
+/* Short-lived, renderer-independent score/combo callouts. The layer is
+   capped by useGameplayCallouts and uses transform/opacity only. */
+.arc-game-callout-layer {
+  pointer-events: none;
+  position: absolute;
+  z-index: 24;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+}
+
+.arc-game-callout {
+  position: absolute;
+  left: var(--callout-x, 50%);
+  top: var(--callout-y, 26%);
+  display: grid;
+  min-width: max-content;
+  justify-items: center;
+  color: var(--text-strong);
+  filter: drop-shadow(0 3px 0 var(--shadow-color));
+  transform: translate(-50%, -50%);
+  transform-origin: center;
+}
+
+.arc-game-callout-label {
+  border: 2px solid var(--border-ink);
+  border-radius: var(--radius-key);
+  background: var(--surface-raised);
+  padding: 0.25rem 0.55rem;
+  box-shadow: var(--shadow-chip);
+  font-family: var(--font-display-arcade), ui-sans-serif, sans-serif;
+  font-size: clamp(0.9rem, 2.4vw, 1.35rem);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.arc-game-callout-detail {
+  margin-top: 0.25rem;
+  border: 1px solid var(--border-ink);
+  border-radius: 999px;
+  background: var(--surface-panel);
+  padding: 0.12rem 0.42rem;
+  color: var(--text-body);
+  font-size: 0.625rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.arc-game-callout[data-tone='score'] .arc-game-callout-label,
+.arc-game-callout[data-tone='success'] .arc-game-callout-label {
+  background: var(--enamel-prize);
+  color: var(--enamel-prize-on);
+}
+
+.arc-game-callout[data-tone='combo'] .arc-game-callout-label,
+.arc-game-callout[data-tone='best'] .arc-game-callout-label {
+  background: var(--enamel-tickets);
+  color: var(--enamel-tickets-on);
+}
+
+.arc-game-callout[data-tone='warning'] .arc-game-callout-label {
+  background: var(--enamel-info);
+  color: var(--enamel-info-on);
+}
+
+.arc-game-callout[data-tone='danger'] .arc-game-callout-label {
+  background: var(--enamel-danger);
+  color: var(--enamel-danger-on);
+}
+
+/* Multiplier / HUD readout color transitions (crash, limbo, etc.) */
+.arc-mult {
+  transition: color var(--motion-snap) var(--ease-snap);
+  font-variant-numeric: tabular-nums;
+}
+
+/* History chip that lands after a round */
+.arc-history-chip {
+  display: inline-flex;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .arc-modal-overlay[data-state='open'],
+  .arc-modal-overlay:not([data-state]) {
+    animation: arc-overlay-in var(--motion-settle) var(--ease-out) both;
+  }
+  .arc-modal-overlay[data-state='closed'] {
+    animation: arc-overlay-out var(--motion-exit) var(--ease-in) both;
+  }
+
+  .arc-modal[data-state='open'],
+  .arc-modal:not([data-state]) {
+    animation: arc-modal-in var(--motion-settle) var(--ease-spring) both;
+  }
+  .arc-modal[data-state='closed'] {
+    animation: arc-modal-out var(--motion-exit) var(--ease-in) both;
+  }
+
+  .arc-sheet-overlay[data-state='open'],
+  .arc-sheet-overlay:not([data-state]) {
+    animation: arc-overlay-in var(--motion-settle) var(--ease-out) both;
+  }
+  .arc-sheet-overlay[data-state='closed'] {
+    animation: arc-overlay-out var(--motion-exit) var(--ease-in) both;
+  }
+
+  .arc-sheet[data-state='open'],
+  .arc-sheet:not([data-state]) {
+    animation: arc-sheet-in var(--motion-sheet) var(--ease-spring) both;
+  }
+  .arc-sheet[data-state='closed'] {
+    animation: arc-sheet-out var(--motion-exit) var(--ease-in) both;
+  }
+
+  /* tixy (r-kit): panels move on one axis, 120 to 180 ms, and slow to a
+     stop. The modal rises 10 px; the sheet slides up the screen. */
+  :root[data-arcade-theme='tixy'] .arc-modal:is([data-state='open'], :not([data-state])) {
+    animation: tx-modal-in var(--tixy-panel-slow) var(--tixy-ease-settle) both;
+  }
+  :root[data-arcade-theme='tixy'] .arc-modal[data-state='closed'] {
+    animation: tx-modal-out var(--tixy-panel-fast) ease-in both;
+  }
+  :root[data-arcade-theme='tixy'] .arc-sheet:is([data-state='open'], :not([data-state])) {
+    animation: arc-sheet-in var(--tixy-panel-slow) var(--tixy-ease-settle) both;
+  }
+  :root[data-arcade-theme='tixy'] .arc-sheet[data-state='closed'] {
+    animation: arc-sheet-out var(--tixy-panel-fast) ease-in both;
+  }
+
+  .arc-stub-delta,
+  .arc-toast[data-state='open'],
+  .arc-toast:not([data-state]) {
+    animation: arc-toast-in var(--motion-reveal) var(--ease-spring) both;
+  }
+  .arc-toast[data-state='closed'] {
+    animation: arc-toast-out var(--motion-exit) var(--ease-in) both;
+  }
+
+  .arc-enter-up {
+    animation: arc-rise var(--motion-settle) var(--ease-out) both;
+    animation-delay: var(--_enter-delay, 0ms);
+  }
+  .arc-enter-scale {
+    animation: arc-scale-in var(--motion-settle) var(--ease-spring) both;
+    animation-delay: var(--_enter-delay, 0ms);
+  }
+  .arc-enter-fade {
+    animation: arc-fade-in var(--motion-snap) var(--ease-out) both;
+    animation-delay: var(--_enter-delay, 0ms);
+  }
+  .arc-enter-pop {
+    animation: arc-stub-pop var(--motion-reveal) var(--ease-spring) both;
+    animation-delay: var(--_enter-delay, 0ms);
+  }
+
+  .arc-num-pop {
+    animation: arc-num-pop var(--motion-reveal) var(--ease-spring) both;
+  }
+
+  .arc-success-pop {
+    animation: arc-success-pop var(--motion-reveal) var(--ease-spring) both;
+  }
+
+  .arc-shake {
+    animation: arc-shake var(--motion-shake) var(--ease-snap) both;
+  }
+
+  .arc-tooltip[data-state='open'],
+  .arc-tooltip:not([data-state]) {
+    animation: arc-tooltip-in var(--motion-snap) var(--ease-spring) both;
+  }
+
+  .arc-skeleton::after {
+    animation: arc-skeleton-sweep 1.2s var(--ease-emphasized) infinite;
+  }
+
+  /* Icon swap: crossfade + scale the new glyph */
+  .arc-icon-swap {
+    animation: arc-icon-swap var(--motion-snap) var(--ease-spring) both;
+  }
+
+  /* List / grid items that reflow after filter */
+  .arc-list-enter {
+    animation: arc-rise var(--motion-settle) var(--ease-out) both;
+    animation-delay: calc(var(--i, 0) * 35ms);
+  }
+
+  /* dispensed ticket emerges from behind the slot; the [data-claimed]
+     guard + a remount key (bump) restart the keyframe on each claim */
+  .arc-dispenser[data-claimed] .arc-ticket {
+    animation: arc-dispense 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  /* arrival motion — gated by data-revealed (IntersectionObserver via
+     useArcReveal). Below-fold aisles stay still until they enter view. */
+  .arc-reveal {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  .arc-reveal[data-revealed] {
+    animation: arc-rise var(--motion-settle) var(--ease-out) both;
+    animation-delay: calc(var(--i, 0) * 55ms);
+  }
+
+  /* Below-fold aisle sections: skip layout/paint until near the viewport. */
+  .arc-aisle {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 28rem;
+  }
+
+  /* Accordion body for lobby "Recent matches" etc. */
+  .arc-collapse {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows var(--motion-settle) var(--ease-out);
+  }
+  .arc-collapse[data-open] {
+    grid-template-rows: 1fr;
+  }
+  .arc-collapse > .arc-collapse-inner {
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  /* Bet pill press — active state snaps with a tiny scale */
+  .arc-bet-pill[data-active='true'] {
+    transition:
+      background var(--motion-snap) var(--ease-snap),
+      color var(--motion-snap) var(--ease-snap),
+      transform var(--motion-press) var(--ease-snap);
+  }
+  .arc-bet-pill:active:not(:disabled) {
+    transform: scale(0.96);
+  }
+
+  /* Chip / segment active fill feels responsive */
+  .arc-chip,
+  .arc-seg-item {
+    transition:
+      color var(--motion-snap) var(--ease-snap),
+      background var(--motion-snap) var(--ease-snap),
+      border-color var(--motion-snap) var(--ease-snap),
+      box-shadow var(--motion-snap) var(--ease-snap),
+      transform var(--motion-press) var(--ease-snap);
+  }
+  .arc-chip:active:not(:disabled),
+  .arc-seg-item:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+
+  .arc-profile-name-animated {
+    animation: arc-profile-name-shimmer 3.8s linear infinite;
+  }
+
+  /* Result plate: win pops, bust settles matter-of-fact */
+  .arc-result-plate {
+    animation: arc-stub-pop var(--motion-reveal) var(--ease-spring) both;
+  }
+  .arc-result-plate[data-win] {
+    animation: arc-result-win var(--motion-reveal) var(--ease-spring) both;
+  }
+
+  .arc-score-burst {
+    animation: arc-stub-pop var(--motion-reveal) var(--ease-spring) both;
+  }
+
+  .arc-run-result {
+    animation: arc-run-result-in var(--motion-reveal) var(--ease-spring) both;
+  }
+
+  .arc-ticket-payout {
+    animation: arc-ticket-payout-in 0.55s var(--ease-spring) both;
+  }
+
+  .arc-ticket-payout[data-tier='big'] {
+    animation: arc-ticket-big-in 0.75s var(--ease-spring) both;
+  }
+
+  .arc-ticket-payout[data-tier='jackpot'] {
+    animation: arc-ticket-jackpot-in 1s var(--ease-spring) both;
+  }
+
+  .arc-ticket-payout-number {
+    animation: arc-ticket-number 0.7s var(--ease-spring) both;
+  }
+
+  .arc-ticket-payout[data-tier='big'] .arc-ticket-payout-icon,
+  .arc-ticket-payout[data-tier='jackpot'] .arc-ticket-payout-icon {
+    animation: arc-ticket-stamp 0.65s var(--ease-spring) both;
+  }
+
+  .arc-ticket-particle {
+    animation: arc-ticket-scatter 0.9s var(--ease-out) both;
+    animation-delay: calc(var(--ticket-i) * 35ms);
+  }
+
+  .arc-ticket-payout[data-tier='jackpot'] .arc-ticket-particle {
+    animation-name: arc-ticket-rain;
+    animation-duration: 1.35s;
+  }
+
+  .arc-achievement-reveal {
+    animation: arc-achievement-reveal 0.58s var(--ease-spring) both;
+    animation-delay: calc(var(--i, 0) * 110ms);
+  }
+
+  .arc-game-hud-value {
+    animation: arc-game-hud-value 0.32s var(--ease-spring) both;
+  }
+
+  .arc-game-hud-status {
+    animation: arc-game-hud-status 0.28s var(--ease-spring) both;
+  }
+
+  .arc-game-callout {
+    animation: arc-game-callout 0.76s var(--ease-out) both;
+    animation-delay: calc(var(--callout-i, 0) * 22ms);
+  }
+
+  .arc-history-chip {
+    animation: arc-scale-in var(--motion-snap) var(--ease-spring) both;
+    animation-delay: calc(var(--i, 0) * 30ms);
+  }
+
+  /* Stage juice — one-shot, cleared by useGameJuice */
+  .arc-stage[data-juice='win'] {
+    animation: arc-stage-win var(--motion-reveal) var(--ease-spring) both;
+  }
+  .arc-stage[data-juice='big-win'] {
+    animation: arc-stage-big-win 0.7s var(--ease-spring) both;
+  }
+  .arc-stage[data-juice='cashout'] {
+    animation: arc-stage-win var(--motion-reveal) var(--ease-spring) both;
+  }
+  .arc-stage[data-juice='bust'] {
+    animation: arc-stage-bust var(--motion-shake) var(--ease-snap) both;
+  }
+  .arc-stage[data-juice='hit'] {
+    animation: arc-stage-hit var(--motion-press) var(--ease-snap) both;
+  }
+  .arc-stage[data-juice='collect'] {
+    animation: arc-stage-collect var(--motion-snap) var(--ease-spring) both;
+  }
+  .arc-stage[data-juice='combo'],
+  .arc-stage[data-juice='level-up'] {
+    animation: arc-stage-combo var(--motion-reveal) var(--ease-spring) both;
+  }
+  .arc-stage[data-juice='near-miss'] {
+    animation: arc-stage-near-miss var(--motion-snap) var(--ease-snap) both;
+  }
+
+  /* Brief enamel edge flash via outline (no glow) */
+  .arc-stage[data-juice='win']::after,
+  .arc-stage[data-juice='cashout']::after,
+  .arc-stage[data-juice='big-win']::after {
+    content: '';
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    border: 2px solid var(--enamel-prize);
+    animation: arc-stage-rim var(--motion-reveal) var(--ease-out) both;
+  }
+  .arc-stage[data-juice='big-win']::after {
+    border-color: var(--enamel-tickets);
+  }
+  .arc-stage[data-juice='collect']::after,
+  .arc-stage[data-juice='combo']::after,
+  .arc-stage[data-juice='level-up']::after {
+    content: '';
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    border: 2px solid var(--enamel-prize);
+    animation: arc-stage-rim var(--motion-reveal) var(--ease-out) both;
+  }
+  .arc-stage[data-juice='bust']::after {
+    content: '';
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    border: 2px solid var(--enamel-danger);
+    animation: arc-stage-rim var(--motion-settle) var(--ease-out) both;
+  }
+}
+
+@keyframes arc-rise {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes arc-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes arc-scale-in {
+  from { opacity: 0; transform: scale(0.94); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes arc-overlay-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes arc-overlay-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes arc-modal-in {
+  from {
+    transform: translateY(14px) scale(0.97);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+@keyframes arc-modal-out {
+  from {
+    transform: none;
+    opacity: 1;
+  }
+  to {
+    transform: translateY(10px) scale(0.98);
+    opacity: 0;
+  }
+}
+
+@keyframes arc-sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: none;
+  }
+}
+
+@keyframes arc-sheet-out {
+  from { transform: none; }
+  to { transform: translateY(100%); }
+}
+
+@keyframes tx-modal-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes tx-modal-out {
+  from { opacity: 1; transform: none; }
+  to { opacity: 0; transform: translateY(10px); }
+}
+
+@keyframes arc-toast-in {
+  from {
+    transform: translateY(12px) scale(0.92);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+@keyframes arc-toast-out {
+  from {
+    transform: none;
+    opacity: 1;
+  }
+  to {
+    transform: translateY(8px) scale(0.96);
+    opacity: 0;
+  }
+}
+
+@keyframes arc-stub-pop {
+  from {
+    transform: translateY(6px) scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+@keyframes arc-num-pop {
+  0% { transform: scale(0.7); opacity: 0; }
+  55% { transform: scale(1.08); opacity: 1; }
+  100% { transform: none; opacity: 1; }
+}
+
+@keyframes arc-success-pop {
+  0% { transform: scale(0.5); opacity: 0; }
+  60% { transform: scale(1.12); opacity: 1; }
+  100% { transform: none; opacity: 1; }
+}
+
+@keyframes arc-shake {
+  0%, 100% { transform: translateX(0); }
+  15% { transform: translateX(-6px); }
+  30% { transform: translateX(6px); }
+  45% { transform: translateX(-4px); }
+  60% { transform: translateX(4px); }
+  75% { transform: translateX(-2px); }
+  90% { transform: translateX(2px); }
+}
+
+@keyframes arc-tooltip-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes arc-icon-swap {
+  0% { opacity: 0; transform: scale(0.6) rotate(-12deg); }
+  100% { opacity: 1; transform: none; }
+}
+
+@keyframes arc-skeleton-sweep {
+  100% { transform: translateX(100%); }
+}
+
+@keyframes arc-preview-fade {
+  from { opacity: 0; }
+}
+
+@keyframes arc-dispense {
+  0% { transform: translateY(-34px); opacity: 0; }
+  35% { opacity: 1; }
+  100% { transform: translateY(28px); opacity: 1; }
+}
+
+@keyframes arc-profile-name-shimmer {
+  from { background-position: 0% 50%; }
+  to { background-position: 220% 50%; }
+}
+
+@keyframes arc-result-win {
+  0% { opacity: 0; transform: translateY(8px) scale(0.92); }
+  55% { opacity: 1; transform: translateY(-2px) scale(1.03); }
+  100% { opacity: 1; transform: none; }
+}
+
+@keyframes arc-run-result-in {
+  0% { opacity: 0; transform: translateY(12px) scale(0.96); }
+  60% { opacity: 1; transform: translateY(-2px) scale(1.01); }
+  100% { opacity: 1; transform: none; }
+}
+
+@keyframes arc-ticket-payout-in {
+  0% { opacity: 0; transform: translateY(8px) scale(0.94); }
+  65% { opacity: 1; transform: translateY(-1px) scale(1.015); }
+  100% { opacity: 1; transform: none; }
+}
+
+@keyframes arc-ticket-big-in {
+  0% { opacity: 0; transform: scale(0.88) rotate(-1deg); }
+  45% { opacity: 1; transform: scale(1.035) rotate(0.5deg); }
+  72% { transform: scale(0.99); }
+  100% { opacity: 1; transform: none; }
+}
+
+@keyframes arc-ticket-jackpot-in {
+  0% { opacity: 0; transform: translateY(10px) scale(0.82); }
+  32% { opacity: 1; transform: translateY(-4px) scale(1.055); }
+  55% { transform: translateY(1px) scale(0.985); }
+  76% { transform: translateY(-1px) scale(1.018); }
+  100% { opacity: 1; transform: none; }
+}
+
+@keyframes arc-ticket-number {
+  0% { opacity: 0; transform: scale(0.62); }
+  58% { opacity: 1; transform: scale(1.09); }
+  100% { opacity: 1; transform: none; }
+}
+
+@keyframes arc-ticket-stamp {
+  0% { opacity: 0; transform: scale(0.45) rotate(-18deg); }
+  62% { opacity: 1; transform: scale(1.12) rotate(3deg); }
+  100% { opacity: 1; transform: none; }
+}
+
+@keyframes arc-ticket-scatter {
+  0% { opacity: 0; transform: translate(-50%, 10px) scale(0.55) rotate(-12deg); }
+  35% { opacity: 0.65; }
+  100% { opacity: 0; transform: translate(calc(-50% + (var(--ticket-i) - 5.5) * 10px), -38px) scale(1) rotate(calc((var(--ticket-i) - 5.5) * 9deg)); }
+}
+
+@keyframes arc-ticket-rain {
+  0% { opacity: 0; transform: translate(-50%, -52px) rotate(-18deg); }
+  20% { opacity: 0.72; }
+  100% { opacity: 0; transform: translate(calc(-50% + (var(--ticket-i) - 5.5) * 7px), 54px) rotate(calc((var(--ticket-i) - 5.5) * 14deg)); }
+}
+
+@keyframes arc-achievement-reveal {
+  0% { opacity: 0; transform: translateX(-10px) scale(0.94); }
+  62% { opacity: 1; transform: translateX(2px) scale(1.01); }
+  100% { opacity: 1; transform: none; }
+}
+
+@keyframes arc-game-hud-value {
+  0% { opacity: 0.72; transform: translateY(2px) scale(0.82); }
+  55% { opacity: 1; transform: translateY(-1px) scale(1.08); }
+  100% { opacity: 1; transform: none; }
+}
+
+@keyframes arc-game-hud-status {
+  0% { opacity: 0.7; transform: translateY(2px) scale(0.96); }
+  100% { opacity: 1; transform: none; }
+}
+
+@keyframes arc-game-callout {
+  0% { opacity: 0; transform: translate(-50%, -25%) scale(0.72) rotate(-2deg); }
+  22% { opacity: 1; transform: translate(-50%, -50%) scale(1.08) rotate(1deg); }
+  70% { opacity: 1; transform: translate(-50%, -72%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -115%) scale(0.94); }
+}
+
+@keyframes arc-stage-win {
+  0% { transform: scale(1); }
+  35% { transform: scale(1.012); }
+  100% { transform: none; }
+}
+
+@keyframes arc-stage-big-win {
+  0% { transform: scale(1); }
+  20% { transform: scale(1.02); }
+  45% { transform: scale(0.995); }
+  70% { transform: scale(1.015); }
+  100% { transform: none; }
+}
+
+@keyframes arc-stage-bust {
+  0%, 100% { transform: translateX(0); }
+  15% { transform: translateX(-5px); }
+  30% { transform: translateX(5px); }
+  45% { transform: translateX(-3px); }
+  60% { transform: translateX(3px); }
+  75% { transform: translateX(-1px); }
+}
+
+@keyframes arc-stage-hit {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.985); }
+  100% { transform: none; }
+}
+
+@keyframes arc-stage-collect {
+  0% { transform: scale(1); }
+  48% { transform: scale(1.008); }
+  100% { transform: none; }
+}
+
+@keyframes arc-stage-combo {
+  0% { transform: scale(1); }
+  42% { transform: translateY(-2px) scale(1.014); }
+  100% { transform: none; }
+}
+
+@keyframes arc-stage-near-miss {
+  0%, 100% { transform: translateX(0); }
+  35% { transform: translateX(-2px); }
+  70% { transform: translateX(2px); }
+}
+
+@keyframes arc-stage-rim {
+  0% { opacity: 0.95; }
+  100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .arc-key,
+  .arc-gamecard,
+  .arc-progress-fill,
+  .arc-switch,
+  .arc-switch-thumb,
+  .arc-collapse,
+  .arc-chip,
+  .arc-seg-item,
+  .arc-bet-pill {
+    transition: none;
+  }
+
+  a.arc-gamecard:hover {
+    transform: none;
+  }
+
+  /* Instant final state — never hide content behind an unfired reveal. */
+  .arc-reveal,
+  .arc-enter-up,
+  .arc-enter-scale,
+  .arc-enter-fade,
+  .arc-enter-pop,
+  .arc-list-enter,
+  .arc-toast,
+  .arc-modal,
+  .arc-modal-overlay,
+  .arc-sheet,
+  .arc-sheet-overlay,
+  .arc-stub-delta,
+  .arc-num-pop,
+  .arc-success-pop,
+  .arc-tooltip,
+  .arc-icon-swap {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+
+  .arc-skeleton::after {
+    animation: none;
+  }
+
+  .arc-shake {
+    animation: none;
+  }
+
+  .arc-stage[data-juice],
+  .arc-stage[data-juice]::after,
+  .arc-result-plate,
+  .arc-score-burst,
+  .arc-history-chip,
+  .arc-run-result,
+  .arc-ticket-payout,
+  .arc-ticket-payout-number,
+  .arc-ticket-payout-icon,
+  .arc-ticket-particle,
+  .arc-achievement-reveal {
+    animation: none !important;
+    transform: none;
+  }
+
+  .arc-game-hud-value,
+  .arc-game-hud-status,
+  .arc-game-callout {
+    animation: none !important;
+    transform: translate(-50%, -50%);
+  }
+
+  .arc-game-hud-value,
+  .arc-game-hud-status {
+    transform: none;
+  }
+
+  ::view-transition-old(root),
+  ::view-transition-new(root),
+  ::view-transition-old(arcade-main),
+  ::view-transition-new(arcade-main) {
+    animation: none !important;
+  }
+
+  /* Every theme, every page: anything the rules above miss (game CSS,
+     previews, Tailwind animate-*) jumps to its end, and loops run once
+     and stop. animationend still fires at 0s; nothing listens for
+     transitionend. A component that must keep a short fade under reduce
+     (a "+40" floater) sets it with !important in its own reduce block;
+     its selector outranks this one. See arc-reduced-fade below. */
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0s !important;
+    transition-delay: 0s !important;
+    scroll-behavior: auto !important;
+  }
+
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+/* The fade a floater keeps under reduced motion: it shows, then goes,
+   without moving. Use with !important in a reduce block:
+   animation: arc-reduced-fade 700ms linear forwards !important; */
+@keyframes arc-reduced-fade {
+  0% { opacity: 0; }
+  20% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* ── Store preview motion ───────────────────────────────────────────
+   Idle loops for the mini previews: a preview moves only when the
+   asset moves in game (trails drift, coins flip, clouds roll, line
+   clears flash). Transform/opacity only; still under reduced motion. */
+@media (prefers-reduced-motion: no-preference) {
+  .arcprev-bob { animation: arcprev-bob 1.5s ease-in-out infinite alternate; }
+  .arcprev-drift { animation: arcprev-drift 1.4s ease-in-out infinite; }
+  .arcprev-clouds { animation: arcprev-clouds 14s ease-in-out infinite alternate; }
+  .arcprev-wobble { animation: arcprev-wobble 1.9s ease-in-out infinite; }
+  .arcprev-orbit { animation: arcprev-orbit 7s linear infinite; }
+  .arcprev-pulse { animation: arcprev-pulse 1s ease-in-out infinite alternate; }
+  .arcprev-glow { animation: arcprev-glow 2.8s ease-in-out infinite alternate; }
+  .store-reveal { animation: store-reveal-in var(--motion-reveal) var(--ease-spring) both; }
+}
+
+@keyframes arcprev-bob {
+  from { transform: translateY(-3px); }
+  to { transform: translateY(3px); }
+}
+@keyframes arcprev-drift {
+  from { transform: translateX(0); opacity: 1; }
+  to { transform: translateX(-14px); opacity: 0.1; }
+}
+@keyframes arcprev-clouds {
+  from { transform: translateX(-2.5%); }
+  to { transform: translateX(2.5%); }
+}
+@keyframes arcprev-wobble {
+  0%, 100% { transform: perspective(280px) rotateY(-26deg); }
+  50% { transform: perspective(280px) rotateY(26deg); }
+}
+@keyframes arcprev-orbit {
+  to { transform: rotate(360deg); }
+}
+@keyframes arcprev-pulse {
+  from { opacity: 0.35; }
+  to { opacity: 1; }
+}
+@keyframes arcprev-glow {
+  from { opacity: 0.16; }
+  to { opacity: 0.42; }
+}
+@keyframes store-reveal-in {
+  from { opacity: 0; transform: translateY(4px) scale(0.97); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Avatars are circles everywhere (ProfileAvatar). Under tixy the initial
+   sits on paper 3 in ink, like the home's friends. */
+:root[data-arcade-theme='tixy'] .arc-avatar {
+  background-color: var(--tixy-paper-3);
+  color: var(--tixy-ink);
+  font-family: var(--tixy-font-text);
+}

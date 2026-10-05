@@ -1,0 +1,161 @@
+/* ──────────────────────────────────────────────────────────────────────
+   Reversi/Othello — Midway in-game graphics. SCOPED to .reversi-arcade so
+   nothing leaks into shared surfaces or sibling games. Uses the global Midway
+   tokens (--grain, --shadow-*, --radius-*, fonts). The board is a felt-green
+   playfield in a dark cabinet frame; discs are enamel black / cream-white with
+   hard bevels. NOTHING GLOWS — a placement is a hard settle. All motion degrades
+   under prefers-reduced-motion. Keyframes prefixed rv-mk-.
+   ────────────────────────────────────────────────────────────────────── */
+
+.reversi-arcade {
+  --rv-felt-top: #1f7a4d;
+  --rv-felt-bottom: #155f3b;
+  --rv-grid-line: rgba(8, 28, 18, 0.55);
+  --rv-frame-top: #2a2118;
+  --rv-frame-bottom: #1a140d;
+  --rv-frame-edge: #0c0805;
+  --rv-disc-black: #1b1d22;
+  --rv-disc-black-glint: #4a4e58;
+  --rv-disc-black-edge: #050608;
+  --rv-disc-white: #f3eee2;
+  --rv-disc-white-glint: #ffffff;
+  --rv-disc-white-edge: #c9c0ab;
+  --rv-accent: #f2c14e;
+}
+
+/* ── Cabinet: dark wood frame around the felt board ─────────────────────── */
+.reversi-arcade .rv-cabinet {
+  position: relative;
+  padding: clamp(8px, 1.6vw, 16px);
+  border-radius: calc(var(--radius-well, 16px) + 8px);
+  background: var(--grain),
+    linear-gradient(180deg, var(--rv-frame-top), var(--rv-frame-bottom));
+  background-size: 80px 80px, auto;
+  border: 1px solid var(--rv-frame-edge);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.08),
+    inset 0 -4px 10px rgb(0 0 0 / 0.5),
+    var(--shadow-panel);
+}
+
+/* the recessed felt playfield the grid sits in */
+.reversi-arcade .rv-playfield {
+  position: relative;
+  border-radius: var(--radius-well, 16px);
+  background: linear-gradient(180deg, var(--rv-felt-top), var(--rv-felt-bottom));
+  padding: clamp(5px, 1vw, 10px);
+  box-shadow:
+    inset 0 2px 12px rgb(0 0 0 / 0.55),
+    inset 0 0 0 1px rgb(255 255 255 / 0.05),
+    0 0 0 2px var(--rv-frame-edge);
+}
+
+/* the 8×8 cell grid */
+.reversi-arcade .rv-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: clamp(2px, 0.5vw, 5px);
+}
+
+/* a single board square */
+.reversi-arcade .rv-cell {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border-radius: 4px;
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 0.05), rgb(0 0 0 / 0.06));
+  box-shadow: inset 0 0 0 1px var(--rv-grid-line);
+}
+.reversi-arcade .rv-cell-playable {
+  cursor: pointer;
+}
+.reversi-arcade .rv-cell-playable:hover {
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 0.12), rgb(0 0 0 / 0.04));
+}
+
+/* the disc itself — enamel black / white, hard bevel + offset shadow, no glow */
+.reversi-arcade .rv-disc {
+  position: absolute;
+  inset: 9%;
+  border-radius: 999px;
+  box-shadow:
+    inset 0 2px 0 rgb(255 255 255 / 0.22),
+    inset 0 -3px 4px rgb(0 0 0 / 0.42),
+    0 2px 3px rgb(0 0 0 / 0.45);
+}
+.reversi-arcade .rv-disc-black {
+  background:
+    radial-gradient(
+      circle at 50% 34%,
+      var(--rv-disc-black-glint),
+      var(--rv-disc-black) 62%,
+      var(--rv-disc-black-edge) 100%
+    );
+}
+.reversi-arcade .rv-disc-white {
+  background:
+    radial-gradient(
+      circle at 50% 34%,
+      var(--rv-disc-white-glint),
+      var(--rv-disc-white) 64%,
+      var(--rv-disc-white-edge) 100%
+    );
+}
+
+/* a freshly placed / flipped disc pops in */
+.reversi-arcade .rv-disc-pop {
+  animation: rv-mk-pop 240ms cubic-bezier(0.3, 0.85, 0.35, 1);
+}
+@keyframes rv-mk-pop {
+  0% { transform: scale(0.2); opacity: 0.3; }
+  70% { transform: scale(1.06); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+/* a captured disc flips over to reveal its new color. A quick Y-axis turn
+   reads as an enamel disc being flipped rather than a silent color swap. */
+.reversi-arcade .rv-disc-flip {
+  animation: rv-mk-flip 300ms cubic-bezier(0.4, 0.1, 0.3, 1);
+  transform-style: preserve-3d;
+}
+@keyframes rv-mk-flip {
+  0% { transform: perspective(320px) rotateY(-180deg) scale(0.9); }
+  55% { transform: perspective(320px) rotateY(-20deg) scale(1.05); }
+  100% { transform: perspective(320px) rotateY(0deg) scale(1); }
+}
+
+/* the last-placed disc carries a thin amber ring */
+.reversi-arcade .rv-disc-last {
+  box-shadow:
+    inset 0 2px 0 rgb(255 255 255 / 0.22),
+    inset 0 -3px 4px rgb(0 0 0 / 0.42),
+    0 2px 3px rgb(0 0 0 / 0.45),
+    0 0 0 2px var(--rv-accent);
+}
+
+/* a legal-move hint dot for the player to move */
+.reversi-arcade .rv-hint {
+  position: absolute;
+  inset: 38%;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--rv-accent, #f2c14e) 72%, transparent);
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.35);
+}
+
+/* a ghost disc preview on hover */
+.reversi-arcade .rv-ghost-disc {
+  opacity: 0.4;
+}
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  .reversi-arcade .rv-disc-pop,
+  .reversi-arcade .rv-disc-flip {
+    animation: none !important;
+  }
+  .reversi-arcade .rv-cell,
+  .reversi-arcade .rv-cell-playable:hover {
+    transition: none;
+  }
+}

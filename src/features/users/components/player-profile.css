@@ -1,0 +1,381 @@
+/* The profile (docs/design/tixy-rebrand/PROFILES.md). The tixy six, Gabarito
+   for words, Big Shoulders for numbers through <Num>. Surfaces told apart by
+   tone; the only lines are hairlines between rows in one list. Nothing moves
+   on its own; a block lifts when pointed at. */
+
+.pf-page {
+  width: min(100%, 72rem);
+  margin-inline: auto;
+  padding: clamp(1rem, 1.8vw, 1.5rem) 1rem clamp(2rem, 4vw, 3rem);
+  display: grid;
+  gap: 20px;
+  min-width: 0;
+}
+
+/* ── the header ─────────────────────────────────────────────────────────── */
+
+.pf-hero {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--tixy-radius-panel-lg);
+  background: var(--tixy-paper-2);
+  padding: 0 20px 20px;
+  display: grid;
+  gap: 14px;
+}
+.pf-band {
+  margin: 0 -20px;
+  height: 96px;
+  overflow: hidden;
+  background: var(--tixy-paper-3);
+}
+/* No namecard: a shorter band, so an empty header doesn't read as missing art. */
+.pf-band[data-plain='true'] { height: 72px; }
+.pf-band img,
+.pf-band span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: left top;
+}
+.pf-id {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: end;
+  gap: 4px 16px;
+  margin-top: -56px;
+  min-width: 0;
+}
+.pf-avatar {
+  display: inline-flex;
+  border-radius: 50%;
+  padding: 5px;
+  background: var(--tixy-paper-2);
+}
+.pf-avatar .arc-avatar,
+.pf-avatar > span:not(.arc-avatar) {
+  width: 104px;
+  height: 104px;
+}
+.pf-avatar .arc-avatar { font-size: 2.5rem; }
+.pf-who { min-width: 0; padding-bottom: 6px; }
+.pf-who h1 {
+  margin: 0;
+  font-size: clamp(1.75rem, 6vw, 2.75rem);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  min-width: 0;
+}
+.pf-who h1 > span { max-width: 100%; }
+.pf-title {
+  margin: 4px 0 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--tixy-ink-2);
+}
+.pf-meta {
+  margin: 4px 0 0;
+  font-size: 15px;
+  color: var(--tixy-ink-2);
+}
+.pf-level {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: var(--tixy-radius-panel-sm);
+  background: var(--tixy-paper);
+  min-width: 0;
+}
+.pf-level > svg { flex: none; }
+.pf-level > div { display: grid; gap: 5px; flex: 1; min-width: 0; }
+.pf-level strong {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 15px;
+  font-weight: 700;
+}
+.pf-level strong .tp-num { font-size: 28px; line-height: 0.9; }
+.pf-level small { font-size: 13px; color: var(--tixy-ink-3); }
+.pf-level small .tp-num { font-size: 14px; }
+.pf-bio {
+  margin: 0;
+  max-width: 44rem;
+  font-size: 15px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+.pf-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+@media (min-width: 48rem) {
+  .pf-hero { padding: 0 28px 24px; grid-template-columns: minmax(0, 1fr) auto; column-gap: 24px; }
+  .pf-band { grid-column: 1 / -1; margin: 0 -28px; height: 132px; }
+  .pf-band[data-plain='true'] { height: 88px; }
+  .pf-id { grid-column: 1 / -1; grid-template-columns: auto minmax(0, 1fr) minmax(15rem, 18rem); margin-top: -64px; }
+  .pf-avatar .arc-avatar,
+  .pf-avatar > span:not(.arc-avatar) { width: 128px; height: 128px; }
+  .pf-level { grid-column: auto; align-self: end; margin-bottom: 4px; }
+  .pf-bio { grid-column: 1; }
+  .pf-actions { grid-column: 2; grid-row: 3; justify-content: flex-end; align-self: start; }
+  .pf-bio + .pf-actions { grid-row: 3; }
+}
+
+/* ── two columns: the showcase and activity, then the stats ─────────────── */
+
+.pf-cols { display: grid; gap: 20px; min-width: 0; }
+.pf-main { display: grid; gap: 16px; align-content: start; min-width: 0; }
+@media (min-width: 64rem) {
+  .pf-cols { grid-template-columns: minmax(0, 1fr) 19rem; align-items: start; }
+}
+
+.pf-side { display: grid; gap: 12px; align-content: start; min-width: 0; }
+@media (max-width: 63.99rem) {
+  /* On a phone the stats come first, as one tone block under the header. */
+  .pf-side { order: -1; }
+}
+.pf-stats {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2px;
+  overflow: hidden;
+  border-radius: var(--tixy-radius-panel);
+  background: var(--tixy-paper-3);
+}
+.pf-stats > div {
+  display: grid;
+  gap: 2px;
+  padding: 12px 14px;
+  background: var(--tixy-paper-2);
+  min-width: 0;
+}
+.pf-stats > div:last-child:nth-child(odd) { grid-column: 1 / -1; }
+.pf-stats dt { font-size: 14px; color: var(--tixy-ink-2); }
+.pf-stats dd {
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  font-size: 15px;
+  font-weight: 700;
+}
+.pf-stats dd .tp-num { font-size: 26px; line-height: 1; font-weight: var(--tixy-weight-num); }
+.pf-stats dd a { color: inherit; text-decoration: none; }
+.pf-stats dd a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.pf-of { font-weight: 600; color: var(--tixy-ink-3); }
+.pf-of .tp-num { font-size: 17px !important; }
+@media (min-width: 40rem) and (max-width: 63.99rem) {
+  .pf-stats { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .pf-stats > div:last-child:nth-child(odd) { grid-column: auto; }
+}
+
+.pf-side-bests {
+  border-radius: var(--tixy-radius-panel);
+  background: var(--tixy-paper-2);
+  padding: 14px 16px 8px;
+}
+@media (max-width: 63.99rem) { .pf-side-bests { display: none; } }
+.pf-side-bests h2 { margin: 0 0 4px; font-size: 17px; font-weight: 800; letter-spacing: -0.01em; }
+.pf-best-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto 3.4rem;
+  align-items: baseline;
+  gap: 8px;
+  padding: 8px 0;
+  color: inherit;
+  text-decoration: none;
+}
+.pf-best-row + .pf-best-row { box-shadow: 0 -1px 0 rgb(31 26 22 / 0.08); }
+.pf-best-row > span:first-child {
+  font-size: 15px;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.pf-best-row .tp-num { font-size: 20px; text-align: right; }
+.pf-best-row small { font-size: 13px; color: var(--tixy-ink-3); }
+.pf-best-row:hover > span:first-child { text-decoration: underline; text-underline-offset: 3px; }
+.pf-best-row:focus-visible { outline: 3px solid var(--tixy-ticket); outline-offset: 2px; border-radius: 6px; }
+
+/* ── showcase blocks ────────────────────────────────────────────────────── */
+
+.pf-showcase { display: grid; gap: 16px; min-width: 0; }
+.pf-block {
+  border-radius: var(--tixy-radius-panel-lg);
+  background: var(--tixy-paper-2);
+  padding: 16px 18px 18px;
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+.pf-block-title {
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+.pf-block-title small { font-size: 14px; font-weight: 600; color: var(--tixy-ink-3); }
+.pf-block-title small .tp-num { font-size: 17px; }
+.pf-block-head {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.pf-screen { width: 100%; }
+
+/* Featured score: the cabinet's screen and the number, big. The block is
+   ink, the one dark surface on the page, so the eye lands on it first. */
+.pf-feature { padding: 0; background: var(--tixy-ink); color: var(--tixy-paper); }
+.pf-feature-link {
+  display: grid;
+  gap: 14px;
+  padding: 12px 12px 18px;
+  color: inherit;
+  text-decoration: none;
+  border-radius: inherit;
+}
+.pf-feature-link:focus-visible { outline: 3px solid var(--tixy-ticket); outline-offset: 3px; }
+.pf-feature .pf-screen { border-color: var(--tixy-rail); }
+@media (max-width: 39.99rem) {
+  .pf-feature .pf-screen,
+  .pf-favorite .pf-screen { aspect-ratio: 16 / 8; }
+}
+.pf-feature-text { display: grid; gap: 4px; padding-inline: 8px; min-width: 0; }
+.pf-feature-num { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.pf-feature-num .tp-num { font-size: clamp(56px, 14vw, 84px); line-height: 0.9; color: var(--tixy-ticket); }
+.pf-feature-num > span:last-child { font-size: 17px; font-weight: 700; color: var(--tixy-on-ink-2); }
+.pf-feature-rank { font-size: 15px; color: var(--tixy-on-ink-2); }
+.pf-feature-rank .tp-num { font-size: 18px; color: var(--tixy-paper); }
+.pf-feature-cta {
+  justify-self: start;
+  margin-top: 8px;
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 16px;
+  border-radius: var(--tixy-radius-button);
+  background: var(--tixy-paper);
+  color: var(--tixy-ink);
+  font-weight: 700;
+  font-size: 15px;
+}
+@media (min-width: 40rem) {
+  .pf-feature-link { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); align-items: center; padding: 14px; gap: 22px; }
+  .pf-feature-text { padding: 0; }
+}
+
+/* Favorite game: the screen, then time, plays and best. */
+.pf-favorite-link {
+  display: grid;
+  gap: 12px;
+  color: inherit;
+  text-decoration: none;
+  border-radius: var(--tixy-radius-panel);
+}
+.pf-favorite-link:focus-visible { outline: 3px solid var(--tixy-ticket); outline-offset: 3px; }
+.pf-favorite-link:hover .pf-block-head { text-decoration: underline; text-underline-offset: 3px; }
+.pf-favorite-text { display: grid; gap: 8px; min-width: 0; }
+.pf-facts { display: flex; flex-wrap: wrap; gap: 6px 20px; font-size: 15px; color: var(--tixy-ink-2); }
+.pf-facts .tp-num { font-size: 24px; color: var(--tixy-ink); }
+@media (min-width: 40rem) {
+  .pf-favorite-link { grid-template-columns: minmax(0, 14rem) minmax(0, 1fr); align-items: center; gap: 20px; }
+}
+
+/* Achievements: medals in a row, each with its name and how many have it. */
+.pf-medals { display: grid; grid-template-columns: repeat(auto-fill, minmax(6rem, 1fr)); gap: 8px; }
+@media (min-width: 40rem) { .pf-medals { grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr)); gap: 10px; } }
+.pf-medal[data-locked='true'] { background: transparent; box-shadow: inset 0 0 0 2px var(--tixy-paper-3); }
+.pf-medal {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  padding: 12px 8px;
+  border-radius: var(--tixy-radius-panel-sm);
+  background: var(--tixy-paper);
+  text-align: center;
+  min-width: 0;
+}
+.pf-medal strong { font-size: 14px; font-weight: 700; line-height: 1.2; overflow-wrap: anywhere; }
+.pf-medal small { font-size: 13px; color: var(--tixy-ink-3); }
+
+/* Prizes: square previews with their names. */
+.pf-items { display: grid; grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr)); gap: 10px; }
+.pf-item { display: grid; gap: 6px; min-width: 0; }
+.pf-item-art { overflow: hidden; border-radius: var(--tixy-radius-panel-sm); background: var(--tixy-paper-3); }
+.pf-item strong { font-size: 14px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Season: the medal and the tier. */
+.pf-season { grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 16px; }
+.pf-season-medal { opacity: 0.35; filter: grayscale(1); }
+.pf-season-medal[data-owned='true'] { opacity: 1; filter: none; }
+.pf-season-text { display: grid; gap: 6px; min-width: 0; }
+.pf-season-tier { display: flex; align-items: baseline; gap: 6px; font-size: 16px; font-weight: 700; }
+.pf-season-tier .tp-num { font-size: 36px; line-height: 0.9; }
+.pf-season-tier > span { font-weight: 600; color: var(--tixy-ink-3); }
+.pf-season-tier > span .tp-num { font-size: 20px; }
+.pf-season small { font-size: 14px; color: var(--tixy-ink-2); }
+.pf-season small .tp-num { font-size: 16px; }
+
+.pf-games { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (min-width: 40rem) { .pf-games { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.pf-games .tp-game { background: var(--tixy-paper); }
+
+.pf-unlock { margin: -4px 0 0; font-size: 14px; color: var(--tixy-ink-3); }
+.pf-unlock .tp-num { font-size: 16px; color: var(--tixy-ink-2); }
+
+/* ── recent activity ───────────────────────────────────────────────────── */
+
+.pf-recent h2 small .tp-num { font-size: 17px; color: var(--tixy-ink-2); }
+.pf-played {
+  display: grid;
+  grid-template-columns: 5.5rem minmax(0, 1fr);
+  align-items: center;
+  gap: 4px 14px;
+  padding: 10px 0;
+  color: inherit;
+  text-decoration: none;
+}
+.pf-played + .pf-played { box-shadow: 0 -1px 0 rgb(31 26 22 / 0.08); }
+.pf-played:focus-visible { outline: 3px solid var(--tixy-ticket); outline-offset: 2px; border-radius: 8px; }
+.pf-played:hover strong { text-decoration: underline; text-underline-offset: 3px; }
+.pf-thumb { border-width: 3px; border-radius: 8px; }
+.pf-played-main { display: grid; gap: 2px; min-width: 0; }
+.pf-played-main strong { font-size: 16px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pf-played-main small,
+.pf-played-side small { font-size: 14px; color: var(--tixy-ink-2); }
+.pf-played .tp-num { font-size: 17px; color: var(--tixy-ink); }
+.pf-played-side { grid-column: 2; display: flex; flex-wrap: wrap; gap: 2px 12px; font-size: 14px; color: var(--tixy-ink-2); }
+@media (min-width: 40rem) {
+  .pf-played { grid-template-columns: 6.5rem minmax(0, 1fr) auto; }
+  .pf-played-side { grid-column: 3; display: grid; justify-items: end; text-align: right; }
+}
+
+@media (hover: hover) {
+  .pf-feature,
+  .pf-favorite { transition: transform var(--tixy-panel-slow) var(--tixy-ease-settle); }
+  .pf-feature:hover,
+  .pf-favorite:hover { transform: translateY(-3px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pf-feature,
+  .pf-favorite { transition: none; }
+  .pf-feature:hover,
+  .pf-favorite:hover { transform: none; }
+}

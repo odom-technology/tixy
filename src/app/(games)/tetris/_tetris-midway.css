@@ -1,0 +1,267 @@
+/* ──────────────────────────────────────────────────────────────────────
+   TETRIS — Midway arcade-cabinet in-game chrome.
+   Scoped entirely under .tetris-midway so nothing leaks into shared UI or
+   sibling games. Uses production shell tokens (--surface-*, --enamel-*,
+   --piece-N, --bevel-hi, --grain, --screen-well, --radius-*, --font-*) so
+   it tracks all four Midway sub-themes. Material is depth, not light —
+   hard offset block + inset bevel pair; NOTHING glows. Reduced-motion safe.
+   ────────────────────────────────────────────────────────────────────── */
+
+/* ── inset "stat cell" — recessed screen with mono numerics ──────────── */
+.tetris-midway .tet-stat {
+  display: block;
+  padding: 0.55rem 0.7rem;
+  border: var(--border-w, 2px) solid var(--border-ink);
+  border-radius: var(--radius-well, 8px);
+  background: linear-gradient(180deg, var(--surface-well), #060505);
+  box-shadow:
+    inset 0 2px 6px #000000aa,
+    inset 0 0 0 1px #ffffff0a,
+    0 1px 0 var(--bevel-hi);
+}
+.tetris-midway .tet-stat-label {
+  display: block;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 0.15rem;
+}
+.tetris-midway .tet-stat-value {
+  display: block;
+  font-family: var(--font-mono-arcade);
+  font-variant-numeric: tabular-nums;
+  font-size: 1.35rem;
+  font-weight: 600;
+  line-height: 1.05;
+  color: var(--text-strong);
+}
+.tetris-midway .tet-stat-value[data-accent='tickets'] {
+  color: var(--enamel-tickets-text);
+}
+.tetris-midway .tet-stat-value[data-accent='prize'] {
+  color: var(--enamel-prize-text);
+}
+
+/* ── wooden side panel (Hold / Next / Music / Controls) ──────────────── */
+.tetris-midway .tet-panel {
+  position: relative;
+  padding: 0.7rem;
+  border: var(--border-w, 2px) solid var(--border-soft);
+  border-radius: var(--radius-panel, 12px);
+  background:
+    var(--grain),
+    linear-gradient(180deg, var(--surface-raised), var(--surface-panel));
+  background-size: 80px 80px, 80px 80px, auto;
+  box-shadow:
+    inset 0 1px 0 var(--bevel-hi),
+    inset 0 -2px 4px var(--bevel-lo),
+    0 5px 0 var(--shadow-color),
+    0 7px 14px #00000050;
+}
+.tetris-midway .tet-eyebrow {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+}
+
+/* recessed tray that holds the Hold / Next canvases */
+.tetris-midway .tet-tray {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: var(--border-w-hairline, 1px) solid var(--border-ink);
+  border-radius: var(--radius-well, 8px);
+  background:
+    repeating-linear-gradient(0deg, #0000 0 11px, #00000026 11px 12px),
+    repeating-linear-gradient(90deg, #0000 0 11px, #00000026 11px 12px),
+    var(--screen-well);
+  box-shadow: inset 0 2px 8px #000000aa, inset 0 0 0 1px #ffffff08;
+}
+
+/* ── keycap rows (controls legend) ───────────────────────────────────── */
+.tetris-midway .tet-controls {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.tetris-midway .tet-control {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.tetris-midway .tet-kbd-group {
+  display: inline-flex;
+  gap: 0.25rem;
+  flex: 0 0 auto;
+}
+.tetris-midway .tet-kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.5rem;
+  height: 1.4rem;
+  padding: 0 0.35rem;
+  font-family: var(--font-mono-arcade);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-strong);
+  border-radius: 6px;
+  background: linear-gradient(180deg, var(--surface-raised), var(--surface-panel));
+  border: 1px solid var(--border-soft);
+  box-shadow:
+    inset 0 1px 0 var(--bevel-hi),
+    inset 0 -2px 3px var(--bevel-lo),
+    0 2px 0 var(--shadow-color);
+}
+.tetris-midway .tet-control-action {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-body);
+}
+
+/* ── cream physical "KEY" face — mobile control buttons ──────────────── */
+.tetris-midway .tet-key {
+  font-family: var(--font-sans, inherit);
+  font-size: 11px;
+  font-weight: 700;
+  color: #241808;
+  padding: 0.5rem 0.25rem;
+  border-radius: var(--radius-key, 9px);
+  border: 1px solid var(--key-bevel-lo);
+  cursor: pointer;
+  background: linear-gradient(180deg, #fbf4e3, #e6d9bd);
+  box-shadow:
+    inset 0 1px 0 var(--key-bevel-hi),
+    inset 0 -3px 5px var(--key-bevel-lo),
+    0 4px 0 #6b5631,
+    0 6px 10px #00000050;
+  transition: transform 0.06s ease, box-shadow 0.06s ease;
+  touch-action: manipulation;
+}
+.tetris-midway .tet-key:active:not(:disabled) {
+  transform: translateY(3px);
+  box-shadow:
+    inset 0 1px 0 var(--key-bevel-hi),
+    inset 0 -2px 4px var(--key-bevel-lo),
+    0 1px 0 #6b5631;
+}
+.tetris-midway .tet-key:disabled {
+  cursor: not-allowed;
+  filter: saturate(0.45) brightness(0.9);
+  transform: translateY(2px);
+  box-shadow: inset 0 1px 0 var(--key-bevel-hi), 0 2px 0 #6b5631;
+}
+
+/* ── in-screen overlays (idle / paused / game-over) ──────────────────── */
+.tetris-midway .tet-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 1.25rem;
+  text-align: center;
+  border-radius: var(--radius-well, 8px);
+  background:
+    radial-gradient(ellipse at 50% 35%, #1a130b 0%, #0a0705 80%),
+    #0a0705e0;
+  backdrop-filter: blur(1px);
+}
+.tetris-midway .tet-overlay-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  color: var(--text-strong);
+  text-shadow: 0 2px 0 var(--shadow-color);
+}
+.tetris-midway .tet-overlay-title[data-tone='paused'] {
+  color: var(--enamel-tickets-text);
+}
+.tetris-midway .tet-overlay-title[data-tone='gameover'] {
+  color: var(--enamel-primary-text);
+}
+.tetris-midway .tet-overlay-sub {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* enamel plate badge inside overlays */
+.tetris-midway .tet-plate {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.7rem;
+  border-radius: var(--radius-tag, 6px);
+  box-shadow:
+    inset 0 1px 0 #ffffff30,
+    inset 0 -2px 4px #00000050,
+    0 2px 0 var(--shadow-color);
+}
+.tetris-midway .tet-plate[data-tone='tickets'] {
+  background: linear-gradient(180deg, var(--enamel-tickets-hi), var(--enamel-tickets));
+  color: var(--enamel-tickets-on);
+  border: 1px solid var(--enamel-tickets-edge);
+}
+.tetris-midway .tet-plate[data-tone='danger'] {
+  background: linear-gradient(180deg, var(--enamel-primary-hi), var(--enamel-primary));
+  color: var(--enamel-primary-on);
+  border: 1px solid var(--enamel-primary-edge);
+}
+
+/* big mono score on the game-over card */
+.tetris-midway .tet-final-score {
+  font-family: var(--font-mono-arcade);
+  font-variant-numeric: tabular-nums;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-strong);
+  text-shadow: 0 2px 0 var(--shadow-color);
+}
+
+/* floating line-clear callout — amber enamel chip */
+.tetris-midway .tet-clear-chip {
+  font-family: var(--font-mono-arcade);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  padding: 0.25rem 0.7rem;
+  border-radius: var(--radius-tag, 6px);
+  color: var(--enamel-tickets-on);
+  background: linear-gradient(180deg, var(--enamel-tickets-hi), var(--enamel-tickets));
+  border: 1px solid var(--enamel-tickets-edge);
+  box-shadow:
+    inset 0 1px 0 #ffffff35,
+    0 2px 0 var(--shadow-color),
+    0 3px 7px #00000050;
+}
+.tetris-midway .tet-clear-enter {
+  animation: tet-clear-pop var(--motion-reveal, 0.22s) var(--ease-spring, ease-out);
+}
+
+@keyframes tet-clear-pop {
+  0% { transform: translateY(-4px) scale(0.94); opacity: 0; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tetris-midway .tet-key { transition: none; }
+  .tetris-midway .tet-clear-enter { animation: none; }
+}

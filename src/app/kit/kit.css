@@ -1,0 +1,228 @@
+/* The kit sheet's own layout. Nothing here styles a shared piece. */
+.kit-sheet {
+  width: min(1120px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 2rem 0 6rem;
+}
+
+.kit-head h1 {
+  font-size: 1.875rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.kit-head p,
+.kit-note {
+  color: var(--text-muted);
+}
+
+.kit-section {
+  margin-top: 2.5rem;
+}
+
+.kit-section > h2 {
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+
+.kit-body {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.kit-body > .arc-key {
+  justify-self: start;
+}
+
+.kit-row {
+  display: grid;
+  grid-template-columns: 6rem 1fr;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.kit-row-label {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.kit-row-items {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.kit-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 0.75rem;
+  align-items: start;
+}
+
+.kit-stack {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.kit-stage {
+  position: relative;
+  min-height: 15rem;
+  overflow: hidden;
+  border: 5px solid var(--tixy-ink);
+  border-radius: 14px;
+  background: var(--tixy-screen);
+  color: var(--tixy-paper);
+}
+
+.kit-stage-short {
+  display: grid;
+  min-height: 6rem;
+  place-items: center;
+  padding: 0.75rem;
+}
+
+.kit-stage-row {
+  display: flex;
+  min-height: 0;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.75rem;
+}
+
+.kit-stage-notice {
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+}
+
+.kit-stage-center {
+  display: grid;
+  place-items: center;
+}
+
+/* Freeze a callout part way in, so a screenshot catches it. */
+.kit-still :is(.arc-game-callout, .arc-game-callout *, .arc-game-callout::after) {
+  animation-play-state: paused !important;
+  animation-delay: var(--kit-at, -560ms) !important;
+}
+
+.kit-still-count .arc-countdown-value {
+  animation-play-state: paused !important;
+  animation-delay: -400ms !important;
+}
+
+.kit-stage-tall {
+  min-height: 20rem;
+}
+
+.kit-stage-count {
+  min-height: 11rem;
+}
+
+.kit-stage-pad {
+  min-height: 0;
+  padding: 0.75rem;
+}
+
+.kit-stage-best {
+  min-height: 18rem;
+}
+
+.kit-fake-play {
+  position: absolute;
+  inset: auto 0 1.5rem;
+  display: grid;
+  justify-items: center;
+  gap: 0.25rem;
+  color: var(--tixy-on-ink-2);
+}
+
+.kit-fake-play > :first-child {
+  color: var(--tixy-paper);
+  font-size: 3rem;
+}
+
+.kit-tickets {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.5rem;
+  border-radius: 18px;
+  background: var(--surface-panel);
+}
+
+.kit-tickets-balance {
+  display: inline-flex;
+}
+
+@media (max-width: 40rem) {
+  .kit-row {
+    grid-template-columns: 1fr;
+    gap: 0.375rem;
+  }
+}
+
+/* /kit/sounds */
+.kit-sound-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.kit-sound-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(22rem, 1fr));
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.kit-sound-item {
+  display: grid;
+  gap: 0.5rem;
+  align-content: start;
+  padding: 0.875rem;
+  border-radius: 0.75rem;
+  background: var(--surface-panel);
+}
+
+.kit-sound-name span,
+.kit-sound-prompt {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+.kit-sound-take {
+  display: inline-flex;
+  gap: 0.25rem;
+}
+
+.kit-sound-cues {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+  gap: 0.25rem 1rem;
+  margin-top: 0.75rem;
+}
+
+.kit-sound-cue {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.875rem;
+}
+
+.kit-sound-cue > span {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.kit-sound-cue em {
+  font-style: normal;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}

@@ -1,0 +1,23 @@
+/* Slots: the symbols on the pays sheet and on the glass when a line pays.
+   The cabinet itself is drawn on the canvas (_slots-client.tsx). */
+.slots-pay-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.slots-glyphs {
+  display: inline-flex;
+  gap: 2px;
+}
+
+/* Each symbol on a small paper tile, so it reads on paper and on the red
+   of the line that paid. */
+.slots-glyph {
+  display: block;
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 2px;
+  border-radius: 5px;
+  background: var(--tixy-paper);
+}

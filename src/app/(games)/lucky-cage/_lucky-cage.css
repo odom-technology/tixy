@@ -1,0 +1,482 @@
+/* ──────────────────────────────────────────────────────────────────────
+   LUCKY CAGE — boardwalk cabinet polish. Everything is namespaced under
+   .lucky-cage-midway so nothing here can leak into other games or the
+   shared shells.
+
+   The three.js canvas draws the walnut cabinet, the brass drum and the
+   twenty painted balls. This file lays out the screen, styles the ticket
+   board that sits against the cabinet, the draw count with its five cradles,
+   and the receipt's numbers. Nothing glows; nothing animates on a loop while
+   the cabinet is idle.
+   ────────────────────────────────────────────────────────────────────── */
+
+/* The machine's screen: the cabinet and its five cradles, with the ticket
+   board under them on a phone and beside them from 40rem. */
+.lucky-cage-midway .lc-screen {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.lucky-cage-midway .lc-cabinet {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+.lucky-cage-midway .lc-stage {
+  position: relative;
+  flex: 1;
+  min-height: 14rem;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.lucky-cage-midway .lc-chute-row {
+  display: grid;
+  flex: none;
+  gap: 2px;
+  padding: 8px 10px 6px;
+}
+
+/* Phones: the cabinet, its cradles and the board share the screen. The
+   cabinet gives up height first, so the cradles and all twenty numbers
+   stay whole over the crank; the bet row is a short scroll inside the
+   frame. */
+.arc-shell[data-game='lucky-cage'] .arc-machine-frame:not([data-wide]) {
+  --machine-screen-min: 34rem;
+}
+
+.arc-shell[data-game='lucky-cage'] .arc-machine-frame:not([data-wide]) .lc-stage {
+  min-height: 11rem;
+}
+
+.arc-shell[data-game='lucky-cage'] .arc-machine-frame:not([data-wide]) .lc-cabinet {
+  flex: none;
+}
+
+@container (min-width: 40rem) {
+  .lucky-cage-midway .lc-screen {
+    flex-direction: row;
+  }
+  .lucky-cage-midway .lc-stage {
+    min-height: 0;
+  }
+}
+
+/* Absolute so the drawing buffer always tracks the stage box, even where
+   percentage heights against an aspect-ratio parent would resolve to auto. */
+.lucky-cage-midway .lc-canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: manipulation;
+}
+
+/* The stage is focusable so keyboard users can crank it directly. */
+.lucky-cage-midway .lc-stage:focus-visible {
+  outline: 3px solid var(--enamel-tickets, #e0a33a);
+  outline-offset: 3px;
+}
+
+/* ── Chute read-out: the draw count and the five cradles ────────────── */
+
+.lucky-cage-midway .lc-tray {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 8px;
+  align-items: stretch;
+}
+
+.lucky-cage-midway .lc-count {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 3.5rem;
+  margin: 0;
+  color: var(--tixy-on-ink-2, #d8cdbb);
+  font-size: 0.875rem;
+  line-height: 1.1;
+  text-align: center;
+}
+
+.lucky-cage-midway .lc-count b {
+  color: var(--tixy-paper, #f4ebdc);
+  font-family: var(--tixy-font-num, inherit);
+  font-size: 2rem;
+  font-weight: var(--tixy-weight-num, 800);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.lucky-cage-midway .lc-chute {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lucky-cage-midway .lc-cradle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-height: 3.25rem;
+  padding: 3px 2px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--tixy-paper, #f4ebdc) 9%, transparent);
+}
+
+.lucky-cage-midway .lc-cradle-index {
+  color: var(--tixy-on-ink-2, #d8cdbb);
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.lucky-cage-midway .lc-ball {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(26px, 8cqi, 34px);
+  height: clamp(26px, 8cqi, 34px);
+  border-radius: 50%;
+  font-family: var(--tixy-font-num, inherit);
+  font-size: 1.125rem;
+  font-weight: var(--tixy-weight-num, 800);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  color: #1d1409;
+  /* painted balls are cream in every theme */
+  background: #f2e7cd;
+}
+
+/* Empty cradle placeholder: a dashed ring, not a ghost ball. */
+.lucky-cage-midway .lc-ball-empty {
+  background: none;
+  outline: 2px dashed color-mix(in srgb, var(--tixy-paper, #f4ebdc) 30%, transparent);
+  outline-offset: -2px;
+  color: transparent;
+}
+
+/* A ball your ticket counts gets a ticket ring. */
+.lucky-cage-midway .lc-ball-hit,
+.lucky-cage-midway .lc-ball-head {
+  box-shadow: 0 0 0 3px var(--tixy-ticket, #f2a33c);
+}
+
+/* Drop-in for a seating ball. Reduced motion collapses it to a swap. */
+.lucky-cage-midway .lc-ball-seat {
+  animation: lc-seat 240ms cubic-bezier(0.2, 1.5, 0.4, 1);
+}
+
+@keyframes lc-seat {
+  0% {
+    transform: translateY(-38%) scale(0.82);
+    opacity: 0.25;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* ── The ticket board: the cabinet's own walnut and brass ───────────── */
+
+.lucky-cage-midway .lc-board {
+  --lc-cell: 2.75rem;
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.625rem 0.75rem 0.75rem;
+  background: var(--lc-wood, #54341b);
+  /* the brass edge of the cabinet's top rail */
+  border-top: 4px solid var(--lc-brass, #bf9648);
+  color: var(--lc-ball, #f2e7cd);
+}
+
+.lucky-cage-midway .lc-board-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px;
+  padding: 4px;
+  border-radius: 12px;
+  background: var(--lc-wood-lo, #2f1d0f);
+}
+
+.lucky-cage-midway .lc-board-tab {
+  min-height: 2.75rem;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--lc-ball, #f2e7cd);
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 90ms ease-out;
+}
+
+.lucky-cage-midway .lc-board-tab[aria-checked='true'] {
+  background: var(--tixy-ticket, #f2a33c);
+  color: var(--tixy-ink, #1f1a16);
+}
+
+.lucky-cage-midway .lc-board-tab:active {
+  transform: scale(0.96);
+  transition-duration: 40ms;
+}
+
+.lucky-cage-midway .lc-board-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  /* four rows in every kind of ticket, so the board never changes height */
+  grid-template-rows: repeat(4, var(--lc-cell));
+  gap: 6px;
+  align-content: center;
+  min-height: calc(4 * var(--lc-cell) + 3 * 6px);
+}
+
+.lucky-cage-midway .lc-board-grid[data-family='tier'] {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+}
+
+.lucky-cage-midway .lc-board-grid[data-family='rack'] {
+  grid-template-rows: minmax(0, 1fr);
+}
+
+.lucky-cage-midway .lc-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  background: var(--lc-ball, #f2e7cd);
+  color: var(--lc-ball-ink, #1d1409);
+  font: inherit;
+  cursor: pointer;
+  transition: transform 90ms ease-out;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.lucky-cage-midway .lc-cell:active {
+  transform: scale(0.94);
+  transition-duration: 40ms;
+}
+
+.lucky-cage-midway .lc-cell[aria-disabled='true'] {
+  cursor: default;
+}
+
+.lucky-cage-midway .lc-cell-big {
+  font-family: var(--tixy-font-num, inherit);
+  font-size: 1.5rem;
+  font-weight: var(--tixy-weight-num, 800);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.lucky-cage-midway .lc-cell-name {
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* Numbers are cream balls, like the ones in the cage. */
+.lucky-cage-midway .lc-cell[data-kind='ball'],
+.lucky-cage-midway .lc-cell[data-kind='head'] {
+  width: var(--lc-cell);
+  height: var(--lc-cell);
+  justify-self: center;
+  border-radius: 50%;
+}
+
+/* Racks are the painted bands of four. */
+.lucky-cage-midway .lc-cell[data-kind='rack'],
+.lucky-cage-midway .lc-cell[data-kind='tier'] {
+  border-radius: 12px;
+  background: var(--lc-wood-lo, #2f1d0f);
+  color: var(--lc-ball, #f2e7cd);
+}
+
+.lucky-cage-midway .lc-cell[data-kind='tier'] .lc-cell-big {
+  font-size: 2.25rem;
+}
+
+.lucky-cage-midway .lc-cell[data-kind='rack'] .lc-cell-name {
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  background: var(--lc-rack, #a8342c);
+  color: #fff8e8;
+  font-family: var(--tixy-font-num, inherit);
+  font-size: 1.125rem;
+  font-weight: var(--tixy-weight-num, 800);
+}
+
+.lucky-cage-midway .lc-cell[data-rack='0'] { --lc-rack: var(--lc-rack-0); }
+.lucky-cage-midway .lc-cell[data-rack='1'] { --lc-rack: var(--lc-rack-1); }
+.lucky-cage-midway .lc-cell[data-rack='2'] { --lc-rack: var(--lc-rack-2); }
+.lucky-cage-midway .lc-cell[data-rack='3'] { --lc-rack: var(--lc-rack-3); }
+.lucky-cage-midway .lc-cell[data-rack='4'] { --lc-rack: var(--lc-rack-4); }
+
+.lucky-cage-midway .lc-rack-balls {
+  display: grid;
+  gap: 4px;
+}
+
+.lucky-cage-midway .lc-rack-ball {
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  background: var(--lc-ball, #f2e7cd);
+  color: var(--lc-ball-ink, #1d1409);
+  font-family: var(--tixy-font-num, inherit);
+  font-size: 1rem;
+  font-weight: var(--tixy-weight-num, 800);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+/* A ball that has left the cage goes dark on the board. */
+.lucky-cage-midway .lc-cell[data-drawn],
+.lucky-cage-midway .lc-rack-ball[data-drawn] {
+  background: var(--lc-wood-lo, #2f1d0f);
+  color: var(--lc-ball, #f2e7cd);
+}
+
+/* Your pick is lit in ticket amber with a cream ring. */
+.lucky-cage-midway .lc-cell[data-active] {
+  background: var(--tixy-ticket, #f2a33c);
+  color: var(--tixy-ink, #1f1a16);
+  box-shadow:
+    0 0 0 3px var(--lc-wood, #54341b),
+    0 0 0 6px var(--lc-ball, #f2e7cd);
+}
+
+.lucky-cage-midway .lc-cell[data-active] .lc-cell-name {
+  color: inherit;
+}
+
+.lucky-cage-midway .lc-cell[data-active][data-drawn] {
+  animation: lc-hit 260ms cubic-bezier(0.2, 1.5, 0.4, 1);
+}
+
+@keyframes lc-hit {
+  0% {
+    transform: scale(0.88);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.lucky-cage-midway .lc-board-tab:focus-visible,
+.lucky-cage-midway .lc-cell:focus-visible {
+  outline: 3px solid var(--tixy-paper, #f4ebdc);
+  outline-offset: 3px;
+}
+
+@container (min-width: 40rem) {
+  /* Beside the cabinet: a tall panel with the brass edge on its left. */
+  .lucky-cage-midway .lc-board {
+    --lc-cell: clamp(2.75rem, 9cqh, 4.25rem);
+    width: clamp(17rem, 40cqw, 21rem);
+    padding: 0.875rem;
+    border-top: 0;
+    border-left: 4px solid var(--lc-brass, #bf9648);
+    justify-content: center;
+  }
+}
+
+/* ── The receipt: your numbers over the draw ────────────────────────── */
+
+.lucky-cage-midway .lc-slip {
+  display: grid;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.lucky-cage-midway .lc-slip p {
+  margin: 0;
+}
+
+.lucky-cage-midway .lc-slip-line {
+  font-weight: 700;
+}
+
+.lucky-cage-midway .lc-slip-row {
+  display: grid;
+  grid-template-columns: 2.5rem minmax(0, 1fr);
+  align-items: center;
+  gap: 6px;
+}
+
+.lucky-cage-midway .lc-slip-label {
+  font-size: 0.875rem;
+}
+
+.lucky-cage-midway .lc-slip-balls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lucky-cage-midway .lc-slip-ball {
+  display: grid;
+  place-items: center;
+  min-width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 999px;
+  background: var(--tixy-paper-3, #ded0b7);
+  color: var(--tixy-ink, #1f1a16);
+  font-family: var(--tixy-font-num, inherit);
+  font-size: 1rem;
+  font-weight: var(--tixy-weight-num, 800);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.lucky-cage-midway .lc-slip-ball[data-hit] {
+  background: var(--tixy-ticket, #f2a33c);
+}
+
+/* ── Reduced motion ─────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .lucky-cage-midway .lc-ball-seat,
+  .lucky-cage-midway .lc-cell[data-active][data-drawn] {
+    animation: none;
+  }
+  .lucky-cage-midway .lc-cell,
+  .lucky-cage-midway .lc-board-tab {
+    transition: none;
+  }
+}
+
+@media (max-width: 380px) {
+  .lucky-cage-midway .lc-chute {
+    gap: 4px;
+  }
+}

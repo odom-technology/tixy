@@ -1,0 +1,124 @@
+/* Tin duck gallery: the crosshair and the score popups over the canvas.
+   Everything else is drawn in three.js. Both are positioned with transforms
+   from the input handlers, so they keep up with the pointer at the display's
+   refresh rate however slow a WebGL frame is. */
+
+.td-field {
+  position: relative;
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  cursor: none;
+}
+
+.td-field canvas {
+  display: block;
+  touch-action: none;
+}
+
+.td-cross {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  opacity: 0;
+  will-change: transform;
+}
+
+.td-cross[data-on='true'] {
+  opacity: 1;
+}
+
+.td-cross[data-faint='true'] {
+  opacity: 0.4;
+}
+
+.td-cross-ring {
+  position: absolute;
+  left: -19px;
+  top: -19px;
+  width: 38px;
+  height: 38px;
+  box-sizing: border-box;
+  border-radius: 50%;
+  border: 2.5px solid var(--td-sight, #f4ebdc);
+  box-shadow:
+    0 0 0 1.5px rgb(31 26 22 / 0.85),
+    inset 0 0 0 1.5px rgb(31 26 22 / 0.85);
+}
+
+.td-cross-ring[data-kick='1'] {
+  animation: td-kick-a 140ms cubic-bezier(0.2, 1.4, 0.4, 1);
+}
+
+.td-cross-ring[data-kick='2'] {
+  animation: td-kick-b 140ms cubic-bezier(0.2, 1.4, 0.4, 1);
+}
+
+.td-cross[data-dry='true'] .td-cross-ring {
+  border-style: dashed;
+  opacity: 0.7;
+}
+
+.td-cross-dot {
+  position: absolute;
+  left: -3px;
+  top: -3px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--td-sight-accent, #b83627);
+  box-shadow: 0 0 0 1.5px rgb(31 26 22 / 0.85);
+}
+
+.td-cross-tick {
+  position: absolute;
+  background: var(--td-sight, #f4ebdc);
+  box-shadow: 0 0 0 1px rgb(31 26 22 / 0.85);
+}
+
+.td-cross-tick[data-s='t'],
+.td-cross-tick[data-s='b'] {
+  left: -1px;
+  width: 2px;
+  height: 7px;
+}
+
+.td-cross-tick[data-s='l'],
+.td-cross-tick[data-s='r'] {
+  top: -1px;
+  width: 7px;
+  height: 2px;
+}
+
+.td-cross-tick[data-s='t'] { top: -28px; }
+.td-cross-tick[data-s='b'] { top: 21px; }
+.td-cross-tick[data-s='l'] { left: -28px; }
+.td-cross-tick[data-s='r'] { left: 21px; }
+
+@keyframes td-kick-a {
+  from { transform: scale(0.72); }
+  to { transform: scale(1); }
+}
+
+@keyframes td-kick-b {
+  from { transform: scale(0.72); }
+  to { transform: scale(1); }
+}
+
+.td-pop {
+  /* The hit's score is a shared callout plate (.arc-floater in
+     gameplay-feedback.css), parked at the cork. Pooled: the client sets its
+     left and top, flips data-run to replay it. */
+  left: 0;
+  top: 0;
+  will-change: transform, opacity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .td-cross-ring[data-kick] { animation: none; }
+}

@@ -1,0 +1,108 @@
+/* TixySelect (tixy-select.tsx). A paper field with an ink chevron; the list
+   is a paper panel lifted off the page, told apart by its shadow. One button
+   shape (10 px). Labels lowercase, set in Gabarito. */
+
+.tx-select {
+  position: relative;
+  min-width: 0;
+  font-family: var(--tixy-font-text);
+  color: var(--tixy-ink);
+}
+
+.tx-select-button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 46px;
+  padding: 6px 12px 6px 14px;
+  border: 0;
+  border-radius: var(--tixy-radius-button);
+  background: var(--tixy-paper);
+  color: var(--tixy-ink);
+  font: 600 16px/1.2 var(--tixy-font-text);
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color var(--tixy-panel-fast) ease-out;
+}
+.tx-select[data-tone='quiet'] .tx-select-button { background: var(--tixy-paper-2); }
+.tx-select-button:hover { background: var(--tixy-paper-3); }
+.tx-select-button[aria-expanded='true'] { background: var(--tixy-paper-3); }
+.tx-select-button:focus-visible { outline: 3px solid var(--tixy-ticket); outline-offset: 2px; }
+.tx-select-button:disabled { cursor: default; opacity: 0.6; }
+.tx-select-button:disabled:hover { background: var(--tixy-paper); }
+
+.tx-select-value {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tx-select-value[data-empty='true'] { font-weight: 400; color: var(--tixy-ink-3); }
+.tx-select-chevron { flex: none; color: var(--tixy-ink-2); transition: transform var(--tixy-panel-fast) ease-out; }
+.tx-select-button[aria-expanded='true'] .tx-select-chevron { transform: rotate(180deg); }
+
+.tx-select-art {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  overflow: hidden;
+  border-radius: 8px;
+}
+.tx-select-art > * { max-width: 100%; max-height: 100%; }
+
+.tx-select-list {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% + 6px);
+  z-index: 40;
+  max-height: 18rem;
+  margin: 0;
+  padding: 6px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  list-style: none;
+  border-radius: var(--tixy-radius-panel-sm);
+  background: var(--tixy-paper);
+  box-shadow: var(--tixy-shadow-lift), 0 0 0 1px rgb(31 26 22 / 0.08);
+  animation: tx-select-drop var(--tixy-panel-slow) var(--tixy-ease-settle) both;
+}
+.tx-select-list[data-up='true'] {
+  top: auto;
+  bottom: calc(100% + 6px);
+  animation-name: tx-select-rise;
+}
+@keyframes tx-select-drop { from { transform: translateY(-6px); opacity: 0; } }
+@keyframes tx-select-rise { from { transform: translateY(6px); opacity: 0; } }
+
+.tx-select-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 6px 10px;
+  border-radius: var(--tixy-radius-button-sm);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+}
+.tx-select-option[data-active='true'] { background: var(--tixy-paper-2); }
+.tx-select-option[aria-selected='true'] { font-weight: 800; }
+.tx-select-option[aria-disabled='true'] { cursor: default; color: var(--tixy-ink-3); }
+.tx-select-option[aria-disabled='true'] .tx-select-art { opacity: 0.5; }
+.tx-select-text { display: grid; gap: 1px; flex: 1; min-width: 0; }
+.tx-select-text > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tx-select-text small { font-size: 13px; font-weight: 400; color: var(--tixy-ink-3); }
+.tx-select-check { flex: none; color: var(--tixy-ink); }
+
+@media (prefers-reduced-motion: reduce) {
+  .tx-select-list { animation-duration: 0ms; }
+  .tx-select-chevron,
+  .tx-select-button { transition: none; }
+}

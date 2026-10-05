@@ -1,0 +1,207 @@
+/* ──────────────────────────────────────────────────────────────────────
+   Checkers — Midway in-game graphics. SCOPED to .checkers-arcade so nothing
+   leaks into shared surfaces or sibling games. Warm lacquered-wood 8×8 board
+   (enamel dark/light squares), cream + enamel-red discs, gold crown on kings,
+   hard bevels + offset shadows. NOTHING GLOWS. All motion degrades under
+   prefers-reduced-motion. Keyframes prefixed checkers-mk-.
+   ────────────────────────────────────────────────────────────────────── */
+
+.checkers-arcade {
+  /* Midway lacquered board palette (matches the chess Midway default). */
+  --ck-light: #e9d3a8; /* warm cream square */
+  --ck-dark: #a06a3f;  /* cocoa square */
+  --ck-frame: #1c130a; /* espresso frame */
+  --ck-red: #c43a36;   /* enamel red disc */
+  --ck-red-edge: #7c1f1d;
+  --ck-red-hi: #d8514c; /* red disc top highlight */
+  --ck-cream: #f3e7cf; /* cream disc */
+  --ck-cream-edge: #b9a274;
+  --ck-cream-hi: #fff7e8; /* cream disc top highlight */
+  --ck-amber: rgba(242, 163, 60, 0.42); /* last-move wash */
+  --ck-teal: #2fb8a6;  /* selection / legal accent */
+  --ck-crown: #e8b23a; /* king crown fill */
+  --ck-crown-stroke: #7a5a14; /* king crown stroke */
+}
+
+/* ── Board bezel: recessed lacquered well that frames the playfield ───── */
+.checkers-arcade .checkers-board-bezel {
+  position: relative;
+  padding: clamp(8px, 1.6vw, 14px);
+  border-radius: calc(var(--radius-well) + 6px);
+  background: var(--grain),
+    linear-gradient(180deg, var(--surface-raised), var(--surface-panel));
+  background-size: 80px 80px, 80px 80px, auto;
+  border: 1px solid var(--border-soft);
+  box-shadow:
+    inset 0 1px 0 var(--bevel-hi),
+    inset 0 -3px 8px rgb(0 0 0 / 0.45),
+    var(--shadow-panel);
+}
+
+.checkers-arcade .checkers-board-bezel::before {
+  content: '';
+  position: absolute;
+  inset: clamp(5px, 1vw, 9px);
+  border-radius: var(--radius-well);
+  box-shadow:
+    inset 0 2px 10px rgb(0 0 0 / 0.7),
+    inset 0 0 0 1px rgb(255 255 255 / 0.04);
+  pointer-events: none;
+}
+
+/* the grid itself — hard espresso frame, crisp corners */
+.checkers-arcade .checkers-board-grid {
+  position: relative;
+  z-index: 1;
+  border-color: var(--ck-frame);
+  box-shadow:
+    0 0 0 1px rgb(0 0 0 / 0.55),
+    0 2px 0 rgb(0 0 0 / 0.4);
+}
+
+/* ── Squares ─────────────────────────────────────────────────────────── */
+.checkers-arcade .checkers-sq-light {
+  background: var(--ck-light);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.06);
+}
+.checkers-arcade .checkers-sq-dark {
+  background: var(--ck-dark);
+  box-shadow: inset 0 0 10px rgb(28 19 10 / 0.4);
+}
+.checkers-arcade .checkers-sq-lastmove::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--ck-amber);
+  box-shadow: inset 0 0 0 1px rgb(242 163 60 / 0.3);
+  pointer-events: none;
+  /* One-shot fade/scale when a square becomes the latest move's landing/origin,
+     giving a clear "piece just landed" beat. Holds at full opacity after. */
+  animation: checkers-mk-lastmove-in 300ms ease both;
+}
+@keyframes checkers-mk-lastmove-in {
+  from {
+    opacity: 0;
+    transform: scale(0.82);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.checkers-arcade .checkers-sq-selected {
+  box-shadow: inset 0 0 0 3px var(--ck-teal);
+}
+
+/* ── Legal-move markers ──────────────────────────────────────────────── */
+.checkers-arcade .checkers-target-dot {
+  width: 30%;
+  height: 30%;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ck-teal) 78%, transparent);
+  box-shadow: 0 1px 0 rgb(0 0 0 / 0.35);
+}
+.checkers-arcade .checkers-target-ring {
+  width: 70%;
+  height: 70%;
+  border-radius: 999px;
+  border: 5px solid color-mix(in srgb, var(--ck-teal) 80%, transparent);
+}
+
+/* ── Discs: hard bevel + offset shadow, no glow ──────────────────────── */
+.checkers-arcade .checkers-disc {
+  position: relative;
+  width: 76%;
+  height: 76%;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* concentric "stacked ridge" inset like a real draughts piece */
+  box-shadow:
+    inset 0 2px 1px rgb(255 255 255 / 0.35),
+    inset 0 -3px 4px rgb(0 0 0 / 0.45),
+    0 2px 0 rgb(0 0 0 / 0.5),
+    0 3px 5px rgb(0 0 0 / 0.4);
+  transition: transform 110ms ease, filter 110ms ease;
+}
+.checkers-arcade .checkers-disc::before {
+  /* inner ring */
+  content: '';
+  position: absolute;
+  inset: 16%;
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 2px rgb(0 0 0 / 0.18);
+}
+.checkers-arcade .checkers-disc-red {
+  background: radial-gradient(circle at 38% 32%, var(--ck-red-hi, #d8514c), var(--ck-red) 58%, var(--ck-red-edge));
+  border: 1px solid var(--ck-red-edge);
+}
+.checkers-arcade .checkers-disc-cream {
+  background: radial-gradient(circle at 38% 32%, var(--ck-cream-hi, #fff7e8), var(--ck-cream) 58%, var(--ck-cream-edge));
+  border: 1px solid var(--ck-cream-edge);
+}
+.checkers-arcade .checkers-disc-selectable:hover {
+  transform: translateY(-2px) scale(1.04);
+  filter: drop-shadow(0 4px 5px rgb(0 0 0 / 0.5));
+}
+.checkers-arcade .checkers-disc-selected {
+  transform: translateY(-1px) scale(1.03);
+}
+
+/* ── King crown ──────────────────────────────────────────────────────── */
+.checkers-arcade .checkers-crown {
+  width: 52%;
+  height: 52%;
+  filter: drop-shadow(0 1px 0 rgb(0 0 0 / 0.45));
+}
+
+/* Optional king-crown shimmer (cosmetic fx, off by default). Applied only when
+   the wrapper carries .checkers-fx-king-shimmer; a gentle gold pulse. */
+.checkers-arcade.checkers-fx-king-shimmer .checkers-crown {
+  animation: checkers-mk-crown-shimmer 2.4s ease-in-out infinite;
+}
+@keyframes checkers-mk-crown-shimmer {
+  0%,
+  100% {
+    filter: drop-shadow(0 1px 0 rgb(0 0 0 / 0.45));
+  }
+  50% {
+    filter: drop-shadow(0 1px 0 rgb(0 0 0 / 0.45))
+      drop-shadow(0 0 4px color-mix(in srgb, var(--ck-crown, #e8b23a) 85%, transparent));
+  }
+}
+
+/* ── Multi-jump "keep jumping" flag: a gentle pulse to draw the eye ────── */
+.checkers-arcade .checkers-turn-flag {
+  animation: checkers-mk-flag-pulse 1.4s ease-in-out infinite;
+}
+@keyframes checkers-mk-flag-pulse {
+  0%,
+  100% {
+    transform: translateX(-50%) scale(1);
+  }
+  50% {
+    transform: translateX(-50%) scale(1.06);
+  }
+}
+
+/* ── Reduced motion: drop all transient motion ───────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .checkers-arcade .checkers-disc,
+  .checkers-arcade .checkers-disc-selectable:hover,
+  .checkers-arcade .checkers-disc-selected {
+    transition: none;
+    transform: none;
+  }
+  .checkers-arcade.checkers-fx-king-shimmer .checkers-crown {
+    animation: none;
+  }
+  .checkers-arcade .checkers-sq-lastmove::after {
+    animation: none;
+  }
+  .checkers-arcade .checkers-turn-flag {
+    animation: none;
+    transform: translateX(-50%);
+  }
+}

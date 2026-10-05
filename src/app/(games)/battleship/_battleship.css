@@ -1,0 +1,263 @@
+/* ──────────────────────────────────────────────────────────────────────
+   Battleship — Midway in-game graphics. SCOPED to .battleship-arcade so
+   nothing leaks into shared surfaces or sibling games. Uses the global Midway
+   tokens (--grain, --shadow-*, --radius-*, fonts). Two 10×10 grids: a sonar
+   "enemy waters" board you fire into, and your own fleet board. Ships are
+   riveted steel; hits are hard red blooms, misses pale splashes. NOTHING GLOWS
+   gratuitously — a hit is a hard hit. Motion degrades under reduced-motion.
+   Keyframes prefixed bs-mk-.
+   ────────────────────────────────────────────────────────────────────── */
+
+.battleship-arcade {
+  --bs-water-top: #11375a;
+  --bs-water-bottom: #0a2238;
+  --bs-grid-line: rgba(120, 190, 230, 0.16);
+  --bs-frame-top: #1c2733;
+  --bs-frame-bottom: #0f161e;
+  --bs-frame-edge: #060a0e;
+  --bs-ship: #59636e;
+  --bs-ship-glint: #828d97;
+  --bs-ship-edge: #2a3138;
+  --bs-hit: #e2483d;
+  --bs-hit-edge: #7d1f19;
+  --bs-miss: #b9c6d2;
+  --bs-sunk: #8d231b;
+  --bs-accent: #f2c14e;
+}
+
+/* ── Cabinet frame around a board ──────────────────────────────────────── */
+.battleship-arcade .bs-cabinet {
+  position: relative;
+  padding: clamp(6px, 1.3vw, 12px);
+  border-radius: calc(var(--radius-well, 16px) + 6px);
+  background: var(--grain),
+    linear-gradient(180deg, var(--bs-frame-top), var(--bs-frame-bottom));
+  background-size: 80px 80px, auto;
+  border: 1px solid var(--bs-frame-edge);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.06),
+    inset 0 -4px 10px rgb(0 0 0 / 0.5),
+    var(--shadow-panel);
+}
+
+.battleship-arcade .bs-playfield {
+  position: relative;
+  border-radius: var(--radius-well, 16px);
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgb(80 150 200 / 0.12), transparent 60%),
+    linear-gradient(180deg, var(--bs-water-top), var(--bs-water-bottom));
+  padding: clamp(4px, 0.9vw, 8px);
+  box-shadow:
+    inset 0 2px 12px rgb(0 0 0 / 0.5),
+    inset 0 0 0 1px rgb(255 255 255 / 0.05),
+    0 0 0 2px var(--bs-frame-edge);
+}
+
+/* labelled grid: 10×10 cells with a thin coordinate gutter */
+.battleship-arcade .bs-grid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: clamp(1px, 0.4vw, 4px);
+}
+
+.battleship-arcade .bs-cell {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border-radius: 3px;
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.05), rgb(0 0 0 / 0.08));
+  box-shadow: inset 0 0 0 1px var(--bs-grid-line);
+}
+
+.battleship-arcade .bs-cell-fireable {
+  cursor: crosshair;
+}
+.battleship-arcade .bs-cell-fireable:hover {
+  background: linear-gradient(180deg, rgb(120 190 230 / 0.22), rgb(0 0 0 / 0.04));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--bs-accent) 60%, transparent);
+}
+.battleship-arcade .bs-cell-place {
+  cursor: pointer;
+}
+
+/* own ship segment */
+.battleship-arcade .bs-ship-seg {
+  position: absolute;
+  inset: 12%;
+  border-radius: 3px;
+  background: linear-gradient(180deg, var(--bs-ship-glint), var(--bs-ship) 55%, var(--bs-ship-edge) 100%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.28),
+    inset 0 -2px 3px rgb(0 0 0 / 0.4),
+    0 1px 2px rgb(0 0 0 / 0.4);
+}
+.battleship-arcade .bs-ship-sunk .bs-ship-seg {
+  filter: grayscale(0.5) brightness(0.7);
+}
+
+/* a hit marker (red bloom) */
+.battleship-arcade .bs-hit {
+  position: absolute;
+  inset: 20%;
+  border-radius: 999px;
+  background: radial-gradient(circle at 50% 38%, #ff8a5c, var(--bs-hit) 55%, var(--bs-hit-edge) 100%);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.3), 0 1px 2px rgb(0 0 0 / 0.45);
+}
+.battleship-arcade .bs-hit-sunk {
+  background: radial-gradient(circle at 50% 38%, #c54237, var(--bs-sunk) 55%, #4d1310 100%);
+}
+
+/* Explosion burst — a hard fiery ring that flares the instant a shot LANDS,
+   read distinctly from the soft water splash of a miss. Pseudo-element on the
+   freshly-popped hit marker so it needs no extra DOM. */
+.battleship-arcade .bs-hit.bs-pop::after {
+  content: '';
+  position: absolute;
+  inset: -55%;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgb(255 214 138 / 0.95) 0%, rgb(255 138 92 / 0.6) 34%, rgb(226 72 61 / 0.28) 55%, transparent 72%);
+  pointer-events: none;
+  z-index: 1;
+  animation: bs-mk-blast 460ms cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+@keyframes bs-mk-blast {
+  0% { transform: scale(0.25); opacity: 1; }
+  55% { opacity: 0.65; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+/* Sinking ceremony — when the killing blow lands, the whole ship's cells are
+   flagged `bs-cell-flash`; its hit markers settle and darken as she goes down,
+   a heavier finish than an ordinary hit. */
+.battleship-arcade .bs-cell-flash .bs-hit-sunk {
+  animation: bs-mk-sink 900ms ease both;
+}
+@keyframes bs-mk-sink {
+  0% { transform: translateY(0) scale(1); }
+  35% { transform: translateY(-2px) scale(1.14); filter: brightness(1.25); }
+  100% { transform: translateY(1.5px) scale(0.94); filter: brightness(0.72); }
+}
+
+/* a miss marker (pale splash dot) */
+.battleship-arcade .bs-miss {
+  position: absolute;
+  inset: 38%;
+  border-radius: 999px;
+  background: var(--bs-miss);
+  opacity: 0.62;
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.3);
+}
+
+/* placement ghost preview */
+.battleship-arcade .bs-ghost {
+  position: absolute;
+  inset: 12%;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--bs-accent) 38%, transparent);
+  box-shadow: inset 0 0 0 1px var(--bs-accent);
+}
+.battleship-arcade .bs-ghost-bad {
+  background: color-mix(in srgb, var(--bs-hit) 38%, transparent);
+  box-shadow: inset 0 0 0 1px var(--bs-hit);
+}
+
+/* last-shot ring */
+.battleship-arcade .bs-cell-last {
+  box-shadow: inset 0 0 0 2px var(--bs-accent), inset 0 0 0 1px var(--bs-grid-line);
+}
+
+/* freshly resolved marker pops in */
+.battleship-arcade .bs-pop {
+  animation: bs-mk-pop 220ms cubic-bezier(0.3, 0.85, 0.35, 1);
+}
+@keyframes bs-mk-pop {
+  0% { transform: scale(0.3); opacity: 0.3; }
+  70% { transform: scale(1.08); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+/* a hit jolts the cell */
+.battleship-arcade .bs-cell-shake {
+  animation: bs-mk-shake 360ms ease;
+}
+@keyframes bs-mk-shake {
+  0%, 100% { transform: translate(0, 0); }
+  20% { transform: translate(-2px, 1px); }
+  40% { transform: translate(2px, -1px); }
+  60% { transform: translate(-1.5px, 1px); }
+  80% { transform: translate(1.5px, 0); }
+}
+
+/* a white splash ring blooms when a shot misses */
+.battleship-arcade .bs-splash {
+  position: absolute;
+  inset: 30%;
+  border-radius: 999px;
+  border: 2px solid var(--bs-miss);
+  opacity: 0;
+  pointer-events: none;
+  animation: bs-mk-splash 480ms ease-out;
+}
+@keyframes bs-mk-splash {
+  0% { transform: scale(0.4); opacity: 0.7; }
+  100% { transform: scale(1.9); opacity: 0; }
+}
+
+/* a sunk ship's outline flashes amber across all its cells */
+.battleship-arcade .bs-cell-flash::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 2px var(--bs-accent);
+  pointer-events: none;
+  animation: bs-mk-flash 1s ease;
+}
+@keyframes bs-mk-flash {
+  0%, 100% { opacity: 0; }
+  15% { opacity: 1; }
+  45% { opacity: 0.25; }
+  70% { opacity: 1; }
+}
+
+/* the firing cabinet wears a faint amber ring when it's your shot */
+.battleship-arcade .bs-cabinet.bs-armed {
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.06),
+    inset 0 -4px 10px rgb(0 0 0 / 0.5),
+    0 0 0 1px color-mix(in srgb, var(--bs-accent) 55%, transparent),
+    var(--shadow-panel);
+}
+
+/* coordinate labels */
+.battleship-arcade .bs-coords-x,
+.battleship-arcade .bs-coords-y {
+  display: grid;
+  font-size: clamp(7px, 1.1vw, 10px);
+  color: rgb(180 205 225 / 0.55);
+  font-variant-numeric: tabular-nums;
+}
+.battleship-arcade .bs-coords-x { grid-template-columns: repeat(10, 1fr); gap: clamp(1px, 0.4vw, 4px); }
+.battleship-arcade .bs-coords-x span,
+.battleship-arcade .bs-coords-y span { display: flex; align-items: center; justify-content: center; }
+
+/* small swatch for the fleet roster */
+.battleship-arcade .bs-roster-seg {
+  display: inline-block;
+  height: 10px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, var(--bs-ship-glint), var(--bs-ship) 60%, var(--bs-ship-edge));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .battleship-arcade .bs-pop,
+  .battleship-arcade .bs-cell-shake,
+  .battleship-arcade .bs-splash,
+  .battleship-arcade .bs-cell-flash::after,
+  .battleship-arcade .bs-hit.bs-pop::after,
+  .battleship-arcade .bs-cell-flash .bs-hit-sunk { animation: none !important; }
+  /* A sunk ship still ends dimmed — just without the settle motion. */
+  .battleship-arcade .bs-cell-flash .bs-hit-sunk { filter: brightness(0.72); }
+  .battleship-arcade .bs-hit.bs-pop::after { display: none; }
+  .battleship-arcade .bs-cell,
+  .battleship-arcade .bs-cell-fireable:hover { transition: none; }
+}

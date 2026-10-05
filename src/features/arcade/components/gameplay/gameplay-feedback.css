@@ -1,0 +1,362 @@
+/* In-game feedback under tixy (tixy/r-kit): callouts, the new-best moment,
+   the HUD and the countdown. PLAN.md "Design rules": flat plates told apart
+   by tone, Gabarito for words and Big Shoulders for numbers, lowercase,
+   motion only when something happens, reduced motion shows the end.
+
+   The Midway rules for these classes in globals.css are unlayered, so these
+   are too; every selector starts at the tixy root so it outranks them.
+
+   Plates on the ink screen: screen 2 for words, paper for a combo, red only
+   for a new best. Warnings are the on-ink red as text. */
+
+/* ── callouts ─────────────────────────────────────────────────────── */
+
+/* A floater: the callout plate, parked by the game at a point of its own
+   (a tile, a hit, an apple) instead of a percentage of the stage. Give it
+   `left` and `top` for the centre of the plate, `data-tone` and `data-numeric`
+   like a callout, and a `.arc-floater-label` inside. `--callout-ms` sets
+   how long it lives. Under tixy it has the callout's look and curve above;
+   elsewhere it is a plain plate. */
+.arc-floater {
+  position: absolute;
+  z-index: 3;
+  display: grid;
+  min-width: max-content;
+  justify-items: center;
+  pointer-events: none;
+  white-space: nowrap;
+  padding: 5px 10px 6px;
+  border-radius: 8px;
+  background: var(--surface-raised);
+  color: var(--text-strong);
+  font-family: var(--font-ui, inherit);
+  line-height: 1;
+  transform: translate(-50%, -50%);
+}
+
+.arc-floater[data-run='false'] {
+  opacity: 0;
+}
+
+/* The callout's number under every theme; tixy sets it below. */
+.arc-game-callout-value {
+  margin-top: 0.15rem;
+  font-family: var(--font-num, inherit);
+  font-size: clamp(1.25rem, 1rem + 1vw, 1.75rem);
+  font-weight: 900;
+  line-height: 1;
+}
+
+:root[data-arcade-theme='tixy'] :is(.arc-game-callout, .arc-floater) {
+  --_plate: var(--surface-raised);
+  --_on: var(--text-strong);
+  display: grid;
+  justify-items: center;
+  gap: 1px;
+  min-width: 0;
+  padding: 5px 10px 6px;
+  border-radius: var(--tixy-radius-button-sm);
+  background: var(--_plate);
+  color: var(--_on);
+  filter: none;
+  font-family: var(--tixy-font-text);
+  line-height: 1;
+}
+
+:root[data-arcade-theme='tixy'] :is(.arc-game-callout[data-tone] .arc-game-callout-label, .arc-floater[data-tone] .arc-floater-label) {
+  border: 0;
+  border-radius: 0;
+  background: none;
+  padding: 0;
+  box-shadow: none;
+  color: inherit;
+  font-family: var(--tixy-font-text);
+  font-size: clamp(1rem, 0.85rem + 0.6vw, 1.25rem);
+  font-weight: var(--tixy-weight-heading);
+  letter-spacing: -0.01em;
+  text-transform: none;
+}
+
+:root[data-arcade-theme='tixy'] :is(.arc-game-callout[data-tone][data-numeric] .arc-game-callout-label, .arc-floater[data-tone][data-numeric] .arc-floater-label),
+:root[data-arcade-theme='tixy'] .arc-game-callout .arc-game-callout-value {
+  font-family: var(--tixy-font-num);
+  font-weight: var(--tixy-weight-num);
+  letter-spacing: var(--tixy-tracking-num);
+}
+
+:root[data-arcade-theme='tixy'] :is(.arc-game-callout[data-tone][data-numeric] .arc-game-callout-label, .arc-floater[data-tone][data-numeric] .arc-floater-label) {
+  font-size: clamp(1.25rem, 1rem + 0.9vw, 1.625rem);
+}
+
+:root[data-arcade-theme='tixy'] .arc-game-callout .arc-game-callout-value {
+  font-size: clamp(1.5rem, 1.1rem + 1.2vw, 2rem);
+  line-height: 0.95;
+}
+
+:root[data-arcade-theme='tixy'] .arc-game-callout[data-tone] .arc-game-callout-detail {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  padding: 0;
+  color: inherit;
+  opacity: 0.78;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+/* A combo or a streak: the paper plate, the loudest after a new best. */
+:root[data-arcade-theme='tixy'] :is(.arc-game-callout, .arc-floater)[data-tone='combo'] {
+  --_plate: var(--enamel-primary);
+  --_on: var(--enamel-primary-on);
+}
+
+/* Something is about to go wrong: last life, time short. */
+:root[data-arcade-theme='tixy'] :is(.arc-game-callout, .arc-floater):is([data-tone='warning'], [data-tone='danger']) {
+  --_on: var(--enamel-danger-text);
+}
+
+/* The new best. Red, the number punching in, kept to the top of the stage
+   so it never sits over the play. */
+:root[data-arcade-theme='tixy'] .arc-game-callout[data-tone='best'] {
+  --_plate: var(--tixy-red);
+  --_on: var(--tixy-paper);
+  top: min(var(--callout-y, 16%), 18%);
+  gap: 3px;
+  padding: 6px 16px 9px;
+  border-radius: var(--tixy-radius-button);
+}
+
+:root[data-arcade-theme='tixy'] .arc-game-callout[data-tone='best'] .arc-game-callout-label {
+  font-size: 0.9375rem;
+  font-weight: var(--tixy-weight-button);
+}
+
+:root[data-arcade-theme='tixy'] .arc-game-callout[data-tone='best'] .arc-game-callout-value {
+  font-size: clamp(2rem, 1.5rem + 1.6vw, 2.75rem);
+}
+
+:root[data-arcade-theme='tixy'] .arc-game-callout[data-tone='best'][data-value] .arc-game-callout-detail {
+  display: none;
+}
+
+/* The hit: a ring leaves the plate once. */
+:root[data-arcade-theme='tixy'] .arc-game-callout[data-tone='best']::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :root[data-arcade-theme='tixy'] .arc-game-callout {
+    animation: tx-callout var(--callout-ms, 760ms) linear both;
+    animation-delay: calc(var(--callout-i, 0) * 22ms);
+  }
+
+  /* A floater a game parks wherever it likes: the same curve, on its own
+     clock. A pooled one (data-run) is replayed by flipping it. */
+  :root[data-arcade-theme='tixy'] .arc-floater:not([data-run='false']) {
+    animation: tx-callout var(--callout-ms, 760ms) linear both;
+  }
+
+  :root[data-arcade-theme='tixy'] .arc-game-callout[data-tone='danger'] {
+    animation:
+      tx-callout var(--callout-ms, 760ms) linear both,
+      tx-callout-shake 240ms ease-out both;
+  }
+
+  :root[data-arcade-theme='tixy'] .arc-game-callout[data-tone='best'] {
+    animation: tx-best var(--callout-ms, 1200ms) linear both;
+  }
+
+  :root[data-arcade-theme='tixy'] .arc-game-callout[data-tone='best'] .arc-game-callout-value {
+    animation: tx-best-number 420ms var(--tixy-ease-spring) 90ms both;
+  }
+
+  :root[data-arcade-theme='tixy'] .arc-game-callout[data-tone='best']::after {
+    animation: tx-best-ring 460ms var(--tixy-ease-settle) 60ms both;
+  }
+}
+
+/* In 120 ms on the spring, hold, out up and away over the last fifth. */
+@keyframes tx-callout {
+  0% { opacity: 0; transform: translate(-50%, -30%) scale(0.86); animation-timing-function: cubic-bezier(0.2, 1.5, 0.4, 1); }
+  16% { opacity: 1; transform: translate(-50%, -50%) scale(1); animation-timing-function: linear; }
+  78% { opacity: 1; transform: translate(-50%, -56%); animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45); }
+  100% { opacity: 0; transform: translate(-50%, -78%); }
+}
+
+@keyframes tx-callout-shake {
+  0%, 100% { translate: 0 0; }
+  20% { translate: -3px 0; }
+  45% { translate: 3px 0; }
+  70% { translate: -2px 0; }
+}
+
+/* Slams in from 1.7x, settles past 1, holds, lifts out. */
+@keyframes tx-best {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(1.7); animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45); }
+  9% { opacity: 1; transform: translate(-50%, -50%) scale(0.94); animation-timing-function: cubic-bezier(0.2, 1.5, 0.4, 1); }
+  20% { transform: translate(-50%, -50%) scale(1); animation-timing-function: linear; }
+  84% { opacity: 1; transform: translate(-50%, -50%); animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45); }
+  100% { opacity: 0; transform: translate(-50%, -78%); }
+}
+
+@keyframes tx-best-number {
+  0% { transform: scale(1.5); }
+  100% { transform: none; }
+}
+
+@keyframes tx-best-ring {
+  0% { opacity: 1; box-shadow: 0 0 0 0 rgb(184 54 39 / 0.7); }
+  100% { opacity: 1; box-shadow: 0 0 0 18px rgb(184 54 39 / 0); }
+}
+
+/* In the game shell's strip: one line, centred on the slot, so the play
+   below stays clear. Label then number. */
+:root[data-arcade-theme='tixy'] .arc-game-callout[data-tone='best'][data-place='strip'] {
+  top: 0;
+  left: 0;
+  grid-auto-flow: column;
+  align-items: center;
+  gap: 8px;
+  min-width: max-content;
+  padding: 4px 14px 5px;
+  transform: translate(-50%, -50%);
+}
+
+:root[data-arcade-theme='tixy'] .arc-game-callout[data-tone='best'][data-place='strip'] .arc-game-callout-value {
+  font-size: 1.875rem;
+  line-height: 1;
+}
+
+/* Reduced motion: no move, no ring. It shows, holds and goes. The legacy
+   block pins these with !important, so this does too, more specifically. */
+@media (prefers-reduced-motion: reduce) {
+  :root[data-arcade-theme='tixy']
+    :is(.arc-game-callout[data-tone], .arc-floater[data-tone]:not([data-run='false'])) {
+    transform: translate(-50%, -50%) !important;
+    animation: arc-reduced-fade var(--callout-ms, 500ms) linear forwards !important;
+    animation-delay: 0s !important;
+  }
+
+  :root[data-arcade-theme='tixy'] .arc-game-callout[data-tone] :is(.arc-game-callout-value),
+  :root[data-arcade-theme='tixy'] .arc-game-callout[data-tone]::after {
+    animation: none !important;
+  }
+}
+
+/* ── the hud ──────────────────────────────────────────────────────── */
+
+:root[data-arcade-theme='tixy'] .arc-game-hud .arc-game-hud-metrics {
+  border: 0;
+  border-radius: var(--tixy-radius-button);
+  background: var(--surface-raised);
+  box-shadow: none;
+}
+
+:root[data-arcade-theme='tixy'] .arc-game-hud .arc-game-hud-metric {
+  gap: 2px;
+  padding: 7px 14px 8px;
+}
+
+:root[data-arcade-theme='tixy'] .arc-game-hud .arc-game-hud-metric + .arc-game-hud-metric {
+  border-left: 1px solid var(--border-soft);
+}
+
+:root[data-arcade-theme='tixy'] .arc-game-hud :is(.arc-game-hud-label, .arc-game-hud-detail) {
+  color: var(--text-muted);
+  font-family: var(--tixy-font-text);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+:root[data-arcade-theme='tixy'] .arc-game-hud .arc-game-hud-value {
+  font-family: var(--tixy-font-num);
+  font-size: 1.375rem;
+  font-weight: var(--tixy-weight-num);
+  letter-spacing: var(--tixy-tracking-num);
+  line-height: 1;
+}
+
+:root[data-arcade-theme='tixy'] .arc-game-hud .arc-game-hud-metric[data-emphasis='true']::after {
+  inset: auto 14px 0;
+  height: 2px;
+  border-radius: 1px;
+}
+
+:root[data-arcade-theme='tixy'] .arc-game-hud .arc-game-hud-status {
+  min-height: 0;
+  gap: 8px;
+  border: 0;
+  border-radius: var(--tixy-radius-button);
+  background: var(--surface-raised);
+  padding: 0 14px;
+  box-shadow: none;
+  color: var(--text-strong);
+  font-family: var(--tixy-font-text);
+  font-size: var(--text-sm);
+  font-weight: var(--tixy-weight-button);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+/* The dot: red is your turn, anything else is quiet. */
+:root[data-arcade-theme='tixy'] .arc-game-hud .arc-game-hud-status-dot {
+  border: 0;
+  background: var(--text-muted);
+  box-shadow: none;
+}
+
+:root[data-arcade-theme='tixy'] .arc-game-hud .arc-game-hud-status[data-tone='danger'] .arc-game-hud-status-dot {
+  background: var(--tixy-red);
+}
+
+:root[data-arcade-theme='tixy'] .arc-game-hud .arc-game-hud-status[data-tone='danger'] {
+  color: var(--text-strong);
+}
+
+/* ── the countdown ────────────────────────────────────────────────── */
+
+.arc-countdown {
+  pointer-events: none;
+  position: absolute;
+  z-index: 25;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+.arc-countdown-value {
+  color: var(--text-strong);
+  font-family: var(--font-num, var(--tixy-font-num));
+  font-size: clamp(4rem, 3rem + 6vw, 7.5rem);
+  font-weight: var(--num-weight, 800);
+  line-height: 1;
+}
+
+.arc-countdown-value[data-go] {
+  font-family: var(--font-ui, var(--tixy-font-text));
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .arc-countdown-value {
+    animation: tx-count 900ms linear both;
+  }
+}
+
+@keyframes tx-count {
+  0% { opacity: 0; transform: scale(1.5); animation-timing-function: cubic-bezier(0.2, 1.5, 0.4, 1); }
+  26% { opacity: 1; transform: none; animation-timing-function: linear; }
+  80% { opacity: 1; transform: none; animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45); }
+  100% { opacity: 0; transform: scale(0.9); }
+}

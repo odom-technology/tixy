@@ -1,0 +1,268 @@
+/* Trick shot in the game shell. 8-ball's pool-shell.css draws the table,
+   the controls row and the banner (GameShell className 'pool-midway'); this
+   adds the day row, the fine-aim strip and the moments over the table.
+   Scoped to .trick-shot. */
+@layer components {
+  .trick-shot .trick-hud {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.125rem 0.75rem 0.5rem;
+    color: var(--tixy-paper);
+  }
+
+  .trick-shot .trick-day {
+    display: grid;
+    min-width: 0;
+    gap: 0.125rem;
+  }
+
+  .trick-shot .trick-day-name {
+    font-size: 1.0625rem;
+    font-weight: var(--tixy-weight-button);
+    line-height: 1.15;
+  }
+
+  /* The try in hand, the day's best and the streak: words in the reading
+     face, numbers in the number face, paper on ink. */
+  .trick-shot .trick-day-note {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: 0.875rem;
+    row-gap: 0.125rem;
+    font-size: 0.9375rem;
+    color: var(--tixy-on-ink-2);
+  }
+
+  .trick-shot .trick-day-fact {
+    white-space: nowrap;
+  }
+
+  .trick-shot .trick-day-fact .arc-digits {
+    color: var(--tixy-paper);
+    font-size: 1.0625rem;
+  }
+
+  /* A cleared day's best is yours: amber. */
+  .trick-shot .trick-day-fact[data-clear] .arc-digits {
+    color: var(--tixy-ticket);
+  }
+
+  .trick-shot .trick-balls {
+    justify-content: flex-end;
+  }
+
+  .trick-shot .trick-table {
+    position: relative;
+  }
+
+  /* ── the fine-aim wheel, at the table's right edge ── */
+  .trick-shot .trick-fine {
+    position: absolute;
+    top: 50%;
+    right: 0.375rem;
+    z-index: 3;
+    width: 2.75rem;
+    height: min(18rem, 62%);
+    overflow: hidden;
+    border-radius: var(--tixy-radius-button);
+    background: rgb(31 26 22 / 0.86);
+    transform: translateY(-50%);
+    touch-action: none;
+    cursor: ns-resize;
+  }
+
+  .trick-shot .trick-fine:focus-visible {
+    outline: 2px solid var(--tixy-paper);
+    outline-offset: 2px;
+  }
+
+  .trick-shot .trick-fine[aria-disabled='true'] {
+    opacity: 0.45;
+  }
+
+  /* Hard-edged ridges, like a knurled wheel under the finger. */
+  .trick-shot .trick-fine-ridges {
+    position: absolute;
+    inset: 0 0.625rem;
+    background-image: repeating-linear-gradient(
+      180deg,
+      rgb(244 235 220 / 0.36) 0 2px,
+      transparent 2px 9px
+    );
+    pointer-events: none;
+  }
+
+  /* The centre mark the ridges slide past. */
+  .trick-shot .trick-fine::after {
+    position: absolute;
+    left: 0.25rem;
+    right: 0.25rem;
+    top: 50%;
+    height: 3px;
+    margin-top: -1.5px;
+    border-radius: 2px;
+    background: var(--tixy-red);
+    content: '';
+  }
+
+  /* ── moments over the table ── */
+  .trick-shot .trick-overlay {
+    position: absolute;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  .trick-shot .trick-near {
+    position: absolute;
+    width: 0;
+    height: 0;
+  }
+
+  .trick-shot .trick-near-ring {
+    position: absolute;
+    left: -1.25rem;
+    top: -1.25rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 3px solid var(--tixy-red);
+    border-radius: 50%;
+    animation: trick-ring 360ms var(--tixy-ease-settle) both;
+  }
+
+  .trick-shot .trick-stamp {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    padding: 0.25rem 1rem 0.375rem;
+    border-radius: var(--tixy-radius-button);
+    background: var(--tixy-paper);
+    color: var(--tixy-ink);
+    font-family: var(--tixy-font-text);
+    font-size: clamp(1.75rem, 8vmin, 3.5rem);
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    transform: translate(-50%, -50%) rotate(-5deg);
+    animation: trick-stamp 420ms var(--tixy-ease-spring) both;
+  }
+
+  .trick-shot .trick-stamp[data-tone='foul'] {
+    background: var(--tixy-red);
+    color: var(--tixy-paper);
+    font-size: clamp(1.25rem, 5vmin, 2.25rem);
+  }
+
+  .trick-shot .trick-share-copy {
+    white-space: pre-wrap;
+    font-size: 0.875rem;
+  }
+
+  @keyframes trick-ring {
+    from {
+      transform: scale(0.4);
+      opacity: 0;
+    }
+    60% {
+      opacity: 1;
+    }
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  @keyframes trick-stamp {
+    from {
+      opacity: 0;
+      transform: translate(-50%, -50%) rotate(-5deg) scale(1.6);
+    }
+    to {
+      opacity: 1;
+      transform: translate(-50%, -50%) rotate(-5deg) scale(1);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .trick-shot .trick-near-ring,
+    .trick-shot .trick-stamp {
+      animation-duration: 0s;
+    }
+  }
+}
+
+/* Friends on the result card: one line each, name and score line. */
+@layer components {
+  .trick-shot .trick-friends-card {
+    margin-top: 0.5rem;
+  }
+
+  .trick-shot .trick-friends {
+    display: grid;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .trick-shot .trick-friend {
+    display: flex;
+    min-height: 2rem;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .trick-shot .trick-friend + .trick-friend {
+    border-top: 1px solid var(--border-soft);
+  }
+
+  .trick-shot .trick-friend-name {
+    overflow: hidden;
+    font-weight: var(--tixy-weight-button);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .trick-shot .trick-friend-score {
+    display: inline-flex;
+    flex: none;
+    align-items: baseline;
+    gap: 0.375rem;
+  }
+
+  .trick-shot .trick-friend-score .arc-digits {
+    font-family: var(--tixy-font-num);
+    font-size: 1.125rem;
+    font-weight: var(--tixy-weight-num);
+  }
+
+  .trick-shot .trick-friend-clear {
+    font-size: 0.9375rem;
+    font-weight: var(--tixy-weight-button);
+  }
+
+  .trick-shot .trick-friend-tries {
+    margin-left: 0.25rem;
+    font-size: 0.9375rem;
+  }
+
+  .trick-shot .trick-friend-tries .arc-digits {
+    font-size: 1rem;
+  }
+
+  .trick-shot .trick-friends-more {
+    margin: 0.25rem 0 0;
+    font-size: 0.9375rem;
+  }
+}
+
+/* A phone on its side: the table needs the height more than the day row. */
+@layer components {
+  @media (orientation: landscape) and (max-height: 30rem) {
+    .trick-shot .trick-hud {
+      display: none;
+    }
+  }
+}

@@ -1,0 +1,879 @@
+/* Derby Royale — boardwalk enamel. The diorama owns its viewport; betting
+   chrome lives beside/below it and never covers the race. */
+
+.derby-shell {
+  --derby-walnut: #1d1209;
+  --derby-panel: rgba(29, 18, 9, 0.84);
+  --derby-panel-soft: rgba(43, 28, 18, 0.72);
+  --derby-cream: #f2e3c6;
+  --derby-cream-dim: rgba(242, 227, 198, 0.66);
+  --derby-red: #c6483c;
+  --derby-teal: #2e7f74;
+  --derby-gold: #d99a2b;
+  --derby-brass: #b8834a;
+  --derby-line: rgba(217, 154, 43, 0.28);
+
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  color: var(--derby-cream);
+}
+
+.derby-panel {
+  background: var(--derby-panel);
+  border: 1px solid var(--derby-line);
+  border-radius: 0.85rem;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+}
+
+/* ── top bar (above the stage — never overlays it) ──────────────────── */
+
+.derby-topbar {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.55rem 1rem;
+  flex-wrap: wrap;
+  row-gap: 0.25rem;
+}
+.derby-title {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: 0.14em;
+  color: var(--derby-gold);
+  text-shadow: 0 0 18px rgba(217, 154, 43, 0.35);
+  white-space: nowrap;
+}
+.derby-round-chip {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  color: var(--derby-cream-dim);
+  border: 1px solid var(--derby-line);
+  border-radius: 999px;
+  padding: 0.15rem 0.6rem;
+  white-space: nowrap;
+}
+.derby-live-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: var(--derby-teal);
+  box-shadow: 0 0 8px var(--derby-teal);
+  animation: derby-breathe 2.4s ease-in-out infinite;
+  flex: none;
+}
+.derby-live-dot[data-status='reconnecting'] {
+  background: var(--derby-red);
+  box-shadow: 0 0 8px var(--derby-red);
+}
+@keyframes derby-breathe {
+  0%, 100% { opacity: 0.55; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+
+.derby-countdown {
+  margin-left: auto;
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-family: Georgia, serif;
+}
+.derby-countdown-label {
+  font-size: 0.68rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--derby-cream-dim);
+}
+.derby-countdown-time {
+  font-size: 1.55rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--derby-cream);
+  transition: color 200ms ease;
+}
+.derby-countdown[data-urgent='true'] .derby-countdown-time {
+  color: var(--derby-red);
+  animation: derby-urgent 1s ease-in-out infinite;
+}
+@keyframes derby-urgent {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.07); }
+}
+
+/* ── main region: stage + rail side by side ─────────────────────────── */
+
+.derby-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 330px;
+  gap: 0.75rem;
+  align-items: stretch;
+}
+
+.derby-stage {
+  position: relative;
+  height: clamp(430px, 56vh, 640px);
+  border-radius: 1rem;
+  overflow: hidden;
+  border: 1px solid var(--derby-line);
+  background: var(--derby-walnut);
+  isolation: isolate;
+}
+.derby-scene-host,
+.derby-scene-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* in-scene HUD: slim, edge-hugging, racing only */
+.derby-hud-ticker {
+  position: absolute;
+  top: 0.7rem;
+  left: 0.7rem;
+  z-index: 2;
+  padding: 0.5rem 0.6rem;
+  background: rgba(29, 18, 9, 0.62);
+  border: 1px solid rgba(217, 154, 43, 0.2);
+  border-radius: 0.6rem;
+  backdrop-filter: blur(6px);
+}
+.derby-rank-row {
+  position: relative;
+  height: 1.32rem;
+}
+.derby-rank-chip {
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.68rem;
+  transition: transform 550ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+.derby-rank-pos {
+  width: 1rem;
+  font-family: Georgia, serif;
+  font-weight: 700;
+  color: var(--derby-gold);
+  font-variant-numeric: tabular-nums;
+}
+.derby-rank-name { color: var(--derby-cream); white-space: nowrap; }
+.derby-rank-chip[data-mine='true'] .derby-rank-name { color: var(--derby-gold); font-weight: 700; }
+
+.derby-commentary {
+  position: absolute;
+  bottom: 0.9rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  max-width: min(30rem, 86%);
+  text-align: center;
+  padding: 0.45rem 1.1rem;
+  font-family: Georgia, serif;
+  font-size: 0.95rem;
+  color: var(--derby-cream);
+  background: rgba(29, 18, 9, 0.62);
+  border: 1px solid rgba(217, 154, 43, 0.2);
+  border-radius: 999px;
+  backdrop-filter: blur(6px);
+  animation: derby-slide-up 320ms ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+@keyframes derby-slide-up {
+  from { transform: translate(-50%, 12px); opacity: 0; }
+  to { transform: translate(-50%, 0); opacity: 1; }
+}
+
+/* ── right rail ─────────────────────────────────────────────────────── */
+
+.derby-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-height: 0;
+  min-width: 0;
+}
+
+.derby-slip {
+  padding: 0.8rem 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.derby-slip-title {
+  font-size: 0.7rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--derby-gold);
+}
+.derby-slip-horse {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-family: Georgia, serif;
+  font-weight: 700;
+}
+.derby-slip-empty {
+  color: var(--derby-cream-dim);
+  font-size: 0.8rem;
+  font-style: italic;
+}
+.derby-chips {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+.derby-chip {
+  border: 1px solid var(--derby-line);
+  background: rgba(0, 0, 0, 0.3);
+  color: var(--derby-cream);
+  border-radius: 999px;
+  padding: 0.28rem 0.7rem;
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: transform 140ms ease, border-color 140ms ease, background 140ms ease;
+}
+.derby-chip:hover { transform: translateY(-1px); border-color: var(--derby-gold); }
+.derby-chip[data-active='true'] {
+  background: var(--derby-gold);
+  color: #241812;
+  border-color: var(--derby-gold);
+  font-weight: 700;
+}
+.derby-slip-payout {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 0.78rem;
+  color: var(--derby-cream-dim);
+}
+.derby-slip-payout strong {
+  font-family: Georgia, serif;
+  font-size: 1.15rem;
+  color: var(--derby-cream);
+  font-variant-numeric: tabular-nums;
+}
+.derby-bet-button {
+  border: none;
+  border-radius: 0.65rem;
+  padding: 0.65rem;
+  font-weight: 800;
+  font-size: 0.9rem;
+  letter-spacing: 0.06em;
+  background: linear-gradient(180deg, #e5ad46, var(--derby-gold));
+  color: #241812;
+  cursor: pointer;
+  transition: transform 140ms ease, filter 140ms ease;
+  box-shadow: 0 4px 14px rgba(217, 154, 43, 0.35);
+}
+.derby-bet-button:hover { transform: translateY(-1px); filter: brightness(1.06); }
+.derby-bet-button:active { transform: translateY(1px); }
+.derby-bet-button:disabled {
+  filter: grayscale(0.7) brightness(0.7);
+  cursor: not-allowed;
+  transform: none;
+}
+.derby-bet-button[data-flash='success'] { animation: derby-bet-success 900ms ease; }
+@keyframes derby-bet-success {
+  0% { box-shadow: 0 0 0 0 rgba(46, 127, 116, 0.9); }
+  100% { box-shadow: 0 0 0 18px rgba(46, 127, 116, 0); }
+}
+.derby-slip-error {
+  color: #e08a7a;
+  font-size: 0.74rem;
+}
+
+.derby-custom-row {
+  display: flex;
+  gap: 0.4rem;
+}
+.derby-custom-input {
+  font-variant-numeric: tabular-nums;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+.derby-custom-input::-webkit-outer-spin-button,
+.derby-custom-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.derby-tickets {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.derby-ticket {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px dashed rgba(242, 227, 198, 0.35);
+  border-radius: 0.5rem;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.78rem;
+  background: rgba(0, 0, 0, 0.25);
+  animation: derby-stamp 380ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes derby-stamp {
+  0% { transform: scale(1.15) rotate(-2deg); opacity: 0; }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+.derby-ticket[data-won='true'] {
+  border-color: var(--derby-gold);
+  background: rgba(217, 154, 43, 0.14);
+}
+.derby-ticket-payout { color: var(--derby-gold); font-weight: 700; font-variant-numeric: tabular-nums; }
+
+/* tabs: feed / chat */
+.derby-social {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 14rem;
+}
+.derby-tabs {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.45rem 0.45rem 0;
+}
+.derby-tab {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--derby-cream-dim);
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 0.45rem 0;
+  cursor: pointer;
+  border-radius: 0.5rem 0.5rem 0 0;
+  border-bottom: 2px solid transparent;
+  transition: color 160ms ease, border-color 160ms ease;
+}
+.derby-tab[data-active='true'] {
+  color: var(--derby-gold);
+  border-bottom-color: var(--derby-gold);
+}
+.derby-social-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.5rem 0.65rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--derby-brass) transparent;
+  font-size: 0.78rem;
+  max-height: 24rem;
+}
+.derby-feed-row {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+  animation: derby-slide-in 260ms ease;
+  color: var(--derby-cream-dim);
+}
+@keyframes derby-slide-in {
+  from { transform: translateX(10px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+.derby-feed-silk {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 0.2rem;
+  flex: none;
+}
+.derby-feed-amt { color: var(--derby-gold); font-variant-numeric: tabular-nums; font-weight: 600; }
+.derby-chat-row { line-height: 1.35; overflow-wrap: anywhere; animation: derby-slide-in 260ms ease; }
+.derby-chat-name { color: #7fc4b9; font-weight: 700; margin-right: 0.35rem; }
+.derby-chat-name[data-self='true'] { color: var(--derby-gold); }
+.derby-chat-body { color: var(--derby-cream); }
+.derby-chat-form {
+  display: flex;
+  gap: 0.4rem;
+  padding: 0.5rem;
+  border-top: 1px solid rgba(217, 154, 43, 0.16);
+}
+.derby-chat-input {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--derby-line);
+  border-radius: 0.5rem;
+  color: var(--derby-cream);
+  padding: 0.45rem 0.6rem;
+  font-size: 0.8rem;
+  min-width: 0;
+}
+.derby-chat-input:focus { outline: 1px solid var(--derby-gold); }
+.derby-chat-send {
+  border: 1px solid var(--derby-line);
+  background: rgba(217, 154, 43, 0.16);
+  color: var(--derby-gold);
+  border-radius: 0.5rem;
+  padding: 0 0.8rem;
+  cursor: pointer;
+  font-weight: 700;
+}
+.derby-chat-hint {
+  padding: 0.5rem 0.65rem;
+  font-size: 0.7rem;
+  color: var(--derby-cream-dim);
+  border-top: 1px solid rgba(217, 154, 43, 0.16);
+}
+
+/* ── the field: card grid BELOW the stage ───────────────────────────── */
+
+.derby-fieldbar {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 0.9rem;
+  flex-wrap: wrap;
+}
+.derby-fieldbar-title {
+  font-size: 0.7rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--derby-gold);
+  white-space: nowrap;
+}
+.derby-board-pool {
+  color: var(--derby-cream-dim);
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.derby-strip-label {
+  margin-left: auto;
+  font-size: 0.62rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--derby-cream-dim);
+  white-space: nowrap;
+}
+.derby-strip-run {
+  display: flex;
+  gap: 0.35rem;
+  overflow: hidden;
+}
+.derby-winner-pip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  border: 1px solid var(--derby-line);
+  border-radius: 999px;
+  padding: 0.12rem 0.5rem 0.12rem 0.2rem;
+  font-size: 0.68rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--derby-cream-dim);
+  white-space: nowrap;
+  background: rgba(0, 0, 0, 0.3);
+}
+.derby-winner-pip .derby-feed-silk { width: 0.85rem; height: 0.85rem; border-radius: 999px; }
+.derby-fairness-chip {
+  border: 1px solid rgba(46, 127, 116, 0.55);
+  color: #7fc4b9;
+  background: rgba(46, 127, 116, 0.12);
+  border-radius: 999px;
+  padding: 0.2rem 0.65rem;
+  font-size: 0.66rem;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 160ms ease;
+}
+.derby-fairness-chip:hover { background: rgba(46, 127, 116, 0.25); }
+
+.derby-field-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.derby-horse-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 0.55rem;
+  align-items: center;
+  padding: 0.55rem 0.65rem;
+  border-radius: 0.7rem;
+  border: 1px solid rgba(217, 154, 43, 0.16);
+  background: var(--derby-panel-soft);
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  color: inherit;
+  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+  overflow: hidden;
+}
+.derby-horse-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(217, 154, 43, 0.45);
+}
+.derby-horse-card[data-selected='true'] {
+  border-color: var(--derby-gold);
+  background: rgba(217, 154, 43, 0.14);
+  box-shadow: 0 0 0 1px var(--derby-gold), 0 6px 18px rgba(0, 0, 0, 0.35);
+}
+.derby-horse-card[data-mine='true']::after {
+  content: '🎟';
+  position: absolute;
+  top: 0.3rem;
+  right: 0.4rem;
+  font-size: 0.7rem;
+}
+.derby-horse-card:focus-visible {
+  outline: 2px solid var(--derby-gold);
+  outline-offset: 2px;
+}
+/* while the race runs the cards are a live leaderboard, not buttons */
+.derby-horse-card[data-locked='true'] { cursor: default; }
+.derby-horse-card[data-locked='true']:hover { transform: none; border-color: rgba(217, 154, 43, 0.16); }
+
+.derby-silks {
+  width: 2.35rem;
+  height: 2.35rem;
+  border-radius: 0.55rem;
+  flex: none;
+  border: 1px solid rgba(0, 0, 0, 0.45);
+  box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.22), 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.derby-horse-main { min-width: 0; }
+.derby-horse-name {
+  font-family: Georgia, serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--derby-cream);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+.derby-horse-sub {
+  display: flex;
+  gap: 0.45rem;
+  align-items: center;
+  font-size: 0.64rem;
+  color: var(--derby-cream-dim);
+  margin-top: 0.1rem;
+}
+.derby-personality {
+  border: 1px solid rgba(46, 127, 116, 0.55);
+  color: #7fc4b9;
+  border-radius: 999px;
+  padding: 0 0.4rem;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+.derby-form { display: inline-flex; gap: 0.16rem; }
+.derby-form-dot {
+  width: 0.42rem;
+  height: 0.42rem;
+  border-radius: 999px;
+  background: rgba(242, 227, 198, 0.18);
+}
+.derby-form-dot[data-win='true'] {
+  background: var(--derby-gold);
+  box-shadow: 0 0 5px rgba(217, 154, 43, 0.7);
+}
+
+.derby-horse-odds { text-align: right; }
+.derby-odds-mult {
+  font-family: Georgia, serif;
+  font-size: 1.12rem;
+  font-weight: 700;
+  color: var(--derby-gold);
+  font-variant-numeric: tabular-nums;
+  display: block;
+}
+.derby-odds-mult[data-flash='true'] { animation: derby-odds-flash 700ms ease; }
+@keyframes derby-odds-flash {
+  0% { color: var(--derby-cream); text-shadow: 0 0 12px rgba(242, 227, 198, 0.9); }
+  100% { color: var(--derby-gold); text-shadow: none; }
+}
+.derby-odds-backed {
+  font-size: 0.6rem;
+  color: var(--derby-cream-dim);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* live position badge during the race */
+.derby-race-pos {
+  position: absolute;
+  top: 0.35rem;
+  right: 0.45rem;
+  min-width: 1.35rem;
+  text-align: center;
+  font-family: Georgia, serif;
+  font-weight: 700;
+  font-size: 0.78rem;
+  color: #241812;
+  background: var(--derby-cream);
+  border-radius: 999px;
+  padding: 0.05rem 0.3rem;
+  transition: background 300ms ease;
+}
+.derby-race-pos[data-first='true'] {
+  background: var(--derby-gold);
+  box-shadow: 0 0 10px rgba(217, 154, 43, 0.8);
+}
+
+.derby-heat {
+  grid-column: 1 / -1;
+  height: 0.28rem;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+}
+.derby-heat-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--derby-teal), var(--derby-gold));
+  transition: width 600ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ── stage cinematics (ephemeral only) ──────────────────────────────── */
+
+.derby-posttime {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  z-index: 3;
+}
+.derby-posttime-inner {
+  text-align: center;
+  animation: derby-posttime-in 900ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes derby-posttime-in {
+  from { transform: scale(0.82); opacity: 0; letter-spacing: 0.6em; }
+  to { transform: scale(1); opacity: 1; }
+}
+.derby-posttime-title {
+  font-family: Georgia, serif;
+  font-size: clamp(1.8rem, 4.5vw, 3rem);
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  color: var(--derby-gold);
+  text-shadow: 0 0 30px rgba(217, 154, 43, 0.5);
+}
+.derby-posttime-sub {
+  margin-top: 0.4rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--derby-cream-dim);
+}
+
+.derby-photo {
+  position: absolute;
+  top: 8%;
+  right: 3%;
+  width: min(260px, 28vw);
+  background: var(--derby-cream);
+  padding: 0.55rem 0.55rem 2rem;
+  border-radius: 0.3rem;
+  transform: rotate(4deg);
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.6);
+  z-index: 4;
+  animation: derby-photo-drop 700ms cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+@keyframes derby-photo-drop {
+  from { transform: rotate(10deg) translateY(-40px) scale(1.1); opacity: 0; }
+  to { transform: rotate(4deg) translateY(0) scale(1); opacity: 1; }
+}
+.derby-photo img {
+  width: 100%;
+  display: block;
+  border-radius: 0.15rem;
+  filter: sepia(0.5) contrast(1.05);
+  animation: derby-develop 1.6s ease;
+}
+@keyframes derby-develop {
+  from { filter: sepia(1) brightness(0.3) contrast(0.6); }
+  to { filter: sepia(0.5) brightness(1) contrast(1.05); }
+}
+.derby-photo-caption {
+  position: absolute;
+  bottom: 0.45rem;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-family: Georgia, serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: #6b4a2f;
+}
+
+.derby-flash {
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  z-index: 5;
+  pointer-events: none;
+  animation: derby-flash-out 480ms ease forwards;
+}
+@keyframes derby-flash-out {
+  from { opacity: 0.95; }
+  to { opacity: 0; }
+}
+
+.derby-results {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: end center;
+  padding-bottom: 1.6rem;
+  z-index: 3;
+  pointer-events: none;
+}
+.derby-results-card {
+  pointer-events: auto;
+  text-align: center;
+  padding: 1rem 2rem;
+  animation: derby-posttime-in 700ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.derby-results-eyebrow {
+  font-size: 0.68rem;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--derby-cream-dim);
+}
+.derby-results-name {
+  font-family: Georgia, serif;
+  font-size: clamp(1.4rem, 3.2vw, 2.1rem);
+  font-weight: 700;
+  color: var(--derby-gold);
+  margin: 0.15rem 0;
+  text-shadow: 0 0 26px rgba(217, 154, 43, 0.45);
+}
+.derby-results-mult {
+  font-size: 0.95rem;
+  color: var(--derby-cream);
+  font-variant-numeric: tabular-nums;
+}
+.derby-results-win {
+  margin-top: 0.5rem;
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #7fc4b9;
+  animation: derby-count-pop 600ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes derby-count-pop {
+  from { transform: scale(0.6); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+.derby-results-lose {
+  margin-top: 0.5rem;
+  font-size: 0.82rem;
+  color: var(--derby-cream-dim);
+  font-style: italic;
+}
+.derby-results-next {
+  margin-top: 0.6rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--derby-cream-dim);
+  font-variant-numeric: tabular-nums;
+}
+.derby-topwins {
+  margin-top: 0.5rem;
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  font-size: 0.72rem;
+  color: var(--derby-cream-dim);
+}
+.derby-topwins span { color: var(--derby-gold); font-variant-numeric: tabular-nums; }
+
+/* fairness modal (viewport-level) */
+.derby-modal-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: rgba(10, 6, 3, 0.7);
+  display: grid;
+  place-items: center;
+  backdrop-filter: blur(4px);
+}
+.derby-modal {
+  width: min(560px, 92%);
+  max-height: 84vh;
+  overflow-y: auto;
+  padding: 1.2rem 1.4rem;
+  font-size: 0.82rem;
+  line-height: 1.55;
+}
+.derby-modal h3 {
+  font-family: Georgia, serif;
+  color: var(--derby-gold);
+  font-size: 1.05rem;
+  margin-bottom: 0.5rem;
+}
+.derby-modal code {
+  font-size: 0.68rem;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 0.3rem;
+  padding: 0.05rem 0.3rem;
+  overflow-wrap: anywhere;
+}
+.derby-modal-close {
+  margin-top: 0.9rem;
+  border: 1px solid var(--derby-line);
+  background: transparent;
+  color: var(--derby-cream);
+  border-radius: 0.5rem;
+  padding: 0.4rem 1rem;
+  cursor: pointer;
+}
+.derby-seed-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.3rem 0.6rem;
+  margin: 0.55rem 0;
+  padding: 0.5rem;
+  border: 1px solid rgba(217, 154, 43, 0.16);
+  border-radius: 0.5rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── responsive ─────────────────────────────────────────────────────── */
+
+@media (max-width: 1180px) {
+  .derby-field-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 900px) {
+  .derby-main { grid-template-columns: minmax(0, 1fr); }
+  .derby-stage { height: clamp(300px, 44vh, 460px); }
+  .derby-social-body { max-height: 14rem; }
+}
+@media (max-width: 560px) {
+  .derby-field-grid { grid-template-columns: minmax(0, 1fr); }
+  .derby-title { font-size: 0.95rem; letter-spacing: 0.09em; }
+  .derby-countdown-time { font-size: 1.3rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .derby-shell *, .derby-modal-scrim * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,257 @@
+/* Mini golf: the DOM layer over the course. The hole number, its name and
+   par sit top left; the round against par and the stroke pips top right.
+   Between holes the scorecard covers the stage. Numbers are Big Shoulders,
+   names Gabarito, everything on ink. */
+
+.mini-golf-midway .mg-hud {
+  position: absolute;
+  inset: 0 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 0.625rem 0.75rem;
+  pointer-events: none;
+  color: var(--tixy-paper, #f4ebdc);
+}
+
+.mg-hud-hole {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.mg-hud-num {
+  font-family: var(--tixy-font-num, 'Big Shoulders'), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 2.25rem;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.mg-hud-meta {
+  display: grid;
+  line-height: 1.15;
+}
+
+.mg-hud-name {
+  font-family: var(--tixy-font-text, 'Gabarito'), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 0.9375rem;
+}
+
+.mg-hud-par {
+  font-family: var(--tixy-font-text, 'Gabarito'), system-ui, sans-serif;
+  font-size: 0.9375rem;
+  color: var(--tixy-on-ink-2, #c9c1b4);
+}
+
+.mg-hud-right {
+  display: grid;
+  justify-items: end;
+  gap: 0.375rem;
+}
+
+.mg-hud-topar {
+  font-family: var(--tixy-font-num, 'Big Shoulders'), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+.mg-hud-topar[data-under] {
+  color: var(--tixy-ticket, #f2a33c);
+}
+
+.mg-hud-pips {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.mg-hud-pip {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: rgb(244 235 220 / 0.85);
+  transition: background-color 120ms ease-out, transform 160ms cubic-bezier(.2, 1.5, .4, 1);
+}
+
+.mg-hud-pip[data-used] {
+  background: rgb(244 235 220 / 0.22);
+  transform: scale(0.8);
+}
+
+.mini-golf-midway .mg-card {
+  position: absolute;
+  inset: auto 0.75rem 0.75rem;
+  display: grid;
+  gap: 0.625rem;
+  justify-items: center;
+  padding: 0.875rem 0.75rem 0.75rem;
+  border: 0;
+  border-radius: 16px;
+  background-color: var(--tixy-ink, #1f1a16);
+  color: var(--tixy-paper, #f4ebdc);
+  opacity: 1;
+  z-index: 2;
+  cursor: pointer;
+  animation: mg-card-in 220ms cubic-bezier(.15, .8, .25, 1) both;
+}
+
+@keyframes mg-card-in {
+  from {
+    transform: translateY(1rem);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mini-golf-midway .mg-card {
+    animation: none;
+  }
+}
+
+.mg-card-next {
+  font-family: var(--tixy-font-text, 'Gabarito'), system-ui, sans-serif;
+  font-size: 0.9375rem;
+  color: var(--tixy-on-ink-2, #c9c1b4);
+}
+
+.mg-scorecard {
+  border-collapse: collapse;
+  font-family: var(--tixy-font-num, 'Big Shoulders'), system-ui, sans-serif;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  font-size: 1rem;
+  width: 100%;
+}
+
+.mg-scorecard th {
+  font-family: var(--tixy-font-text, 'Gabarito'), system-ui, sans-serif;
+  font-weight: 400;
+  font-size: 0.9375rem;
+  text-align: left;
+  padding-right: 0.375rem;
+  opacity: 0.85;
+}
+
+.mg-scorecard td {
+  text-align: center;
+  min-width: 1.4em;
+  padding: 0.1875rem 0;
+}
+
+.mg-sc-holes td {
+  opacity: 0.8;
+  font-size: 0.9375rem;
+}
+
+.mg-sc-par td {
+  opacity: 0.85;
+}
+
+.mg-sc-you td[data-under] {
+  color: var(--tixy-ticket, #f2a33c);
+}
+
+.mg-sc-you td[data-ace] {
+  color: var(--tixy-ink, #1f1a16);
+  background: var(--tixy-ticket, #f2a33c);
+  border-radius: 999px;
+}
+
+.mg-sc-total {
+  padding-left: 0.375rem !important;
+}
+
+.mg-scorecard[data-compact] {
+  font-size: 0.9375rem;
+  max-width: 22rem;
+  margin-inline: auto;
+}
+
+.mg-scorecard-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.mg-sc-friend th {
+  max-width: 5.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mg-sc-friend td {
+  opacity: 0.85;
+}
+
+.mg-sc-more,
+.mg-result-note {
+  margin-top: 0.375rem;
+  font-family: var(--tixy-font-text, 'Gabarito'), system-ui, sans-serif;
+  font-size: 0.9375rem;
+  text-align: center;
+}
+
+/* The aim on the glass: where the press began, a line to the finger, and
+   the pace read out by the arrowhead. Positions are set every frame. */
+.mini-golf-midway .mg-aim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.mg-pull {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  opacity: 0;
+  --mg-pace: #f4ebdc;
+}
+
+.mg-pull-line {
+  stroke: var(--mg-pace);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-dasharray: 2 7;
+  opacity: 0.85;
+}
+
+.mg-pull-anchor {
+  fill: rgba(28, 23, 20, 0.35);
+  stroke: var(--mg-pace);
+  stroke-width: 2.5;
+}
+
+.mg-pull[data-live='false'] .mg-pull-line,
+.mg-pull[data-live='false'] .mg-pull-anchor {
+  stroke: var(--tixy-on-ink-2, #c9c1b4);
+}
+
+.mg-pace-tag {
+  position: absolute;
+  left: 0;
+  top: 0;
+  padding: 0.125rem 0.5rem 0.0625rem;
+  border-radius: 999px;
+  background: rgba(28, 23, 20, 0.82);
+  border: 2px solid var(--mg-pace, #f4ebdc);
+  color: var(--tixy-paper, #f4ebdc);
+  font-family: var(--tixy-font-num, 'Big Shoulders'), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 1.0625rem;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  opacity: 0;
+  will-change: transform;
+}
+
+.mg-pace-tag[data-state='cancel'] {
+  font-family: var(--tixy-font-text, 'Gabarito'), system-ui, sans-serif;
+  font-size: 0.875rem;
+  border-color: var(--tixy-on-ink-2, #c9c1b4);
+}

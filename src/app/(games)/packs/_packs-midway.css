@@ -1,0 +1,197 @@
+/* ──────────────────────────────────────────────────────────────────────
+   PACKS — Midway scoped polish. Namespaced under .packs-midway so nothing
+   leaks into other games or shared shells.
+
+   The pack-rip reveal is a CSS 3D card fan. This file repaints every card
+   as an ENAMEL chip (flat lacquer face + hard bevel, NO glow), turns the
+   pack body + card backs into wood-cabinet stock, and renders HOLO as an
+   iridescent MATTE paint — a fixed multi-hue diagonal sheen baked into the
+   face, never an animated bright glow. Depth is material, not light.
+   ────────────────────────────────────────────────────────────────────── */
+
+/* ── Pack body (idle) + card backs — warm wood stock with hard bevel ──── */
+.packs-midway .pk-pack {
+  position: relative;
+  border-radius: var(--radius-cabinet);
+  border: 1px solid var(--border-soft);
+  background:
+    var(--grain),
+    linear-gradient(160deg, var(--surface-raised), var(--surface-panel) 70%);
+  background-size: 70px 70px, 70px 70px, auto;
+  box-shadow:
+    inset 0 1px 0 var(--bevel-hi),
+    inset 0 -3px 8px #00000060,
+    0 6px 0 var(--shadow-color),
+    0 9px 20px #00000055;
+}
+
+/* enamel name plate on the idle pack */
+.packs-midway .pk-pack-plate {
+  font-family: var(--font-display);
+  letter-spacing: 0.04em;
+  color: var(--enamel-tickets);
+  text-shadow: 0 2px 0 var(--shadow-color);
+}
+.packs-midway .pk-pack-sub {
+  font-family: var(--font-display);
+  letter-spacing: 0.2em;
+  color: var(--text-faint);
+}
+
+/* card back stock */
+.packs-midway .pk-card-back {
+  border-radius: var(--radius-well);
+  border: 1px solid var(--border-soft);
+  background:
+    repeating-linear-gradient(135deg, #00000018 0 6px, transparent 6px 12px),
+    linear-gradient(160deg, var(--surface-raised), var(--surface-well));
+  box-shadow:
+    inset 0 1px 0 var(--bevel-hi),
+    inset 0 -2px 6px #00000060;
+}
+.packs-midway .pk-card-back-q {
+  font-family: var(--font-display);
+  color: var(--text-faint);
+}
+
+/* ── Enamel card face ─────────────────────────────────────────────────── */
+.packs-midway .pk-card-face {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-well);
+  border: 1px solid var(--pk-tier-edge, var(--border-soft));
+  background: linear-gradient(
+    165deg,
+    var(--pk-tier-hi, var(--surface-raised)) 0%,
+    var(--pk-tier, var(--surface-panel)) 48%,
+    var(--pk-tier-deep, var(--surface-well)) 100%
+  );
+  box-shadow:
+    inset 0 1px 0 #ffffff32,
+    inset 0 -3px 6px #00000050,
+    0 4px 0 var(--shadow-color),
+    0 6px 12px #00000045;
+}
+
+/* top enamel sheen — physical gloss, not glow */
+.packs-midway .pk-card-face::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 38%;
+  border-radius: var(--radius-well) var(--radius-well) 40% 40% / var(--radius-well) var(--radius-well) 18px 18px;
+  background: linear-gradient(180deg, #ffffff22, transparent);
+  pointer-events: none;
+}
+
+.packs-midway .pk-card-mult,
+.packs-midway .pk-card-name,
+.packs-midway .pk-card-tier {
+  position: relative;
+  z-index: 1;
+}
+.packs-midway .pk-card-mult {
+  font-family: var(--font-mono-arcade);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  color: var(--pk-tier-on, var(--text-strong));
+  text-shadow: 0 1px 0 #00000050;
+}
+.packs-midway .pk-card-name {
+  font-weight: 700;
+  color: var(--pk-tier-on, var(--text-strong));
+  text-shadow: 0 1px 0 #00000040;
+}
+.packs-midway .pk-card-tier {
+  font-family: var(--font-display);
+  letter-spacing: 0.08em;
+  color: var(--pk-tier-on-muted, var(--text-muted));
+}
+
+/* ── HOLO — iridescent MATTE paint. A fixed multi-hue diagonal wash baked
+   into the enamel. No animation, no glow; the hues are low-alpha so the
+   card reads as oily lacquer, not light. ─────────────────────────────── */
+.packs-midway .pk-holo {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(
+    115deg,
+    rgba(255, 120, 180, 0.16) 0%,
+    rgba(255, 210, 120, 0.14) 22%,
+    rgba(120, 230, 200, 0.16) 44%,
+    rgba(120, 170, 255, 0.16) 66%,
+    rgba(200, 130, 255, 0.16) 86%,
+    rgba(255, 120, 180, 0.14) 100%
+  );
+  mix-blend-mode: screen;
+}
+/* a second faint band gives the iridescence a "brushed" matte grain */
+.packs-midway .pk-holo::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    115deg,
+    #ffffff10 0 2px,
+    transparent 2px 5px
+  );
+  mix-blend-mode: overlay;
+}
+
+.packs-midway .pk-holo-badge {
+  color: var(--pk-tier-on, #f6eddc);
+  opacity: 0.7;
+}
+
+/* NEW stamp — enamel prize chip */
+.packs-midway .pk-new {
+  font-family: var(--font-display);
+  letter-spacing: 0.04em;
+  color: var(--enamel-prize-on);
+  background: var(--enamel-prize);
+  box-shadow: inset 0 1px 0 #ffffff35, 0 1px 0 var(--shadow-color);
+}
+
+/* ── Tease (rare+ pre-flip): hard bevel ring, not a radial glow ──────── */
+.packs-midway .pk-tease {
+  position: absolute;
+  inset: -3px;
+  z-index: 0;
+  border-radius: calc(var(--radius-well) + 3px);
+  pointer-events: none;
+  border: 2px solid var(--pk-tier, var(--enamel-tickets));
+  box-shadow: inset 0 0 0 1px #ffffff20;
+}
+
+/* ── Collection modal locked card ─────────────────────────────────────── */
+.packs-midway .pk-coll-locked {
+  border-radius: var(--radius-well);
+  border: 1px solid var(--border-soft);
+  background: linear-gradient(160deg, var(--surface-panel), var(--surface-well));
+  box-shadow: inset 0 1px 0 var(--bevel-hi), inset 0 -2px 5px #00000050;
+}
+
+/* ── Card slot (reveal + result) — query container for cqi-scaled faces, plus
+   a subtle lift on the resolved hand so the final cards read as collectibles. */
+.packs-midway .pk-cell {
+  transition: transform var(--motion-snap, 140ms) var(--ease-snap, ease-out);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .packs-midway .pk-cell-final:hover {
+    transform: translateY(-4px);
+  }
+}
+
+/* ── Reduced motion: kill the flip/reveal motion — cards settle straight
+   to their revealed enamel face. The holo is already static. ──────────── */
+@media (prefers-reduced-motion: reduce) {
+  .packs-midway .pk-flip {
+    transition: none !important;
+  }
+  .packs-midway .pk-face-anim {
+    animation: none !important;
+  }
+}

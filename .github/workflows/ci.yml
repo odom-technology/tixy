@@ -1,0 +1,185 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [dev, main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Game availability regression checks
+        run: npx tsx scripts/verify-game-availability.ts
+
+  smoke:
+    name: Smoke test game routes
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: arcade
+          POSTGRES_PASSWORD: arcade
+          POSTGRES_DB: arcade
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U arcade"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      # Ephemeral CI database + throwaway secrets. Never used outside this job.
+      DATABASE_URL: postgres://arcade:arcade@localhost:5432/arcade
+      GAME_SESSION_SECRET: ci-smoke-game-session-secret-not-for-prod
+      CRON_SECRET: ci-smoke-cron-secret-not-for-prod
+      NEXT_TELEMETRY_DISABLED: 1
+      PORT: 3000
+      HOSTNAME: 127.0.0.1
+      QA_SMOKE_EMAIL: qa-cards@example.com
+      QA_SMOKE_PASSWORD: QaPass!2026
+      QA_BASE_URL: http://127.0.0.1:3000
+      ARCADE_ADMIN_EMAILS: qa-cards@example.com
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Stripe payment regressions
+        env:
+          PAYMENT_TEST_DATABASE_URL: postgres://arcade:arcade@localhost:5432/arcade_payment_regression
+        run: |
+          node --input-type=module -e "import pg from 'pg'; const pool = new pg.Pool({connectionString: process.env.DATABASE_URL}); await pool.query('CREATE DATABASE arcade_payment_regression'); await pool.end();"
+          npm run test:stripe-payments
+
+      - name: Leaderboard identity regressions
+        env:
+          LEADERBOARD_TEST_DATABASE_URL: postgres://arcade:arcade@localhost:5432/arcade_leaderboard_test
+        run: |
+          node --input-type=module -e "import pg from 'pg'; const pool = new pg.Pool({connectionString: process.env.DATABASE_URL}); await pool.query('CREATE DATABASE arcade_leaderboard_test'); await pool.end();"
+          npm run test:leaderboard-identities
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run database migrations
+        run: npm run db:migrate
+
+      - name: Admin metrics
+        run: npm run test:admin-metrics
+
+      - name: Admin routes use the gate
+        env:
+          # Static part only: the live part runs after the app is up.
+          QA_BASE_URL: ''
+        run: npm run test:admin-routes
+
+      - name: Build
+        run: npm run build
+
+      - name: Start app
+        run: |
+          npm run start > server.log 2>&1 &
+          echo "APP_PID=$!" >> "$GITHUB_ENV"
+
+      - name: Wait for health
+        run: |
+          for i in $(seq 1 90); do
+            if curl -fsS http://127.0.0.1:3000/api/health >/dev/null 2>&1; then
+              echo "app healthy after ${i}s"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "app did not become healthy in time" >&2
+          cat server.log >&2 || true
+          exit 1
+
+      - name: Seed QA account
+        run: |
+          # Fresh CI database, so this creates the QA account the smoke test logs
+          # in as. Tolerate a non-2xx (e.g. already-exists) so a re-run is safe.
+          curl -fsS -X POST http://127.0.0.1:3000/api/account/register \
+            -H 'content-type: application/json' \
+            -d '{"email":"qa-cards@example.com","username":"qa-cards","password":"QaPass!2026"}' \
+            || echo "register returned non-2xx (account may already exist) - continuing"
+
+      - name: Seed QA player account
+        run: |
+          # A plain account with no admin role, for the admin route check.
+          curl -fsS -X POST http://127.0.0.1:3000/api/account/register \
+            -H 'content-type: application/json' \
+            -d '{"email":"qa-player@example.com","username":"qa-player","password":"QaPlayer!2026"}' \
+            || echo "register returned non-2xx (account may already exist) - continuing"
+
+      - name: Admin routes turn away non-admins
+        env:
+          QA_PLAYER_EMAIL: qa-player@example.com
+          QA_PLAYER_PASSWORD: QaPlayer!2026
+        run: npm run test:admin-routes
+
+      - name: Verify site availability controls
+        run: npm run test:site-availability
+
+      - name: Smoke test game routes
+        run: npm run test:smoke
+
+      - name: Smoke test redesigned account and admin routes
+        run: >-
+          npm run test:smoke --
+          /profile /u/qa-cards
+          /settings '/settings?tab=profile' '/settings?tab=preferences'
+          '/settings?tab=security' '/settings?tab=activity'
+          /admin /admin/analytics /admin/users /admin/feedback
+          '/admin/analytics?days=7' '/admin/analytics?days=90'
+          /admin/social /admin/achievements /admin/skins
+          '/admin/skins?tab=editor'
+          /admin/site-settings /admin/db/economy /admin/db/game-time
+          '/admin/db/economy?tab=ledger' '/admin/db/economy?tab=store'
+          '/admin/db/economy?tab=catalog' '/admin/db/economy?tab=adjustments'
+          /admin/connections /admin/pangram /admin/word-grid
+          /admin/live /admin/players /admin/games /admin/economy
+          /admin/machines /admin/counter /admin/progression /admin/trust
+          '/admin/players?days=90' '/admin/economy?days=7'
+          /admin/audit /admin/ops
+
+      - name: Dump server logs on failure
+        if: failure()
+        run: cat server.log || true

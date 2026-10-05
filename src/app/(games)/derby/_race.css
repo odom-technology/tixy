@@ -1,0 +1,187 @@
+/* Derby's stage overlays: the countdown and the place callout over the
+   backboard. Everything else is drawn on the canvas. */
+
+.dr-stage {
+  position: relative;
+  overflow: hidden;
+}
+
+.dr-canvas {
+  display: block;
+  cursor: crosshair;
+}
+
+.dr-board-overlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.dr-callout {
+  left: 50%;
+  top: 30%;
+}
+
+:root[data-arcade-theme='tixy'] .dr-callout .arc-floater-label {
+  font-size: clamp(1.5rem, 1.1rem + 1.6vw, 2.25rem);
+}
+
+/* ── The lobby under the cabinet ── */
+
+.dr-lobby {
+  display: grid;
+  gap: 12px;
+  width: min(100%, 34rem);
+  margin: 12px auto 0;
+  padding: 16px;
+  border-radius: 18px;
+  background: var(--tixy-paper-2, #eadfcb);
+  color: var(--tixy-ink, #1f1a16);
+}
+
+.dr-lobby-main {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.dr-lobby-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.dr-lobby-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* Play now on its own row, practice and invite under it. */
+.dr-lobby-actions.dr-lobby-main {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.dr-lobby-main > .arc-key {
+  justify-content: center;
+}
+
+.dr-lobby-main > .arc-key:first-child {
+  grid-column: 1 / -1;
+  min-height: 56px;
+  font-size: 1.25rem;
+}
+
+.dr-lobby-title {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.dr-lobby-title .arc-digits {
+  font-size: 1.3em;
+  line-height: 1;
+}
+
+.dr-lobby-line {
+  margin: 0;
+  color: var(--tixy-ink-2, #54483d);
+  font-size: 0.9375rem;
+}
+
+.dr-lobby-error {
+  margin: 0;
+  color: var(--tixy-red-text, #9a2d20);
+  font-size: 0.9375rem;
+}
+
+.dr-lobby .arc-signin-line {
+  padding: 0 2px;
+  font-size: 1rem;
+}
+
+.dr-code {
+  font-family: var(--tixy-font-num, inherit);
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.06em;
+  color: var(--tixy-ink, #1f1a16);
+}
+
+.dr-lanes {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dr-lane {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  font-size: 0.9375rem;
+}
+
+.dr-lane[data-open] {
+  color: var(--tixy-ink-3, #6b5e51);
+}
+
+.dr-lane-pip {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  font-family: var(--tixy-font-num, inherit);
+  font-weight: 800;
+  font-size: 12px;
+  box-shadow: 0 0 0 1.5px var(--tixy-ink, #1f1a16);
+}
+
+.dr-lane-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── A wide screen: the cabinet hugs the race, the lobby sits beside it ──
+   The stage is 1.22 wide on a wide screen, so the cabinet takes what is
+   left beside the lobby. The cabinet's width is worked out from its
+   height the way the stage is: the viewport under the strip and the hint
+   row, times the stage's aspect, plus the stage's padding and bezel. */
+@media (min-width: 64rem) and (min-aspect-ratio: 1/1) {
+  .arc-shell.derby-midway {
+    display: grid;
+    grid-template-columns: auto minmax(18rem, 24rem);
+    justify-content: center;
+    align-items: start;
+    column-gap: 16px;
+    width: min(100% - 2rem, 72rem);
+  }
+
+  .derby-midway > .arc-shell-cabinet[data-stage] {
+    width: min(
+      calc(100vw - 2rem - 18rem - 16px),
+      max(24rem, calc((100dvh - var(--shell-top, 4.5rem) - var(--shell-bottom, 0.75rem) - 5.75rem) * 1.22 + 1.25rem + 10px))
+    );
+  }
+
+  .derby-midway > .arc-shell-below {
+    margin-top: 0;
+  }
+
+  .derby-midway .dr-lobby {
+    width: 100%;
+    margin: 0;
+  }
+}

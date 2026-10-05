@@ -1,0 +1,930 @@
+/* The ticket machine frame. arcade-machine.tsx.
+   It is GameShell's child, so it fills the ink cabinet under the strip.
+   Wide (64rem and up): the machines sit side by side and a deck on the
+   right holds the bet, the game's options and the receipt tray. Narrow:
+   a switcher when there are several machines, one machine, the deck under
+   it, and the receipt drawn over the screen. Colours come from the tixy
+   tokens, which every theme defines, so the frame is the same cabinet
+   under every theme. */
+@layer components {
+  .arc-machine-frame {
+    display: grid;
+    flex: 1;
+    min-height: 0;
+    gap: 0.625rem;
+    padding: 0 0.625rem 0.625rem;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) auto;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    font-family: var(--tixy-font-text);
+  }
+
+  /* Narrow: one column, in the order a thumb reads it. The screen (glass
+     and playfield) fills what is left, then the bet and the game's
+     options, then the big button last, at the bottom edge. The row and the
+     machine on show lend their children to the frame (display: contents)
+     so the deck can sit between the screen and the button. */
+  .arc-machine-frame:not([data-wide]) {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .arc-machine-frame:not([data-wide]) .arc-machine-row,
+  .arc-machine-frame:not([data-wide]) .arc-machine[data-active] {
+    display: contents;
+  }
+
+  .arc-machine-frame:not([data-wide]) .arc-machine-switch {
+    order: 0;
+  }
+
+  .arc-machine-frame:not([data-wide]) .arc-machine-body {
+    order: 1;
+    flex: 1 0 auto;
+  }
+
+  .arc-machine-frame[data-many]:not([data-wide]) .arc-machine-body {
+    min-height: 16rem;
+  }
+
+  /* The deck never shrinks: squeezed, it clipped the game's options (a
+     risk row) under the button with no way to reach them. When the screen
+     and the deck don't both fit, the frame scrolls instead. */
+  .arc-machine-frame:not([data-wide]) .arc-machine-deck {
+    order: 2;
+    flex: none;
+  }
+
+  .arc-machine-frame:not([data-wide]) .arc-machine-actions {
+    order: 3;
+  }
+
+  .arc-machine-frame[data-wide] {
+    grid-template-columns: minmax(0, 1fr) 19.5rem;
+    grid-template-rows: minmax(0, 1fr);
+    gap: 0.75rem;
+    padding: 0 0.75rem 0.75rem;
+    overflow: hidden;
+  }
+
+  @media (max-width: 39.999rem) {
+    .arc-machine-frame {
+      padding: 0 0.375rem 0.375rem;
+      gap: 0.5rem;
+    }
+  }
+
+  /* ── the switcher, phones only ── */
+  .arc-machine-frame[data-wide] .arc-machine-switch {
+    display: none;
+  }
+
+  .arc-machine-switch .arc-machine-choice {
+    display: grid;
+    grid-auto-columns: minmax(0, 1fr);
+    grid-auto-flow: column;
+  }
+
+  /* ── choices: the switcher, plinko's rows, a risk tier ──
+     A track on the ink with the options in it, each on one line. The
+     selected option is a raised face with paper text; the others are
+     quieter text on the track. Never the paper of the big button, no
+     underline. When the row is wider than its column (MachineChoice
+     measures it), the options stack one per line. */
+  .arc-machine-choice {
+    display: flex;
+    gap: 0.25rem;
+    padding: 0.25rem;
+    border-radius: var(--tixy-radius-button);
+    background: var(--tixy-screen);
+  }
+
+  .arc-machine-choice[data-stacked] {
+    flex-direction: column;
+  }
+
+  .arc-machine-choice button {
+    flex: 1 1 auto;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    padding: 0 0.75rem;
+    border-radius: var(--tixy-radius-button-sm);
+    font-size: 1rem;
+    font-weight: var(--tixy-weight-button);
+    line-height: 1.2;
+    white-space: nowrap;
+    color: var(--tixy-on-ink-2);
+    transition:
+      background-color var(--tixy-panel-fast) var(--tixy-ease-settle),
+      color var(--tixy-panel-fast) var(--tixy-ease-settle);
+  }
+
+  .arc-machine-choice[data-stacked] button {
+    padding: 0 1rem;
+    text-align: left;
+  }
+
+  .arc-machine-choice button:hover:not([aria-disabled='true']):not([aria-pressed='true']) {
+    background: rgb(244 235 220 / 0.06);
+    color: var(--tixy-paper);
+  }
+
+  .arc-machine-choice button[aria-pressed='true'] {
+    background: rgb(244 235 220 / 0.18);
+    color: var(--tixy-paper);
+  }
+
+  .arc-machine-choice button:disabled {
+    opacity: 0.45;
+  }
+
+  .arc-machine-choice button:focus-visible {
+    outline: 2px solid var(--tixy-paper);
+    outline-offset: 2px;
+  }
+
+  /* ── the machines ── */
+  .arc-machine-row {
+    display: flex;
+    min-height: 0;
+    gap: 0.5rem;
+  }
+
+  .arc-machine {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    gap: 0.5rem;
+  }
+
+  .arc-machine-frame[data-many]:not([data-wide]) .arc-machine:not([data-active]) {
+    display: none;
+  }
+
+  /* A bank, wide: the machines share three rows (glass, screen, buttons),
+     so a rule that takes two lines on one machine doesn't push its screen
+     lower than its neighbours'. The receipt is in the tray here, so the
+     body has no overlay to hold. */
+  .arc-machine-frame[data-many][data-wide] .arc-machine-row {
+    display: grid;
+    grid-auto-columns: minmax(0, 1fr);
+    grid-auto-flow: column;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    column-gap: 0.5rem;
+  }
+
+  .arc-machine-frame[data-many][data-wide] .arc-machine {
+    display: grid;
+    grid-row: span 3;
+    grid-template-rows: subgrid;
+    row-gap: 0.5rem;
+  }
+
+  .arc-machine-frame[data-many][data-wide] .arc-machine-body {
+    display: contents;
+  }
+
+  .arc-machine-frame[data-many][data-wide] .arc-machine-glass-wrap,
+  .arc-machine-frame[data-many][data-wide] .arc-machine-glass {
+    height: 100%;
+  }
+
+  /* The glass: one slim band over the screen. The rule on the left, the
+     pays button on the right. When a line pays, the band swaps the rule for
+     that line, red, for a moment (MACHINE_PAID_MS). */
+  .arc-machine-glass {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-height: 3rem;
+    padding: 0.25rem 0.25rem 0.25rem 1rem;
+    border-radius: 0.75rem;
+    background: var(--tixy-screen-2);
+    color: var(--tixy-paper);
+  }
+
+  .arc-machine-name {
+    flex: none;
+    margin: 0;
+    font-family: var(--tixy-font-text);
+    font-size: 1.125rem;
+    font-weight: var(--tixy-weight-heading);
+    letter-spacing: var(--tixy-tracking-name);
+    line-height: 1.15;
+    color: var(--tixy-on-ink-2);
+    transition: color var(--tixy-panel-fast) var(--tixy-ease-settle);
+  }
+
+  .arc-machine[data-active] .arc-machine-name {
+    color: var(--tixy-paper);
+  }
+
+  /* A single machine's name is in the strip already: keep it for screen
+     readers only. */
+  .arc-machine-frame:not([data-many]) .arc-machine-name {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  /* A bank of machines (plinko): each band is the machine's name over its
+     rule. On phones the switcher names the machine, so the band doesn't. */
+  .arc-machine-frame[data-many] .arc-machine-glass {
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 0.125rem;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .arc-machine-frame[data-many] .arc-machine-glass-line {
+    flex: none;
+  }
+
+  .arc-machine-frame[data-many]:not([data-wide]) .arc-machine-name {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .arc-machine-glass-line {
+    display: grid;
+    flex: 1 1 0;
+    min-width: 0;
+    align-items: center;
+  }
+
+  .arc-machine-rule,
+  .arc-machine-paid {
+    grid-area: 1 / 1;
+    margin: 0;
+    transition:
+      opacity var(--tixy-panel-slow) var(--tixy-ease-settle),
+      transform var(--tixy-panel-slow) var(--tixy-ease-settle);
+  }
+
+  /* The rule: paper, 16 px. At most two lines on a phone; one on a wide
+     frame, where a rule too long for the band ends in an ellipsis (the
+     whole rule is in its title, `pays` and ?). */
+  .arc-machine-rule {
+    display: -webkit-box;
+    overflow: hidden;
+    font-size: 1rem;
+    line-height: 1.375;
+    color: var(--tixy-paper);
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .arc-machine-frame[data-wide]:not([data-many]) .arc-machine-rule {
+    display: block;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* A bank's bands are a third as wide: two lines, a step smaller. */
+  .arc-machine-frame[data-many] .arc-machine-rule {
+    font-size: 0.9375rem;
+    color: var(--tixy-on-ink-2);
+  }
+
+  /* The line that paid: red, in place of the rule. */
+  .arc-machine-paid {
+    display: inline-flex;
+    align-items: baseline;
+    justify-self: start;
+    gap: 0.625rem;
+    padding: 0.125rem 0.625rem;
+    border-radius: 6px;
+    background: var(--tixy-red);
+    color: var(--tixy-on-red);
+    font-size: 0.9375rem;
+    font-weight: var(--tixy-weight-button);
+    opacity: 0;
+    transform: translateY(0.375rem);
+    pointer-events: none;
+  }
+
+  .arc-machine-paid b {
+    font-family: var(--tixy-font-num);
+    font-size: 1.125rem;
+    font-weight: var(--tixy-weight-num);
+    line-height: 1.1;
+  }
+
+  .arc-machine-glass[data-flash] .arc-machine-rule {
+    opacity: 0;
+    transform: translateY(-0.375rem);
+  }
+
+  .arc-machine-glass[data-flash] .arc-machine-paid {
+    opacity: 1;
+    transform: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .arc-machine-rule,
+    .arc-machine-paid {
+      transition: none;
+    }
+  }
+
+  /* A paytable printed on the glass (video poker): the hands at 15 px and
+     the pays in paper, two across on a phone and five across wide. The
+     line that pays is red. */
+  .arc-machine-glass[data-printed] {
+    padding: 0.5rem 0.625rem;
+  }
+
+  .arc-machine-printed {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 0.75rem;
+    width: 100%;
+    margin: 0;
+  }
+
+  .arc-machine-frame[data-wide] .arc-machine-printed {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 0.125rem 1rem;
+  }
+
+  .arc-machine-printed > div {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.375rem;
+    min-width: 0;
+    padding: 0 0.375rem;
+    border-radius: 4px;
+    line-height: 1.5;
+  }
+
+  .arc-machine-printed dt {
+    overflow: hidden;
+    font-size: 0.9375rem;
+    color: var(--tixy-on-ink-2);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .arc-machine-printed dd {
+    flex: none;
+    margin: 0;
+    font-family: var(--tixy-font-num);
+    font-size: 1.0625rem;
+    font-weight: var(--tixy-weight-num);
+    color: var(--tixy-paper);
+  }
+
+  .arc-machine-printed > div[data-lit] {
+    background: var(--tixy-red);
+  }
+
+  .arc-machine-printed > div[data-lit] dt,
+  .arc-machine-printed > div[data-lit] dd {
+    color: var(--tixy-paper);
+  }
+
+  /* pays: the secondary button on the band, a raised face one step
+     lighter than the glass. 44 px tall on a touch screen. */
+  .arc-machine-pays {
+    flex: none;
+    min-width: 2.75rem;
+    min-height: 2.5rem;
+    margin-left: auto;
+    padding: 0 1rem;
+    border-radius: var(--tixy-radius-button-sm);
+    background: rgb(244 235 220 / 0.14);
+    color: var(--tixy-paper);
+    font-size: 1rem;
+    font-weight: var(--tixy-weight-button);
+    line-height: 1;
+    transition:
+      transform var(--tixy-press-out) ease-out,
+      background-color var(--tixy-panel-fast) var(--tixy-ease-settle);
+  }
+
+  .arc-machine-pays:hover {
+    background: rgb(244 235 220 / 0.2);
+  }
+
+  @media (pointer: coarse) {
+    .arc-machine-pays {
+      min-height: 2.75rem;
+    }
+  }
+
+  .arc-machine-pays:active {
+    transform: translateY(1px) scale(var(--tixy-press-scale));
+    transition-duration: var(--tixy-press-in);
+  }
+
+  .arc-machine-pays:focus-visible {
+    outline: 2px solid var(--tixy-paper);
+    outline-offset: 2px;
+  }
+
+  /* The folded paytable, in the pays sheet and the ? sheet (paper). */
+  .arc-machine-pays-sheet {
+    display: grid;
+    gap: 0.75rem;
+    font-family: var(--tixy-font-text);
+    font-size: 1rem;
+    color: var(--tixy-ink);
+  }
+
+  .arc-howto .arc-machine-pays-sheet {
+    margin-top: 0.5rem;
+  }
+
+  .arc-machine-pays-sheet p {
+    margin: 0;
+  }
+
+  .arc-machine-pays-table {
+    display: grid;
+    margin: 0;
+  }
+
+  .arc-machine-pays-table > div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-height: 2.5rem;
+    padding: 0.25rem 0;
+  }
+
+  .arc-machine-pays-table > div + div {
+    border-top: 1px solid rgb(31 26 22 / 0.12);
+  }
+
+  .arc-machine-pays-table dt {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--tixy-ink-2);
+  }
+
+  .arc-machine-pays-table dd {
+    margin: 0;
+    font-family: var(--tixy-font-num);
+    font-size: 1.25rem;
+    font-weight: var(--tixy-weight-num);
+    letter-spacing: var(--tixy-tracking-num);
+  }
+
+  .arc-machine-pays-table > div[data-lit] dt,
+  .arc-machine-pays-table > div[data-lit] dd {
+    color: var(--tixy-red-text);
+    font-weight: var(--tixy-weight-button);
+  }
+
+  /* The screen: a 5 px ink bezel (border-tixy-bezel). It is a size
+     container, so a playfield can fit itself with cqw and cqh. */
+  .arc-machine-body {
+    position: relative;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
+    gap: 0.5rem;
+  }
+
+  .arc-machine-screen {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    /* A game whose playfield needs room on a phone (mines' 44 px tiles)
+       sets --machine-screen-min on the frame; the frame then scrolls. */
+    min-height: var(--machine-screen-min, 0);
+    box-sizing: border-box;
+    overflow: hidden;
+    border-style: solid;
+    border-color: var(--tixy-cabinet);
+    border-radius: 0.75rem;
+    background: var(--tixy-screen);
+    container-type: size;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* A DOM playfield (cards, a tile grid, a wheel) inside the screen. It
+     fills the screen and centres the game; when the game is taller than
+     the screen it scrolls inside the bezel instead of being cut off. */
+  .arc-machine-fit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: safe center;
+    gap: 0.75rem;
+    width: 100%;
+    height: 100%;
+    padding: 0.75rem;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+  }
+
+  .arc-machine-fit > * {
+    max-width: 100%;
+  }
+
+  /* Playing cards are paper on the ink screen. The ink mapping turns the
+     face's key colours dark, which hid the black suits. */
+  :root[data-arcade-theme='tixy'] .arc-machine-screen .arc-card-face {
+    --key-face: var(--tixy-paper);
+    --key-face-hi: var(--tixy-paper);
+    --key-face-edge: var(--tixy-paper-3);
+  }
+
+  /* A line on the screen: an outcome with its numbers, what to do when it
+     isn't obvious, or a live number. Paper, 16 px. When it has nothing to
+     say it takes no space, and stays in the accessibility tree, so a live
+     region still announces what it says next. */
+  .arc-machine-status {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.5rem;
+    text-align: center;
+    text-wrap: balance;
+    color: var(--tixy-paper);
+  }
+
+  .arc-machine-status:empty {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .arc-machine-actions {
+    display: flex;
+    flex: none;
+    gap: 0.5rem;
+  }
+
+  /* Phones: when the frame has to scroll (lucky cage's board, mines'
+     tiles), the machine's big button stays on screen at the frame's bottom
+     edge instead of scrolling away under the playfield. */
+  .arc-machine-frame:not([data-wide]) .arc-machine-actions {
+    position: sticky;
+    bottom: 0;
+    z-index: 6;
+    margin-top: -0.5rem;
+    padding-top: 0.5rem;
+    background: var(--tixy-ink);
+  }
+
+  .arc-machine-actions > * {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .arc-machine-button[aria-disabled='true'] {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  :root[data-arcade-theme='tixy'] .arc-machine-button.arc-key[data-size='lg'] {
+    min-height: 3.25rem;
+    font-size: 1.125rem;
+  }
+
+  /* ── the deck: bet, options, notice, receipt tray ── */
+  /* Wide: the column beside the screen. Each part (the bet, each of the
+     game's options) is a label over its control, 20 px apart, and the
+     controls fill the column. */
+  .arc-machine-deck {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    gap: 1.25rem;
+  }
+
+  .arc-machine-deck-controls {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    gap: 1.25rem;
+    color: var(--tixy-paper);
+  }
+
+  /* Narrow: one row per part, the label on the left. */
+  .arc-machine-frame:not([data-wide]) .arc-machine-deck {
+    gap: 0.5rem;
+  }
+
+  .arc-machine-frame:not([data-wide]) .arc-machine-deck-controls {
+    gap: 0.5rem;
+  }
+
+  /* A game's own options, one under the other. */
+  .arc-machine-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    min-width: 0;
+  }
+
+  .arc-machine-frame:not([data-wide]) .arc-machine-controls {
+    gap: 0.5rem;
+  }
+
+  .arc-machine-label {
+    display: block;
+    margin: 0 0 0.5rem;
+    font-size: 0.9375rem;
+    font-weight: var(--tixy-weight-button);
+    line-height: 1.2;
+    color: var(--tixy-on-ink-2);
+  }
+
+  .arc-machine-frame:not([data-wide]) .arc-machine-controls .arc-machine-choice-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 0;
+  }
+
+  .arc-machine-frame:not([data-wide]) .arc-machine-controls .arc-machine-choice-wrap[data-stacked] {
+    align-items: flex-start;
+  }
+
+  .arc-machine-frame:not([data-wide]) .arc-machine-controls .arc-machine-choice-wrap > .arc-machine-label {
+    flex: none;
+    min-width: 2.5rem;
+    margin: 0;
+  }
+
+  .arc-machine-frame:not([data-wide]) .arc-machine-choice-wrap[data-stacked] > .arc-machine-label {
+    padding-top: 0.875rem;
+  }
+
+  .arc-machine-frame:not([data-wide]) .arc-machine-controls .arc-machine-choice {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  /* The bet: its label and custom on one line, the stubs under them, wide.
+     Narrow: the label, the stubs, then custom, on one line. */
+  .arc-machine-bet {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'label custom'
+      'stubs stubs';
+    align-items: center;
+    gap: 0.5rem 0.75rem;
+    min-width: 0;
+  }
+
+  .arc-machine-bet > .arc-machine-label {
+    grid-area: label;
+    margin: 0;
+  }
+
+  .arc-machine-bet > .arc-machine-stubs {
+    grid-area: stubs;
+  }
+
+  .arc-machine-bet > .arc-machine-custom {
+    grid-area: custom;
+  }
+
+  .arc-machine-frame:not([data-wide]) .arc-machine-bet {
+    grid-template-columns: auto auto minmax(0, 1fr);
+    grid-template-areas: 'label stubs custom';
+    gap: 0.5rem;
+  }
+
+  .arc-machine-frame:not([data-wide]) .arc-machine-bet > .arc-machine-label {
+    min-width: 2.5rem;
+  }
+
+  .arc-machine-frame:not([data-wide]) .arc-machine-bet > .arc-machine-custom {
+    justify-self: start;
+  }
+
+  /* Narrow, when the line doesn't fit (BetRow measures it): custom moves
+     up beside the label, as on a wide frame. */
+  .arc-machine-frame:not([data-wide]) .arc-machine-bet[data-stacked] {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'label custom'
+      'stubs stubs';
+    row-gap: 0.25rem;
+  }
+
+  .arc-machine-frame:not([data-wide]) .arc-machine-bet[data-stacked] > .arc-machine-custom {
+    justify-self: end;
+  }
+
+  /* Beside the label, custom is a step shorter, with a 44 px hit area. */
+  .arc-machine-frame[data-wide] .arc-machine-bet > .arc-machine-custom,
+  .arc-machine-bet[data-stacked] > .arc-machine-custom {
+    position: relative;
+    min-height: 2.25rem;
+  }
+
+  .arc-machine-frame[data-wide] .arc-machine-bet > .arc-machine-custom::before,
+  .arc-machine-bet[data-stacked] > .arc-machine-custom::before {
+    content: '';
+    position: absolute;
+    inset: -0.25rem 0;
+  }
+
+  /* 8 px between stubs, so each notch has ink around it. */
+  .arc-machine-stubs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .arc-machine-frame:not([data-wide]) .arc-machine-stubs {
+    flex-wrap: nowrap;
+    gap: 0.375rem;
+  }
+
+  /* custom: the secondary button on the ink. It opens the bet sheet; the
+     bet it sets joins the stubs. */
+  .arc-machine-custom {
+    display: grid;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    padding: 0 0.875rem;
+    place-items: center;
+    border-radius: var(--tixy-radius-button);
+    background: var(--tixy-screen-2);
+    color: var(--tixy-paper);
+    font-size: 0.9375rem;
+    font-weight: var(--tixy-weight-button);
+    line-height: 1;
+    transition:
+      transform var(--tixy-press-out) ease-out,
+      background-color var(--tixy-panel-fast) var(--tixy-ease-settle);
+  }
+
+  .arc-machine-custom:hover:not([aria-disabled='true']) {
+    background: color-mix(in srgb, var(--tixy-screen-2), var(--tixy-paper) 8%);
+  }
+
+  .arc-machine-custom:active:not([aria-disabled='true']) {
+    transform: translateY(1px) scale(var(--tixy-press-scale));
+    transition-duration: var(--tixy-press-in);
+  }
+
+  .arc-machine-custom[aria-disabled='true'] {
+    cursor: not-allowed;
+    opacity: 0.4;
+  }
+
+  .arc-machine-custom:focus-visible {
+    outline: 2px solid var(--tixy-paper);
+    outline-offset: 1px;
+  }
+
+  /* A stub is a 44 px touch target around the ticket shape. */
+  .arc-machine-stub {
+    display: grid;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    padding: 0;
+    place-items: center;
+    border-radius: var(--tixy-radius-button-sm);
+    background: none;
+    transition: transform var(--tixy-press-out) ease-out;
+  }
+
+  .arc-machine-stub .arc-ticket-stub {
+    min-width: 2.75rem;
+    padding-inline: 11px;
+  }
+
+  .arc-machine-stub:active:not([aria-disabled='true']) {
+    transform: translateY(1px) scale(var(--tixy-press-scale));
+    transition-duration: var(--tixy-press-in);
+  }
+
+  .arc-machine-stub[aria-disabled='true'] {
+    cursor: not-allowed;
+    opacity: 0.4;
+  }
+
+  /* While a round plays the row is locked, but the stub in play stays lit:
+     what you bet is readable mid-round. */
+  .arc-machine-stub[aria-disabled='true'][data-on] {
+    opacity: 1;
+  }
+
+  .arc-machine-stub:focus-visible {
+    outline: 2px solid var(--tixy-paper);
+    outline-offset: 1px;
+  }
+
+  /* One sentence when something went wrong: red on the ink, 16 px. */
+  .arc-machine-notice {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.4;
+    color: var(--tixy-on-ink-red);
+  }
+
+  .arc-machine-tray {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding-bottom: 0.5rem;
+    scrollbar-width: thin;
+  }
+
+  /* The tray is empty until a receipt prints; the receipt brings its own
+     printer slot (the tray's full width, 22 px) at the top of the tray, so
+     nothing above it moves. On the ink cabinet the receipt's own ink
+     printer would vanish, so it uses screen 2. */
+  .arc-machine-tray .arc-receipt {
+    width: 100%;
+  }
+
+  .arc-machine-tray .arc-receipt-printer {
+    flex: none;
+    position: relative;
+    width: 100%;
+    height: 22px;
+    margin: 0;
+    border-radius: 8px 8px 3px 3px;
+    background: var(--tixy-screen-2);
+  }
+
+  .arc-machine-tray .arc-receipt-shadow {
+    margin-inline: 8px;
+  }
+
+  /* ── the receipt over the screen, narrow only ── */
+  .arc-machine-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    display: flex;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 0.75rem;
+    border-radius: 0.75rem;
+    background: rgb(31 26 22 / 0.72);
+    color: var(--text-strong);
+    font-family: var(--font-ui);
+    animation: arc-machine-overlay-in var(--tixy-panel-fast) ease-out both;
+  }
+
+  .arc-machine-overlay-body {
+    display: grid;
+    grid-template-columns: minmax(0, 18rem) 2.75rem;
+    align-items: start;
+    gap: 0.5rem;
+    width: min(100%, 21.25rem);
+    margin: auto;
+  }
+
+  .arc-machine-overlay .arc-receipt {
+    width: 100%;
+  }
+
+  .arc-machine-overlay .arc-receipt-printer {
+    margin: 0;
+    background: var(--tixy-screen-2);
+  }
+
+  .arc-machine-overlay .arc-receipt-shadow {
+    margin-inline: 8px;
+  }
+
+  :root[data-arcade-theme='tixy'] .arc-machine-close.arc-key {
+    width: 2.75rem;
+    height: 2.75rem;
+    min-height: 2.75rem;
+  }
+}
+
+@keyframes arc-machine-overlay-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

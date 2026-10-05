@@ -1,0 +1,712 @@
+{
+  "revision": "rev. 2, 2 October 2026",
+  "basis": "Astra's floor-plan.json, reviewed against every game page and the 3D games in play",
+  "floorAtRelaunch": [
+    "8-ball",
+    "chess",
+    "connect-four",
+    "skee-ball",
+    "high-striker",
+    "prize-claw",
+    "tin-duck",
+    "snake",
+    "2048",
+    "stack",
+    "flappy-bird",
+    "ricochet",
+    "21",
+    "plinko",
+    "mines",
+    "video-poker",
+    "slots",
+    "lucky-cage",
+    "word-grid",
+    "derby",
+    "ticket-stop",
+    "coin-pusher",
+    "trick-shot",
+    "bumper-cars",
+    "mini-golf",
+    "ring-toss"
+  ],
+  "counts": {
+    "floor": 20,
+    "reserve": 18,
+    "later": 0,
+    "merge": 3,
+    "scrap": 28
+  },
+  "games": [
+    {
+      "slug": "8-ball",
+      "title": "8-Ball Pool",
+      "decision": "floor",
+      "group": "with friends",
+      "work": "flagship",
+      "threeD": false,
+      "reason": "Owner says it led the old site. Everything else follows its standard."
+    },
+    {
+      "slug": "chess",
+      "title": "Chess",
+      "decision": "floor",
+      "group": "with friends",
+      "work": "polish",
+      "threeD": false,
+      "reason": "Deep, social, and already has clocks and rated play."
+    },
+    {
+      "slug": "connect-four",
+      "title": "Connect Four",
+      "decision": "floor",
+      "group": "with friends",
+      "work": "polish, rename",
+      "threeD": false,
+      "reason": "A two-minute friend match between longer pool games."
+    },
+    {
+      "slug": "skee-ball",
+      "title": "Skee-Ball",
+      "decision": "floor",
+      "group": "boardwalk",
+      "work": "polish, rename",
+      "threeD": true,
+      "reason": "The best-looking 3D cabinet we have. 6 accounts played it."
+    },
+    {
+      "slug": "high-striker",
+      "title": "High Striker",
+      "decision": "floor",
+      "group": "boardwalk",
+      "work": "polish",
+      "threeD": true,
+      "reason": "Strong cabinet and lighting. The swing needs weight."
+    },
+    {
+      "slug": "prize-claw",
+      "title": "Prize Claw",
+      "decision": "floor",
+      "group": "boardwalk",
+      "work": "rework",
+      "threeD": true,
+      "reason": "Good cabinet, empty case. Fill it with real prizes from the counter."
+    },
+    {
+      "slug": "tin-duck",
+      "title": "Tin Duck Gallery",
+      "decision": "floor",
+      "group": "boardwalk",
+      "work": "rework",
+      "threeD": true,
+      "reason": "A midway staple, but it renders as flat stripes. Rebuild as a real 3D gallery."
+    },
+    {
+      "slug": "snake",
+      "title": "Snake",
+      "decision": "floor",
+      "group": "quick play",
+      "work": "polish",
+      "threeD": false,
+      "reason": "Instant, known, and fine on a phone."
+    },
+    {
+      "slug": "2048",
+      "title": "2048",
+      "decision": "floor",
+      "group": "quick play",
+      "work": "polish",
+      "threeD": false,
+      "reason": "The most play time in the sample we have."
+    },
+    {
+      "slug": "stack",
+      "title": "Stack",
+      "decision": "floor",
+      "group": "quick play",
+      "work": "rebuild",
+      "threeD": false,
+      "reason": "Keep endless mode, add the 15-row stacker cabinet."
+    },
+    {
+      "slug": "flappy-bird",
+      "title": "Flappy Bird",
+      "decision": "floor",
+      "group": "quick play",
+      "work": "polish, rename",
+      "threeD": false,
+      "reason": "Hunter's favourite. Back with a server replay and the tixy pass. The name belongs to someone else, so it renames to flap behind the flag."
+    },
+    {
+      "slug": "ricochet",
+      "title": "Ricochet",
+      "decision": "floor",
+      "group": "quick play",
+      "work": "rebuild",
+      "threeD": false,
+      "reason": "Back on the floor (3 October): replayed on the server, drawn in the tixy scheme, with skins."
+    },
+    {
+      "slug": "21",
+      "title": "21",
+      "decision": "floor",
+      "group": "ticket machines",
+      "work": "polish",
+      "threeD": false,
+      "reason": "157 rounds across 4 accounts."
+    },
+    {
+      "slug": "plinko",
+      "title": "Plinko",
+      "decision": "floor",
+      "group": "ticket machines",
+      "work": "polish, rename",
+      "threeD": false,
+      "reason": "521 rounds across 3 accounts."
+    },
+    {
+      "slug": "mines",
+      "title": "Mines",
+      "decision": "floor",
+      "group": "ticket machines",
+      "work": "polish",
+      "threeD": false,
+      "reason": "140 rounds across 4 accounts."
+    },
+    {
+      "slug": "video-poker",
+      "title": "Video Poker",
+      "decision": "floor",
+      "group": "ticket machines",
+      "work": "polish",
+      "threeD": false,
+      "reason": "755 rounds across 4 accounts, the most of any wager."
+    },
+    {
+      "slug": "slots",
+      "title": "Slots",
+      "decision": "floor",
+      "group": "ticket machines",
+      "work": "polish",
+      "threeD": false,
+      "reason": "A machine everyone knows. Give it a real reel cabinet."
+    },
+    {
+      "slug": "lucky-cage",
+      "title": "Lucky Cage",
+      "decision": "floor",
+      "group": "ticket machines",
+      "work": "polish",
+      "threeD": true,
+      "reason": "Played by 5 accounts, more than any other wager. Already a good 3D cabinet. Takes crash's place."
+    },
+    {
+      "slug": "word-grid",
+      "title": "Word Grid",
+      "decision": "floor",
+      "group": "daily",
+      "work": "polish",
+      "threeD": false,
+      "reason": "One daily ritual with sharing."
+    },
+    {
+      "slug": "derby",
+      "title": "Derby Royale",
+      "decision": "floor",
+      "group": "with friends",
+      "work": "rework",
+      "threeD": true,
+      "reason": "The real midway derby: up to 8 players roll balls up their lanes at once and every hole moves their horse. Was a betting sim with tiny horses and a mirrored track logo."
+    },
+    {
+      "slug": "crash",
+      "title": "Crash",
+      "decision": "reserve",
+      "group": "ticket machines",
+      "work": "keep",
+      "threeD": false,
+      "reason": "12 rounds across 2 accounts, and the most crypto-casino of the set. Lucky cage replaces it."
+    },
+    {
+      "slug": "typing-test",
+      "title": "Typing Test",
+      "decision": "reserve",
+      "group": "quick play",
+      "work": "keep",
+      "threeD": false,
+      "reason": "Good, but not a midway game."
+    },
+    {
+      "slug": "typing-duel",
+      "title": "Typing Duel",
+      "decision": "reserve",
+      "group": "with friends",
+      "work": "keep",
+      "threeD": false,
+      "reason": "Same."
+    },
+    {
+      "slug": "tetris",
+      "title": "Tetris",
+      "decision": "reserve",
+      "group": "quick play",
+      "work": "keep, rename",
+      "threeD": false,
+      "reason": "Solid, but the name is a trademark."
+    },
+    {
+      "slug": "breakout",
+      "title": "Breakout",
+      "decision": "reserve",
+      "group": "quick play",
+      "work": "keep, rename",
+      "threeD": false,
+      "reason": "Solid, but the name is a trademark."
+    },
+    {
+      "slug": "minesweeper",
+      "title": "Minesweeper",
+      "decision": "reserve",
+      "group": "quick play",
+      "work": "keep",
+      "threeD": false,
+      "reason": "Fine, off-theme."
+    },
+    {
+      "slug": "gem-swap",
+      "title": "Gem Swap",
+      "decision": "reserve",
+      "group": "quick play",
+      "work": "keep",
+      "threeD": false,
+      "reason": "Fine, off-theme."
+    },
+    {
+      "slug": "bubble-shooter",
+      "title": "Gumball Drop",
+      "decision": "reserve",
+      "group": "quick play",
+      "work": "keep",
+      "threeD": false,
+      "reason": "Gumball drop. Fine, off-theme."
+    },
+    {
+      "slug": "boardwalk-hop",
+      "title": "Boardwalk Hop",
+      "decision": "reserve",
+      "group": "quick play",
+      "work": "keep",
+      "threeD": false,
+      "reason": "On-theme name, generic play. A candidate for a 3D rebuild later."
+    },
+    {
+      "slug": "gopher",
+      "title": "Gopher Pop",
+      "decision": "reserve",
+      "group": "quick play",
+      "work": "keep",
+      "threeD": false,
+      "reason": "Whack-a-mole. A candidate for a 3D cabinet later."
+    },
+    {
+      "slug": "air-hockey",
+      "title": "Air Hockey",
+      "decision": "reserve",
+      "group": "with friends",
+      "work": "keep",
+      "threeD": false,
+      "reason": "Vs computer or two people on one device. Worth online play later."
+    },
+    {
+      "slug": "battleship",
+      "title": "Battleship",
+      "decision": "reserve",
+      "group": "with friends",
+      "work": "keep, rename",
+      "threeD": false,
+      "reason": "Works, the name is a trademark."
+    },
+    {
+      "slug": "pangram",
+      "title": "Pangram",
+      "decision": "reserve",
+      "group": "daily",
+      "work": "keep",
+      "threeD": false,
+      "reason": "A second daily if word grid needs a partner."
+    },
+    {
+      "slug": "punch-card",
+      "title": "Punch Card",
+      "decision": "reserve",
+      "group": "daily",
+      "work": "keep",
+      "threeD": false,
+      "reason": "Nonograms. Fine, off-theme."
+    },
+    {
+      "slug": "roulette",
+      "title": "Roulette",
+      "decision": "reserve",
+      "group": "ticket machines",
+      "work": "keep",
+      "threeD": false,
+      "reason": "Works, but the floor has enough table wagers."
+    },
+    {
+      "slug": "dice",
+      "title": "Dice",
+      "decision": "reserve",
+      "group": "ticket machines",
+      "work": "keep",
+      "threeD": false,
+      "reason": "Works, too close to the crypto-casino look."
+    },
+    {
+      "slug": "coin-flip",
+      "title": "Coin Flip",
+      "decision": "reserve",
+      "group": "ticket machines",
+      "work": "keep",
+      "threeD": false,
+      "reason": "Works, too close to the crypto-casino look."
+    },
+    {
+      "slug": "prize-wheel",
+      "title": "Prize Wheel",
+      "decision": "reserve",
+      "group": "ticket machines",
+      "work": "keep",
+      "threeD": false,
+      "reason": "The one wheel we keep."
+    },
+    {
+      "slug": "reaction-time",
+      "title": "Reaction Time",
+      "decision": "merge",
+      "group": "quick play",
+      "work": "into ticket stop",
+      "threeD": false,
+      "reason": "Same skill as ticket stop."
+    },
+    {
+      "slug": "tumbler",
+      "title": "Tumbler",
+      "decision": "merge",
+      "group": "quick play",
+      "work": "into ticket stop",
+      "threeD": false,
+      "reason": "Same timing tap as ticket stop."
+    },
+    {
+      "slug": "stoplight",
+      "title": "Lucky Wheel",
+      "decision": "merge",
+      "group": "ticket machines",
+      "work": "into prize wheel",
+      "threeD": false,
+      "reason": "Lucky wheel is a second prize wheel."
+    },
+    {
+      "slug": "gunrush",
+      "title": "Gunrush",
+      "decision": "scrap",
+      "group": "quick play",
+      "work": "retire",
+      "threeD": true,
+      "reason": "The gates-and-squad runner from mobile ads, on an empty lane. Nothing to save."
+    },
+    {
+      "slug": "swerve",
+      "title": "Swerve",
+      "decision": "scrap",
+      "group": "quick play",
+      "work": "retire",
+      "threeD": true,
+      "reason": "A generic traffic dodger with box cars. Its car code goes into bumper cars."
+    },
+    {
+      "slug": "connections",
+      "title": "Connections",
+      "decision": "scrap",
+      "group": "daily",
+      "work": "retire",
+      "threeD": false,
+      "reason": "No puzzles were seeded on the copy I checked, and the name is the New York Times game."
+    },
+    {
+      "slug": "cases",
+      "title": "Cases",
+      "decision": "scrap",
+      "group": "ticket machines",
+      "work": "retire",
+      "threeD": false,
+      "reason": "Loot-box opening. The prize counter replaces it."
+    },
+    {
+      "slug": "packs",
+      "title": "Packs",
+      "decision": "scrap",
+      "group": "ticket machines",
+      "work": "retire",
+      "threeD": false,
+      "reason": "Loot-box opening. The prize counter replaces it."
+    },
+    {
+      "slug": "keno",
+      "title": "Keno",
+      "decision": "scrap",
+      "group": "ticket machines",
+      "work": "retire",
+      "threeD": false,
+      "reason": "Thin play, or another multiplier run the floor already has."
+    },
+    {
+      "slug": "chicken",
+      "title": "Crossy Chicken",
+      "decision": "scrap",
+      "group": "ticket machines",
+      "work": "retire",
+      "threeD": false,
+      "reason": "Thin play, or another multiplier run the floor already has."
+    },
+    {
+      "slug": "hilo",
+      "title": "Hi-Lo",
+      "decision": "scrap",
+      "group": "ticket machines",
+      "work": "retire",
+      "threeD": false,
+      "reason": "Thin play, or another multiplier run the floor already has."
+    },
+    {
+      "slug": "baccarat",
+      "title": "Baccarat",
+      "decision": "scrap",
+      "group": "ticket machines",
+      "work": "retire",
+      "threeD": false,
+      "reason": "Thin play, or another multiplier run the floor already has."
+    },
+    {
+      "slug": "fortune-teller",
+      "title": "Fortune Teller",
+      "decision": "scrap",
+      "group": "ticket machines",
+      "work": "retire",
+      "threeD": false,
+      "reason": "Thin play, or another multiplier run the floor already has."
+    },
+    {
+      "slug": "darts",
+      "title": "Darts",
+      "decision": "scrap",
+      "group": "ticket machines",
+      "work": "retire",
+      "threeD": false,
+      "reason": "Thin play, or another multiplier run the floor already has."
+    },
+    {
+      "slug": "lightspeed",
+      "title": "Lightspeed",
+      "decision": "scrap",
+      "group": "ticket machines",
+      "work": "retire",
+      "threeD": false,
+      "reason": "Thin play, or another multiplier run the floor already has."
+    },
+    {
+      "slug": "limbo",
+      "title": "Limbo",
+      "decision": "scrap",
+      "group": "ticket machines",
+      "work": "retire",
+      "threeD": false,
+      "reason": "Thin play, or another multiplier run the floor already has."
+    },
+    {
+      "slug": "dragon",
+      "title": "Dragon Tower",
+      "decision": "scrap",
+      "group": "ticket machines",
+      "work": "retire",
+      "threeD": false,
+      "reason": "Thin play, or another multiplier run the floor already has."
+    },
+    {
+      "slug": "gem-roll",
+      "title": "Gem Roll",
+      "decision": "scrap",
+      "group": "ticket machines",
+      "work": "retire",
+      "threeD": false,
+      "reason": "Thin play, or another multiplier run the floor already has."
+    },
+    {
+      "slug": "scratch",
+      "title": "Scratch Cards",
+      "decision": "scrap",
+      "group": "ticket machines",
+      "work": "retire",
+      "threeD": false,
+      "reason": "Thin play, or another multiplier run the floor already has."
+    },
+    {
+      "slug": "pump",
+      "title": "Pump",
+      "decision": "scrap",
+      "group": "ticket machines",
+      "work": "retire",
+      "threeD": false,
+      "reason": "Thin play, or another multiplier run the floor already has."
+    },
+    {
+      "slug": "sequence",
+      "title": "Sequence Memory",
+      "decision": "scrap",
+      "group": "quick play",
+      "work": "retire",
+      "threeD": false,
+      "reason": "A hypercasual clone with no midway angle."
+    },
+    {
+      "slug": "knife-booth",
+      "title": "Knife Booth",
+      "decision": "scrap",
+      "group": "quick play",
+      "work": "retire",
+      "threeD": false,
+      "reason": "A hypercasual clone with no midway angle."
+    },
+    {
+      "slug": "melon-chop",
+      "title": "Melon Chop",
+      "decision": "scrap",
+      "group": "quick play",
+      "work": "retire",
+      "threeD": false,
+      "reason": "A hypercasual clone with no midway angle."
+    },
+    {
+      "slug": "sky-climber",
+      "title": "Sky Climber",
+      "decision": "scrap",
+      "group": "quick play",
+      "work": "retire",
+      "threeD": false,
+      "reason": "A hypercasual clone with no midway angle."
+    },
+    {
+      "slug": "log-splitter",
+      "title": "Log Splitter",
+      "decision": "scrap",
+      "group": "quick play",
+      "work": "retire",
+      "threeD": false,
+      "reason": "A hypercasual clone with no midway angle."
+    },
+    {
+      "slug": "sudoku",
+      "title": "Sudoku",
+      "decision": "scrap",
+      "group": "quick play",
+      "work": "retire",
+      "threeD": false,
+      "reason": "Fine on its own, but chess and the daily already cover it."
+    },
+    {
+      "slug": "freecell",
+      "title": "FreeCell Sprint",
+      "decision": "scrap",
+      "group": "quick play",
+      "work": "retire",
+      "threeD": false,
+      "reason": "Fine on its own, but chess and the daily already cover it."
+    },
+    {
+      "slug": "math",
+      "title": "Mental Math Sprint",
+      "decision": "scrap",
+      "group": "quick play",
+      "work": "retire",
+      "threeD": false,
+      "reason": "Fine on its own, but chess and the daily already cover it."
+    },
+    {
+      "slug": "blitz-tactics",
+      "title": "Blitz Tactics",
+      "decision": "scrap",
+      "group": "quick play",
+      "work": "retire",
+      "threeD": false,
+      "reason": "Fine on its own, but chess and the daily already cover it."
+    },
+    {
+      "slug": "checkers",
+      "title": "Checkers",
+      "decision": "scrap",
+      "group": "quick play",
+      "work": "retire",
+      "threeD": false,
+      "reason": "Fine on its own, but chess and the daily already cover it."
+    },
+    {
+      "slug": "reversi",
+      "title": "Reversi",
+      "decision": "scrap",
+      "group": "quick play",
+      "work": "retire",
+      "threeD": false,
+      "reason": "Fine on its own, but chess and the daily already cover it."
+    }
+  ],
+  "newGames": [
+    {
+      "slug": "ticket-stop",
+      "decision": "floor",
+      "group": "quick play",
+      "work": "new",
+      "dim": "2D",
+      "pitch": "Stop the light in the window. Three rounds. Small build, sets the cabinet style."
+    },
+    {
+      "slug": "coin-pusher",
+      "decision": "floor",
+      "group": "ticket machines",
+      "work": "new",
+      "dim": "3D",
+      "pitch": "Two moving shelves, coins you drop, a tray that pays. Your machine keeps its state between visits."
+    },
+    {
+      "slug": "trick-shot",
+      "decision": "floor",
+      "group": "daily",
+      "work": "new",
+      "dim": "2D",
+      "pitch": "One pool position a day, one shot to clear it. Runs on the 8-ball engine."
+    },
+    {
+      "slug": "bumper-cars",
+      "decision": "floor",
+      "group": "with friends",
+      "work": "new",
+      "dim": "3D",
+      "pitch": "Four to eight players, 90-second rounds, most bumps wins. Built from swerve's cars."
+    },
+    {
+      "slug": "mini-golf",
+      "decision": "floor",
+      "group": "daily",
+      "work": "new",
+      "dim": "3D",
+      "pitch": "Nine boardwalk holes, a new course each day, friends compared on one card."
+    },
+    {
+      "slug": "ring-toss",
+      "decision": "floor",
+      "group": "boardwalk",
+      "work": "new",
+      "dim": "3D",
+      "pitch": "Toss rings at a crate of bottles. Short, physical, good on a phone."
+    }
+  ]
+}

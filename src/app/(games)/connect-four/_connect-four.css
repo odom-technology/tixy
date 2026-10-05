@@ -1,0 +1,491 @@
+/* ──────────────────────────────────────────────────────────────────────
+   Connect Four: the rack, the chips, the lit four. SCOPED to
+   .connect-four-arcade so nothing leaks into shared surfaces or sibling
+   games. The default look is the tixy palette: a dark rack with deep holes,
+   red and ticket-amber chips with paper rims. Equipped skins override the
+   colours through the --c4-* vars set inline by _board.tsx. Motion only when
+   something happens; every animation lands on its final state under
+   prefers-reduced-motion. Keyframes prefixed c4-mk-.
+   ────────────────────────────────────────────────────────────────────── */
+
+/* ── Backdrop mat behind the rack (background cosmetic slot). Transparent
+   with zero padding by default; an equipped background skin lifts --c4-bg-*
+   to show a framed mat. ────────────────────────────────────────────────── */
+.connect-four-arcade {
+  max-width: min(92vw, 640px);
+  background: linear-gradient(
+    180deg,
+    var(--c4-bg-top, transparent),
+    var(--c4-bg-bottom, transparent)
+  );
+  padding: var(--c4-bg-pad, 0px);
+  border-radius: var(--c4-bg-radius, 0px);
+}
+
+/* ── The rack: a thick ink frame with a lip under it, so it stands off the
+   screen. The base is a hard step, not a blur. ──────────────────────────── */
+.connect-four-arcade .c4-cabinet {
+  position: relative;
+  padding: clamp(6px, 1.2vw, 12px);
+  border-radius: calc(var(--radius-well, 10px) + 8px);
+  background: linear-gradient(
+    180deg,
+    var(--c4-frame-top, #2b2119),
+    var(--c4-frame-bottom, #2b2119)
+  );
+  border: 1px solid var(--c4-frame-edge, #1f1a16);
+  box-shadow:
+    inset 0 1px 0 rgb(244 235 220 / 0.14),
+    0 clamp(4px, 0.9vw, 8px) 0 var(--c4-frame-edge, #1f1a16);
+}
+
+/* the face the holes are punched in: a step lighter at the top, deeper at
+   the bottom, with a dark inner lip all round */
+.connect-four-arcade .c4-playfield {
+  --c4-gap: clamp(4px, 1.3vw, 10px);
+  position: relative;
+  border-radius: var(--radius-well, 10px);
+  background: linear-gradient(
+    180deg,
+    var(--c4-board, #5e4d3e),
+    var(--c4-board-deep, #46392e)
+  );
+  padding: clamp(6px, 1.1vw, 12px);
+  box-shadow:
+    inset 0 2px 10px rgb(18 15 12 / 0.65),
+    inset 0 0 0 1px rgb(244 235 220 / 0.06);
+  touch-action: none;
+}
+
+/* ── The drop row above the rack: where the preview chip hovers ───────── */
+.connect-four-arcade .c4-droprow {
+  position: relative;
+  margin-bottom: var(--c4-gap);
+}
+.connect-four-arcade .c4-droprow-sizer {
+  display: block;
+  width: calc((100% - 6 * var(--c4-gap)) / 7);
+  aspect-ratio: 1 / 1;
+  visibility: hidden;
+}
+
+/* the 7×6 cell grid */
+.connect-four-arcade .c4-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: var(--c4-gap);
+}
+
+/* a single hole: punched through the face, with a lit lower lip and a deep
+   shadow at the top */
+.connect-four-arcade .c4-cell {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border-radius: 999px;
+  background: radial-gradient(
+    circle at 50% 38%,
+    var(--c4-hole, #1f1a16),
+    var(--c4-hole-deep, #120f0c) 72%
+  );
+  box-shadow:
+    inset 0 4px 8px rgb(0 0 0 / 0.75),
+    0 1px 0 rgb(244 235 220 / 0.09);
+}
+
+/* ── A chip: a coloured body, a striped paper rim and an inner ring, so it
+   reads as a casino chip. The three skin vars drive its colours. ──────── */
+.connect-four-arcade .c4-disc {
+  position: absolute;
+  inset: 7%;
+  border-radius: 999px;
+  transform-origin: 50% 100%;
+  /* the thin ink line keeps the paper rim readable on any skin's body */
+  box-shadow:
+    inset 0 2px 0 rgb(255 255 255 / 0.25),
+    inset 0 -3px 4px rgb(0 0 0 / 0.35),
+    0 2px 3px rgb(0 0 0 / 0.5),
+    0 0 0 1px rgb(31 26 22 / 0.55);
+}
+.connect-four-arcade .c4-disc::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  /* nine paper notches round the rim */
+  background: repeating-conic-gradient(
+    rgb(244 235 220 / 0.92) 0deg 9deg,
+    transparent 9deg 40deg
+  );
+  -webkit-mask: radial-gradient(circle, transparent 0 73%, #000 74%);
+  mask: radial-gradient(circle, transparent 0 73%, #000 74%);
+}
+.connect-four-arcade .c4-disc::after {
+  content: '';
+  position: absolute;
+  inset: 24%;
+  border-radius: inherit;
+  box-shadow:
+    inset 0 0 0 2px rgb(244 235 220 / 0.55),
+    inset 0 2px 3px rgb(0 0 0 / 0.25);
+}
+.connect-four-arcade .c4-disc-red {
+  background: radial-gradient(
+    circle at 50% 34%,
+    var(--c4-disc-red-glint, #d4604f),
+    var(--c4-disc-red, #b83627) 62%,
+    var(--c4-disc-red-edge, #8a2a1e) 100%
+  );
+}
+.connect-four-arcade .c4-disc-yellow {
+  background: radial-gradient(
+    circle at 50% 34%,
+    var(--c4-disc-yellow-glint, #f8c57a),
+    var(--c4-disc-yellow, #f2a33c) 60%,
+    var(--c4-disc-yellow-edge, #c47f1f) 100%
+  );
+}
+
+/* Optional disc glow (cosmetic fx, off by default). Applied only when the
+   wrapper carries .c4-fx-disc-glow; a static coloured halo per colour. */
+.connect-four-arcade.c4-fx-disc-glow .c4-disc-red {
+  filter: drop-shadow(
+    0 0 7px color-mix(in srgb, var(--c4-disc-red, #b83627) 78%, transparent)
+  );
+}
+.connect-four-arcade.c4-fx-disc-glow .c4-disc-yellow {
+  filter: drop-shadow(
+    0 0 7px color-mix(in srgb, var(--c4-disc-yellow, #f2a33c) 78%, transparent)
+  );
+}
+
+/* ── A dropped chip falls under gravity, lands, bounces once and settles.
+   --c4-fall is how many cells it falls, --c4-ms the whole drop (the landing
+   is at 72%), --c4-bounce how high the one bounce goes. _board.tsx sets all
+   three and plays the clack at the landing. ───────────────────────────── */
+.connect-four-arcade .c4-disc-drop {
+  animation: c4-mk-drop var(--c4-ms, 300ms) both;
+}
+@keyframes c4-mk-drop {
+  0% {
+    transform: translateY(calc(var(--c4-fall, 3) * -100%));
+    animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45);
+  }
+  72% {
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0.2, 0.6, 0.4, 1);
+  }
+  86% {
+    transform: translateY(calc(var(--c4-bounce, 12%) * -1));
+    animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+/* ── The winning four light up one after another along the line. Each
+   chip's own --c4-win-delay staggers it; it pops, then stays lit. The
+   rest of the rack dims so the four stand out. ──────────────────────────── */
+.connect-four-arcade .c4-disc-win {
+  z-index: 2;
+  transform-origin: 50% 50%;
+  filter: brightness(1.15);
+  box-shadow:
+    inset 0 2px 0 rgb(255 255 255 / 0.25),
+    inset 0 -3px 4px rgb(0 0 0 / 0.35),
+    0 2px 3px rgb(0 0 0 / 0.5),
+    0 0 0 3px #f4ebdc,
+    0 0 12px 3px rgb(244 235 220 / 0.4);
+  animation: c4-mk-win-light 420ms cubic-bezier(0.2, 1.5, 0.4, 1) both;
+  animation-delay: var(--c4-win-delay, 0ms);
+}
+/* the pop uses the scale property, so it stacks with the drop's transform
+   when the chip that made the four is also the chip that just fell */
+@keyframes c4-mk-win-light {
+  0% {
+    scale: 1;
+    filter: brightness(1);
+    box-shadow:
+      inset 0 2px 0 rgb(255 255 255 / 0.25),
+      inset 0 -3px 4px rgb(0 0 0 / 0.35),
+      0 2px 3px rgb(0 0 0 / 0.5),
+      0 0 0 0 rgb(244 235 220 / 0),
+      0 0 0 0 rgb(244 235 220 / 0);
+  }
+  45% {
+    scale: 1.14;
+    filter: brightness(1.4);
+  }
+  100% {
+    scale: 1;
+    filter: brightness(1.15);
+    box-shadow:
+      inset 0 2px 0 rgb(255 255 255 / 0.25),
+      inset 0 -3px 4px rgb(0 0 0 / 0.35),
+      0 2px 3px rgb(0 0 0 / 0.5),
+      0 0 0 3px #f4ebdc,
+      0 0 12px 3px rgb(244 235 220 / 0.4);
+  }
+}
+/* a finished game opened from a link: lit at once, no motion */
+.connect-four-arcade .c4-disc-win[data-static] {
+  animation: none;
+}
+/* the chip that made the four also fell: run both animations */
+.connect-four-arcade .c4-disc-drop.c4-disc-win:not([data-static]) {
+  animation:
+    c4-mk-drop var(--c4-ms, 300ms) both,
+    c4-mk-win-light 420ms cubic-bezier(0.2, 1.5, 0.4, 1) both;
+  animation-delay: 0ms, var(--c4-win-delay, 0ms);
+}
+.connect-four-arcade.c4-has-win .c4-disc:not(.c4-disc-win) {
+  opacity: 0.5;
+  transition: opacity 300ms var(--tixy-ease-settle, ease-out);
+}
+
+/* keyboard focus on a column: a paper outline inside the rack */
+.connect-four-arcade .c4-column:focus-visible {
+  outline: 2px solid #f4ebdc;
+  outline-offset: -2px;
+}
+
+/* ── Column affordance: a tint under the finger or pointer, and the preview
+   chip hovering over that column in the drop row ───────────────────────── */
+.connect-four-arcade .c4-column {
+  position: relative;
+  cursor: pointer;
+  border-radius: var(--radius-key, 8px);
+}
+.connect-four-arcade .c4-column-preview {
+  background: rgb(244 235 220 / 0.07);
+}
+.connect-four-arcade .c4-column-disabled {
+  cursor: default;
+}
+
+.connect-four-arcade .c4-preview {
+  position: absolute;
+  top: 0;
+  left: calc(var(--c4-col, 0) * ((100% - 6 * var(--c4-gap)) / 7 + var(--c4-gap)));
+  width: calc((100% - 6 * var(--c4-gap)) / 7);
+  aspect-ratio: 1 / 1;
+  pointer-events: none;
+  transition: left 90ms var(--tixy-ease-settle, ease-out), opacity 90ms ease-out;
+}
+.connect-four-arcade .c4-preview .c4-disc {
+  inset: 7%;
+}
+
+/* where the chip would land */
+.connect-four-arcade .c4-ghost-disc {
+  opacity: 0.4;
+}
+
+/* the marker over the last move's column */
+.connect-four-arcade .c4-lastmove {
+  position: absolute;
+  left: 50%;
+  top: -3px;
+  width: 16%;
+  height: 4px;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: var(--c4-accent, #f2a33c);
+}
+
+/* ── A skin set (SKINS.md): flat. The rack face takes the frame colour and
+   its material, the holes are flat cavities, and each chip is a flat SVG
+   (`_chip-art.tsx`) in the same box the house chip fills. Only looks change:
+   the drop, the squash, the hit areas and every time are the house's. ──── */
+.connect-four-arcade.c4-skinned .c4-cabinet {
+  box-shadow: 0 clamp(4px, 0.9vw, 8px) 0 var(--c4-frame-edge, #1f1a16);
+}
+.connect-four-arcade.c4-skinned .c4-playfield {
+  background-color: var(--c4-board);
+  background-image: var(--c4-face-image, none);
+  background-size: var(--c4-face-size, auto);
+  box-shadow: var(--c4-face-inset, none);
+}
+.connect-four-arcade.c4-skinned .c4-cell {
+  background: var(--c4-hole);
+  box-shadow: none;
+}
+.connect-four-arcade.c4-skinned .c4-disc {
+  background: none;
+  box-shadow: none;
+}
+.connect-four-arcade.c4-skinned .c4-disc::before,
+.connect-four-arcade.c4-skinned .c4-disc::after {
+  content: none;
+}
+.connect-four-arcade.c4-skinned .c4-disc[data-side='you'] {
+  --chip: var(--c4-you);
+  --chip-ink: var(--c4-you-ink);
+  --chip-edge: var(--c4-you-edge);
+}
+.connect-four-arcade.c4-skinned .c4-disc[data-side='them'] {
+  --chip: var(--c4-them);
+  --chip-ink: var(--c4-them-ink);
+  --chip-edge: var(--c4-them-edge);
+}
+.connect-four-arcade .c4-chip-art {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+/* the four: a ring round each, one hole-coloured gap off the chip so it
+   never melts into a chip of its own colour */
+.connect-four-arcade.c4-skinned .c4-disc-win {
+  filter: none;
+  box-shadow:
+    0 0 0 1.5px var(--c4-hole),
+    0 0 0 4px var(--c4-win);
+  animation: c4-mk-skin-win 420ms cubic-bezier(0.2, 1.5, 0.4, 1) both;
+  animation-delay: var(--c4-win-delay, 0ms);
+}
+@keyframes c4-mk-skin-win {
+  0% {
+    scale: 1;
+    box-shadow: 0 0 0 0 transparent, 0 0 0 0 transparent;
+  }
+  45% {
+    scale: 1.14;
+  }
+  100% {
+    scale: 1;
+    box-shadow:
+      0 0 0 1.5px var(--c4-hole),
+      0 0 0 4px var(--c4-win);
+  }
+}
+.connect-four-arcade.c4-skinned .c4-disc-win[data-static] {
+  animation: none;
+}
+.connect-four-arcade.c4-skinned .c4-disc-drop.c4-disc-win:not([data-static]) {
+  animation:
+    c4-mk-drop var(--c4-ms, 300ms) both,
+    c4-mk-skin-win 420ms cubic-bezier(0.2, 1.5, 0.4, 1) both;
+  animation-delay: 0ms, var(--c4-win-delay, 0ms);
+}
+.connect-four-arcade.c4-skinned .c4-column-preview {
+  background: color-mix(in srgb, var(--c4-accent) 14%, transparent);
+}
+
+/* ── The match stage: a player row, the rack, a player row, all as wide as
+   the rack. The rack is the largest square the stage leaves after the two
+   rows, so a match fits one screen at any size. ─────────────────────────── */
+.c4-stage {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+  container-type: size;
+}
+.c4-stage .c4-stage-inner {
+  --c4-seat: 3.25rem;
+  --c4-stack-gap: 0.5rem;
+  --c4-board: min(
+    calc(100cqw - 1rem),
+    calc(100cqh - 2 * var(--c4-seat) - 2 * var(--c4-stack-gap) - 0.75rem),
+    640px
+  );
+  display: flex;
+  flex-direction: column;
+  gap: var(--c4-stack-gap);
+  width: var(--c4-board);
+}
+.c4-stage .c4-seat {
+  display: flex;
+  flex: none;
+  align-items: center;
+  height: var(--c4-seat);
+  min-width: 0;
+}
+.c4-stage .c4-seat > * {
+  flex: 1;
+  min-width: 0;
+}
+.c4-stage .connect-four-arcade {
+  width: 100%;
+  max-width: none;
+}
+
+/* ── Reduced motion: the chip is where it lands, the four are lit ─────── */
+@media (prefers-reduced-motion: reduce) {
+  .connect-four-arcade .c4-disc-drop,
+  .connect-four-arcade .c4-disc-win {
+    animation: none !important;
+  }
+  .connect-four-arcade .c4-preview,
+  .connect-four-arcade.c4-has-win .c4-disc:not(.c4-disc-win) {
+    transition: none;
+  }
+}
+
+/* ── A phone on its side: the stage is wide and short, so the player rows go
+   beside the rack and the rack takes the full height. ─────────────────── */
+@container (aspect-ratio > 1) and (max-height: 30rem) {
+  .c4-stage .c4-stage-inner {
+    --c4-board: min(calc(100cqh - 0.25rem), calc(100cqw - 14rem), 640px);
+    display: grid;
+    width: 100%;
+    grid-template-columns: var(--c4-board) minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    justify-content: center;
+    align-content: space-between;
+    column-gap: 0.75rem;
+    height: var(--c4-board);
+  }
+  .c4-stage .c4-stage-inner > :nth-child(1) {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: start;
+  }
+  .c4-stage .c4-stage-inner > :nth-child(2) {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    align-self: center;
+  }
+  .c4-stage .c4-stage-inner > :nth-child(3) {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: end;
+  }
+}
+
+/* Resign and cancel: under the screen normally, beside the rack on a phone on
+   its side, where every pixel of height is the rack's. */
+.c4-actions-stage {
+  display: none;
+}
+@media (orientation: landscape) and (max-height: 32rem) {
+  .arc-shell[data-game='connect-four'] .arc-shell-controls:has(.c4-actions-controls) {
+    display: none;
+  }
+  .arc-shell[data-game='connect-four'] .arc-shell-hint {
+    min-height: 0;
+    padding-block: 0.125rem;
+  }
+  .c4-actions-stage {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+}
+@container (aspect-ratio > 1) and (max-height: 30rem) {
+  .c4-stage .c4-stage-inner {
+    grid-template-rows: auto 1fr auto;
+  }
+  .c4-stage .c4-stage-inner > :nth-child(2) {
+    grid-row: 1 / span 3;
+  }
+  .c4-stage .c4-stage-inner > :nth-child(3) {
+    grid-row: 3;
+  }
+  .c4-stage .c4-stage-inner > :nth-child(4) {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: center;
+  }
+}

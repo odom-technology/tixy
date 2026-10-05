@@ -1,0 +1,744 @@
+[
+  {
+    "id": "0ebf0fee-22cd-47c8-beb9-b37e8202465a",
+    "name": "Ember Bird",
+    "gameType": "flappy-bird",
+    "rarity": "epic",
+    "currencyType": "credits",
+    "price": 800,
+    "slots": [
+      "bird"
+    ],
+    "active": true,
+    "seasonTag": null,
+    "assetRef": {
+      "birdPrimary": "#292524",
+      "birdSecondary": "#ea580c",
+      "birdGlow": true,
+      "birdGlowColor": "#f97316",
+      "birdGlowSize": 14
+    }
+  },
+  {
+    "id": "1af5f18b-4780-4b0d-90b4-6b70ead9edef",
+    "name": "Shadow Trail",
+    "gameType": "flappy-bird",
+    "rarity": "epic",
+    "currencyType": "credits",
+    "price": 800,
+    "slots": [
+      "trail"
+    ],
+    "active": true,
+    "seasonTag": null,
+    "assetRef": {
+      "trailColors": [
+        "#1e1b4b",
+        "#312e81",
+        "#4338ca"
+      ]
+    }
+  },
+  {
+    "id": "20726fd8-b54d-4d10-a6c4-762ab9e05e97",
+    "name": "Storm",
+    "gameType": "flappy-bird",
+    "rarity": "rare",
+    "currencyType": "credits",
+    "price": 500,
+    "slots": [
+      "background"
+    ],
+    "active": true,
+    "seasonTag": null,
+    "assetRef": {
+      "skyTop": "#1f2937",
+      "skyBottom": "#475569",
+      "ground": "#57534e"
+    }
+  },
+  {
+    "id": "2b0e0caf-c905-47ea-835d-9e50077adbd6",
+    "name": "Gold Pipes",
+    "gameType": "flappy-bird",
+    "rarity": "epic",
+    "currencyType": "credits",
+    "price": 800,
+    "slots": [
+      "pipe"
+    ],
+    "active": true,
+    "seasonTag": null,
+    "assetRef": {
+      "pipePrimary": "#b8860b",
+      "pipeSecondary": "#ffd700",
+      "pipeGlow": true,
+      "pipeGlowColor": "#fbbf24",
+      "pipeGlowSize": 6
+    }
+  },
+  {
+    "id": "2e9dfc5c-6689-46cc-bbaf-58a66fef6c82",
+    "name": "Ice Pipes",
+    "gameType": "flappy-bird",
+    "rarity": "rare",
+    "currencyType": "credits",
+    "price": 500,
+    "slots": [
+      "pipe"
+    ],
+    "active": true,
+    "seasonTag": null,
+    "assetRef": {
+      "pipePrimary": "#e0f2fe",
+      "pipeSecondary": "#7dd3fc"
+    }
+  },
+  {
+    "id": "3802222f-7cb3-4aa7-adb6-48479285d648",
+    "name": "Frost Trail",
+    "gameType": "flappy-bird",
+    "rarity": "rare",
+    "currencyType": "credits",
+    "price": 500,
+    "slots": [
+      "trail"
+    ],
+    "active": true,
+    "seasonTag": null,
+    "assetRef": {
+      "trailColors": [
+        "#bfdbfe",
+        "#dbeafe",
+        "#e0f7fa",
+        "#ffffff"
+      ]
+    }
+  },
+  {
+    "id": "3c09a83d-fdf5-457e-98b0-4eb36175a599",
+    "name": "Obsidian Pipes",
+    "gameType": "flappy-bird",
+    "rarity": "rare",
+    "currencyType": "credits",
+    "price": 500,
+    "slots": [
+      "pipe"
+    ],
+    "active": true,
+    "seasonTag": null,
+    "assetRef": {
+      "pipePrimary": "#1a1a2e",
+      "pipeSecondary": "#16213e"
+    }
+  },
+  {
+    "id": "3ef8de7d-6b0c-41eb-b147-fb0588559c42",
+    "name": "Galaxy Trail",
+    "gameType": "flappy-bird",
+    "rarity": "epic",
+    "currencyType": "credits",
+    "price": 800,
+    "slots": [
+      "trail"
+    ],
+    "active": true,
+    "seasonTag": null,
+    "assetRef": {
+      "trailColors": [
+        "#7c3aed",
+        "#2563eb",
+        "#06b6d4",
+        "#d946ef"
+      ]
+    }
+  },
+  {
+    "id": "4407cec4-f002-4459-a9a0-9b3c106e9697",
+    "name": "Inferno Trail",
+    "gameType": "flappy-bird",
+    "rarity": "epic",
+    "currencyType": "credits",
+    "price": 800,
+    "slots": [
+      "trail"
+    ],
+    "active": true,
+    "seasonTag": null,
+    "assetRef": {
+      "trailColors": [
+        "#ef4444",
+        "#f97316",
+        "#fbbf24"
+      ]
+    }
+  },
+  {
+    "id": "58a866ae-674a-44db-a96b-adb7cdaeffb9",
+    "name": "Chrome Bird",
+    "gameType": "flappy-bird",
+    "rarity": "rare",
+    "currencyType": "credits",
+    "price": 500,
+    "slots": [
+      "bird"
+    ],
+    "active": true,
+    "seasonTag": null,
+    "assetRef": {
+      "birdPrimary": "#d4d4d8",
+      "birdSecondary": "#a1a1aa",
+      "birdOutline": true,
+      "birdOutlineColor": "#e4e4e7",
+      "birdOutlineWidth": 1
+    }
+  },
+  {
+    "id": "5d89122e-d835-4fe1-9d0f-2d022aed0fda",
+    "name": "Neon Pipes",
+    "gameType": "flappy-bird",
+    "rarity": "epic",
+    "currencyType": "credits",
+    "price": 800,
+    "slots": [
+      "pipe"
+    ],
+    "active": true,
+    "seasonTag": null,
+    "assetRef": {
+      "pipePrimary": "#db2777",
+      "pipeSecondary": "#06b6d4",
+      "pipeGlow": true,
+      "pipeGlowColor": "#ec4899",
+      "pipeGlowSize": 10
+    }
+  },
+  {
+    "id": "806a162d-3794-4855-870b-07bfefd7c4bf",
+    "name": "Synthwave",
+    "gameType": "flappy-bird",
+    "rarity": "legendary",
+    "currencyType": "credits",
+    "price": 10,
+    "slots": [
+      "background"
+    ],
+    "active": true,
+    "seasonTag": null,
+    "assetRef": {
+      "skyTop": "#2e1065",
+      "skyBottom": "#db2777",
+      "ground": "#06b6d4"
+    }
+  },
+  {
+    "id": "81d790d0-31ea-4137-8e11-956ac7df0321",
+    "name": "CHROME Bird",
+    "gameType": "flappy-bird",
+    "rarity": "legendary",
+    "currencyType": "credits",
+    "price": 15,
+    "slots": [
+      "bird"
+    ],
+    "active": true,
+    "seasonTag": null,
+    "assetRef": {
+      "birdPrimary": "#c0c0c0",
+      "birdSecondary": "#8b8682",
+      "birdGlow": true,
+      "birdGlowColor": "#d4d4d8",
+      "birdGlowSize": 10,
+      "birdOutline": true,
+      "birdOutlineColor": "#fafafa",
+      "birdOutlineWidth": 1.5
+    }
+  },
+  {
+    "id": "8b2a1b08-4e15-4352-8079-12b766b0de14",
+    "name": "Sunset",
+    "gameType": "flappy-bird",
+    "rarity": "rare",
+    "currencyType": "credits",
+    "price": 500,
+    "slots": [
+      "background"
+    ],
+    "active": true,
+    "seasonTag": null,
+    "assetRef": {
+      "skyTop": "#ea580c",
+      "skyBottom": "#fb923c",
+      "ground": "#78350f"
+    }
+  },
+  {
+    "id": "8ball-seed-2685fc6167b674f1",
+    "name": "Neon Cue",
+    "gameType": "8-ball",
+    "rarity": "epic",
+    "currencyType": "credits",
+    "price": 800,
+    "slots": [
+      "cue"
+    ],
+    "active": true,
+    "seasonTag": null,
+    "assetRef": {
+      "cueColor": "#06b6d4",
+      "cueTipColor": "#0891b2",
+      "cueGlow": true,
+      "cueGlowColor": "#22d3ee"
+    }
+  },
+  {
+    "id": "8ball-seed-3c3325f6f1d082b5",
+    "name": "Crimson Cue",
+    "gameType": "8-ball",
+    "rarity": "rare",
+    "currencyType": "credits",
+    "price": 500,
+    "slots": [
+      "cue"
+    ],
+    "active": true,
+    "seasonTag": null,
+    "assetRef": {
+      "cueColor": "#ef4444",
+      "cueTipColor": "#991b1b",
+      "cueGlow": false,
+      "cueGlowColor": "#ffffff"
+    }
+  },
+  {
+    "id": "8ball-seed-42e9972fc3f88292",
+    "name": "Pastel Balls",
+    "gameType": "8-ball",
+    "rarity": "rare",
+    "currencyType": "credits",
+    "price": 500,
+    "slots": [
+      "balls"
+    ],
+    "active": true,
+    "seasonTag": null,
+    "assetRef": {
+      "ballYellow": "#fef08a",
+      "ballBlue": "#bfdbfe",
+      "ballRed": "#fecaca",
+      "ballPurple": "#e9d5ff",
+      "ballOrange": "#fed7aa",
+      "ballGreen": "#bbf7d0",
+      "ballMaroon": "#fecdd3"
+    }
+  },
+  {
+    "id": "8ball-seed-44292d6f53c53717",
+    "name": "Synthwave Table",
+    "gameType": "8-ball",
+    "rarity": "legendary",
+    "currencyType": "credits",
+    "price": 10,
+    "slots": [
+      "table"
+    ],
+    "active": true,
+    "seasonTag": null,
+    "assetRef": {
+      "feltColor": "#1e1b4b",
+      "feltDark": "#160f3d",
+      "railColor": "#db2777",
+      "railBorder": "#9d174d",
+      "pocketColor": "#0a0a0a"
+    }
+  },
+  {
+    "id": "8ball-seed-468ff5468b20e80a",
+    "name": "Midnight Table",
+    "gameType": "8-ball",
+    "rarity": "epic",
+    "currencyType": "credits",
+    "price": 800,
+    "slots": [
+      "table"
+    ],
+    "active": true,
+    "seasonTag": null,
+    "assetRef": {
+      "feltColor": "#0f172a",
+      "feltDark": "#020617",
+      "railColor": "#1e293b",
+      "railBorder": "#0f172a",
+      "pocketColor": "#000000"
+    }
+  },
+  {
+    "id": "8ball-seed-54e3a97bfa606b0a",
+    "name": "CHROME Balls",
+    "gameType": "8-ball",
+    "rarity": "legendary",
+    "currencyType": "credits",
+    "price": 8,
+    "slots": [
+      "balls"
+    ],
+    "active": true,
+    "seasonTag": null,
+    "assetRef": {
+      "ballYellow": "#d4d4d8",
+      "ballBlue": "#a1a1aa",
+      "ballRed": "#e4e4e7",
+      "ballPurple": "#71717a",
+      "ballOrange": "#f4f4f5",
+      "ballGreen": "#52525b",
+      "ballMaroon": "#3f3f46"
+    }
+  },
+  {
+    "id": "8ball-seed-6b2921c042a5bb4a",
+    "name": "Crimson Table",
+    "gameType": "8-ball",
+    "rarity": "rare",
+    "currencyType": "credits",
+    "price": 500,
+    "slots": [
+      "table"
+    ],
+    "active": true,
+    "seasonTag": null,
+    "assetRef": {
+      "feltColor": "#7f1d1d",
+      "feltDark": "#5c1616",
+      "railColor": "#991b1b",
+      "railBorder": "#7f1d1d",
+      "pocketColor": "#0a0a0a"
+    }
+  },
+  {
+    "id": "8ball-seed-7cce3d34f8c3cb0e",
+    "name": "Monochrome Balls",
+    "gameType": "8-ball",
+    "rarity": "epic",
+    "currencyType": "credits",
+    "price": 700,
+    "slots": [
+      "balls"
+    ],
+    "active": true,
+    "seasonTag": null,
+    "assetRef": {
+      "ballYellow": "#e2e8f0",
+      "ballBlue": "#94a3b8",
+      "ballRed": "#64748b",
+      "ballPurple": "#475569",
+      "ballOrange": "#cbd5e1",
+      "ballGreen": "#334155",
+      "ballMaroon": "#1e293b"
+    }
+  },
+  {
+    "id": "8ball-seed-887c80ef37ca7aac",
+    "name": "CHROME Cue",
+    "gameType": "8-ball",
+    "rarity": "legendary",
+    "currencyType": "credits",
+    "price": 15,
+    "slots": [
+      "cue"
+    ],
+    "active": true,
+    "seasonTag": null,
+    "assetRef": {
+      "cueColor": "#d4d4d8",
+      "cueTipColor": "#71717a",
+      "cueGlow": true,
+      "cueGlowColor": "#e4e4e7"
+    }
+  },
+  {
+    "id": "8ball-seed-89bb643ac6fabda3",
+    "name": "Jewel Tone Balls",
+    "gameType": "8-ball",
+    "rarity": "epic",
+    "currencyType": "credits",
+    "price": 750,
+    "slots": [
+      "balls"
+    ],
+    "active": true,
+    "seasonTag": null,
+    "assetRef": {
+      "ballYellow": "#ca8a04",
+      "ballBlue": "#1e40af",
+      "ballRed": "#991b1b",
+      "ballPurple": "#6b21a8",
+      "ballOrange": "#c2410c",
+      "ballGreen": "#166534",
+      "ballMaroon": "#881337"
+    }
+  },
+  {
+    "id": "8ball-seed-9887fa476ec4edea",
+    "name": "Golden Cue",
+    "gameType": "8-ball",
+    "rarity": "legendary",
+    "currencyType": "credits",
+    "price": 10,
+    "slots": [
+      "cue"
+    ],
+    "active": true,
+    "seasonTag": null,
+    "assetRef": {
+      "cueColor": "#fbbf24",
+      "cueTipColor": "#b45309",
+      "cueGlow": true,
+      "cueGlowColor": "#fcd34d"
+    }
+  },
+  {
+    "id": "8ball-seed-a1f9038f39c3e577",
+    "name": "Classic Blue Table",
+    "gameType": "8-ball",
+    "rarity": "common",
+    "currencyType": "credits",
+    "price": 300,
+    "slots": [
+      "table"
+    ],
+    "active": true,
+    "seasonTag": null,
+    "assetRef": {
+      "feltColor": "#1e3a5f",
+      "feltDark": "#172e4d",
+      "railColor": "#5c3a1e",
+      "railBorder": "#3d2510",
+      "pocketColor": "#0a0a0a"
+    }
+  },
+  {
+    "id": "8ball-seed-a7239b332f1ccb3a",
+    "name": "Obsidian Cue",
+    "gameType": "8-ball",
+    "rarity": "epic",
+    "currencyType": "credits",
+    "price": 800,
+    "slots": [
+      "cue"
+    ],
+    "active": true,
+    "seasonTag": null,
+    "assetRef": {
+      "cueColor": "#1e1b4b",
+      "cueTipColor": "#0f0f0f",
+      "cueGlow": true,
+      "cueGlowColor": "#7c3aed"
+    }
+  },
+  {
+    "id": "8ball-seed-a7bc657f4905ebf2",
+    "name": "Ocean Table",
+    "gameType": "8-ball",
+    "rarity": "epic",
+    "currencyType": "credits",
+    "price": 800,
+    "slots": [
+      "table"
+    ],
+    "active": true,
+    "seasonTag": null,
+    "assetRef": {
+      "feltColor": "#164e63",
+      "feltDark": "#0e3a4a",
+      "railColor": "#155e75",
+      "railBorder": "#0c4a5e",
+      "pocketColor": "#042f2e"
+    }
+  },
+  {
+    "id": "8ball-seed-c72cec1b1ce9c84a",
+    "name": "Neon Balls",
+    "gameType": "8-ball",
+    "rarity": "rare",
+    "currencyType": "credits",
+    "price": 500,
+    "slots": [
+      "balls"
+    ],
+    "active": true,
+    "seasonTag": null,
+    "assetRef": {
+      "ballYellow": "#facc15",
+      "ballBlue": "#38bdf8",
+      "ballRed": "#fb7185",
+      "ballPurple": "#c084fc",
+      "ballOrange": "#fb923c",
+      "ballGreen": "#4ade80",
+      "ballMaroon": "#f472b6"
+    }
+  },
+  {
+    "id": "8ball-seed-cc7505d754df853a",
+    "name": "Sakura Cue",
+    "gameType": "8-ball",
+    "rarity": "rare",
+    "currencyType": "credits",
+    "price": 500,
+    "slots": [
+      "cue"
+    ],
+    "active": true,
+    "seasonTag": null,
+    "assetRef": {
+      "cueColor": "#f9a8d4",
+      "cueTipColor": "#be185d",
+      "cueGlow": false,
+      "cueGlowColor": "#ffffff"
+    }
+  },
+  {
+    "id": "8ball-seed-ccc4bc56a569fa1a",
+    "name": "CHROME Table",
+    "gameType": "8-ball",
+    "rarity": "legendary",
+    "currencyType": "credits",
+    "price": 12,
+    "slots": [
+      "table"
+    ],
+    "active": true,
+    "seasonTag": null,
+    "assetRef": {
+      "feltColor": "#18181b",
+      "feltDark": "#0f0f11",
+      "railColor": "#a1a1aa",
+      "railBorder": "#71717a",
+      "pocketColor": "#000000"
+    }
+  },
+  {
+    "id": "8ball-seed-ef50cc69af62b19a",
+    "name": "Royal Purple Table",
+    "gameType": "8-ball",
+    "rarity": "rare",
+    "currencyType": "credits",
+    "price": 500,
+    "slots": [
+      "table"
+    ],
+    "active": true,
+    "seasonTag": null,
+    "assetRef": {
+      "feltColor": "#3b0764",
+      "feltDark": "#2e1065",
+      "railColor": "#581c87",
+      "railBorder": "#3b0764",
+      "pocketColor": "#0a0a0a"
+    }
+  },
+  {
+    "id": "a85945af-bbfb-4c9f-99f2-5b4e6fa8ee08",
+    "name": "Deep Space",
+    "gameType": "flappy-bird",
+    "rarity": "epic",
+    "currencyType": "credits",
+    "price": 800,
+    "slots": [
+      "background"
+    ],
+    "active": true,
+    "seasonTag": null,
+    "assetRef": {
+      "skyTop": "#020617",
+      "skyBottom": "#0f172a",
+      "ground": "#1e293b"
+    }
+  },
+  {
+    "id": "a9e31e4c-2773-454d-9560-527ae5b87e16",
+    "name": "Rainbow Trail",
+    "gameType": "flappy-bird",
+    "rarity": "legendary",
+    "currencyType": "credits",
+    "price": 12,
+    "slots": [
+      "trail"
+    ],
+    "active": true,
+    "seasonTag": null,
+    "assetRef": {
+      "trailColors": [
+        "#ef4444",
+        "#f97316",
+        "#eab308",
+        "#22c55e",
+        "#3b82f6",
+        "#8b5cf6"
+      ]
+    }
+  },
+  {
+    "id": "bd612513-803d-4760-89f7-14b74ba0fe94",
+    "name": "Void Bird",
+    "gameType": "flappy-bird",
+    "rarity": "epic",
+    "currencyType": "credits",
+    "price": 800,
+    "slots": [
+      "bird"
+    ],
+    "active": true,
+    "seasonTag": null,
+    "assetRef": {
+      "birdPrimary": "#0a0a0a",
+      "birdSecondary": "#581c87",
+      "birdOutline": true,
+      "birdOutlineColor": "#a855f7",
+      "birdOutlineWidth": 2
+    }
+  },
+  {
+    "id": "cd92cb68-eb50-4e6b-8583-6b9b7e0ee2ae",
+    "name": "Sakura Trail",
+    "gameType": "flappy-bird",
+    "rarity": "rare",
+    "currencyType": "credits",
+    "price": 500,
+    "slots": [
+      "trail"
+    ],
+    "active": true,
+    "seasonTag": null,
+    "assetRef": {
+      "trailColors": [
+        "#fda4af",
+        "#fecdd3",
+        "#ffe4e6",
+        "#ffffff"
+      ]
+    }
+  },
+  {
+    "id": "ea03868d-f06b-4c7e-bcc9-bd58db38e9b5",
+    "name": "Hologram Bird",
+    "gameType": "flappy-bird",
+    "rarity": "legendary",
+    "currencyType": "credits",
+    "price": 10,
+    "slots": [
+      "bird"
+    ],
+    "active": true,
+    "seasonTag": null,
+    "assetRef": {
+      "birdPrimary": "#06b6d4",
+      "birdSecondary": "#22d3ee",
+      "birdGlow": true,
+      "birdGlowColor": "#67e8f9",
+      "birdGlowSize": 18,
+      "birdOutline": true,
+      "birdOutlineColor": "#ffffff",
+      "birdOutlineWidth": 1.5
+    }
+  }
+]

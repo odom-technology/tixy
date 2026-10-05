@@ -1,0 +1,17 @@
+/* Ticket stop, the lock: the stage is one big button over the canvas. */
+
+.tsl-stage {
+  position: absolute;
+  inset: 0;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  touch-action: none;
+}
+
+.tsl-stage > canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+}

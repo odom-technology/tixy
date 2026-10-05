@@ -1,0 +1,5 @@
+ALTER TABLE IF EXISTS chess_matches
+  ADD COLUMN IF NOT EXISTS wager_status TEXT;
+
+ALTER TABLE IF EXISTS pool_matches
+  ADD COLUMN IF NOT EXISTS wager_status TEXT;

@@ -1,0 +1,199 @@
+/* The prize up close (prize-preview.tsx). A skin sits on its game's screen
+   in an ink cabinet, the game's own colours inside it. A profile prize sits
+   on your header and a row, in the profile's own tones. Panels are told
+   apart by tone; the toggle is the one button shape. Reduced motion jumps
+   the crossfade to its end (the rule at the bottom). */
+
+.pp {
+  display: grid;
+  gap: 14px;
+  color: var(--tixy-ink);
+  font-family: var(--tixy-font-text);
+}
+
+/* ── the stage ─────────────────────────────────────────────────────────── */
+
+.pp-stage {
+  --pp-h: min(46vh, 380px);
+  display: grid;
+  justify-items: center;
+  container-type: inline-size;
+}
+@media (max-width: 639px) {
+  .pp-stage { --pp-h: min(40vh, 330px); }
+}
+.pp-cabinet {
+  width: min(100cqw, calc(var(--pp-h) * var(--pp-aspect, 1.6)));
+  aspect-ratio: var(--pp-aspect, 1.6);
+  border-radius: 16px;
+  background: var(--tixy-ink);
+  padding: 5px;
+}
+.pp-screen {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 11px;
+  background: var(--tixy-rail, #2b2119);
+}
+
+.pp-layers {
+  position: relative;
+  display: grid;
+  width: 100%;
+  height: 100%;
+}
+.pp-layer {
+  grid-area: 1 / 1;
+  position: relative;
+  min-width: 0;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 160ms ease-out, visibility 0s linear 160ms;
+}
+.pp-layer[data-shown] {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 160ms ease-out, visibility 0s;
+}
+.pp-layer-in { position: absolute; inset: 0; }
+.pp-idstage .pp-layer-in { position: static; }
+
+.pp-live,
+.pp-fill {
+  position: absolute;
+  inset: 0;
+}
+.pp-live { display: grid; place-items: center; }
+.pp-shot { object-fit: cover; }
+.pp-flat { position: absolute; inset: 0; }
+.pp-flat > svg { width: 100%; height: 100%; }
+.pp-canvas { display: block; width: 100%; height: 100%; }
+.pp-chess { width: 100%; }
+.pp-chess .chess-board-wrap, .pp-chess > * { margin: 0 auto; }
+.pp-c4 { width: 100%; padding: 4%; }
+.pp-pool { position: absolute; inset: 4px; display: grid; place-items: center; }
+
+.pp-flatstage { border-radius: 14px; overflow: hidden; }
+.pp-flatstage > div { height: auto !important; aspect-ratio: 1.6; }
+
+/* ── now / with it ─────────────────────────────────────────────────────── */
+
+.pp-toggle {
+  display: inline-grid;
+  grid-auto-flow: column;
+  justify-self: center;
+  gap: 4px;
+  border-radius: 12px;
+  background: var(--tixy-paper-3);
+  padding: 4px;
+}
+.pp-toggle button {
+  min-width: 92px;
+  min-height: 36px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: var(--tixy-radius-button, 10px);
+  background: transparent;
+  color: var(--tixy-ink-2);
+  font: 700 0.9375rem/1 var(--tixy-font-text);
+  cursor: pointer;
+  transition: background-color 120ms, color 120ms, transform 90ms ease-out;
+}
+.pp-toggle button[aria-pressed='true'] { background: var(--tixy-ink); color: var(--tixy-paper); }
+.pp-toggle button:active { transform: translateY(1px) scale(0.96); transition-duration: 40ms; }
+.pp-toggle button:focus-visible { outline: 3px solid var(--tixy-ticket); outline-offset: 2px; }
+@media (pointer: coarse) {
+  .pp-toggle button { min-height: 44px; }
+}
+
+/* ── facts and actions ─────────────────────────────────────────────────── */
+
+.pp-facts { display: grid; gap: 4px; }
+.pp-kind { margin: 0; font-size: 16px; }
+.pp-does { margin: 0; font-size: 15px; color: var(--tixy-ink-2); }
+.pp-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+@media (pointer: coarse) {
+  .pp-foot .pc-btn { min-height: 44px; }
+}
+
+/* ── your identity ─────────────────────────────────────────────────────── */
+
+.pp-idstage .pp-layers { min-height: 0; }
+
+.pp-id { display: grid; gap: 10px; color: var(--tixy-ink); text-align: left; }
+.pp-id-head {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--tixy-radius-panel, 18px);
+  background: var(--tixy-paper-2);
+  padding: 0 18px 18px;
+}
+.pp-id-banner {
+  height: 88px;
+  margin: 0 -18px;
+  overflow: hidden;
+  background: var(--tixy-paper-3);
+}
+.pp-id-banner img,
+.pp-id-banner span { display: block; width: 100%; height: 100%; object-fit: cover; object-position: left top; }
+.pp-id-who {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+  padding-top: 18px;
+}
+.pp-id-banner + .pp-id-who { margin-top: -30px; padding-top: 0; align-items: flex-end; }
+.pp-id-avatar { display: inline-flex; flex-shrink: 0; border-radius: 999px; }
+.pp-id-banner + .pp-id-who .pp-id-avatar { box-shadow: 0 0 0 4px var(--tixy-paper-2); }
+.pp-id-text { display: grid; gap: 2px; min-width: 0; flex: 1; }
+.pp-id-banner + .pp-id-who .pp-id-text { padding-bottom: 6px; }
+.pp-id-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.pp-id-badge { width: 1em; height: 1em; object-fit: contain; }
+.pp-id-title { font-size: 15px; color: var(--tixy-ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pp-id-level { flex-shrink: 0; }
+.pp-id-banner + .pp-id-who .pp-id-level { margin-bottom: 4px; }
+
+.pp-id-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-radius: var(--tixy-radius-panel-sm, 14px);
+  background: var(--tixy-paper-2);
+  padding: 10px 14px;
+}
+.pp-id-row .pp-id-name { font-size: 16px; font-weight: 700; letter-spacing: 0; }
+.pp-id-row .pp-id-title { font-size: 14px; }
+.pp-id-rank { width: 20px; text-align: center; color: var(--tixy-ink-2); font-size: 18px; }
+.pp-id-score { font-size: 20px; }
+
+/* On a card: the header alone, scaled to the card. */
+.pp-id[data-compact] { gap: 0; height: 100%; }
+.pp-id[data-compact] .pp-id-head { height: 100%; border-radius: 0; padding: 0 14px 12px; display: grid; align-content: center; }
+.pp-id[data-compact] .pp-id-head:has(.pp-id-banner) { align-content: end; }
+.pp-id[data-compact] .pp-id-banner { position: absolute; inset: 0 0 auto; height: 46%; margin: 0; }
+.pp-id[data-compact] .pp-id-banner + .pp-id-who { margin-top: 0; }
+.pp-id[data-compact] .pp-id-who { gap: 8px; padding-top: 0; position: relative; }
+.pp-id[data-compact] .pp-id-name { font-size: 16px; }
+.pp-id[data-compact] .pp-id-title { font-size: 13px; }
+.pp-id[data-compact] .pp-id-banner + .pp-id-who .pp-id-avatar { box-shadow: 0 0 0 3px var(--tixy-paper-2); }
+
+@media (prefers-reduced-motion: reduce) {
+  .pp-layer,
+  .pp-layer[data-shown],
+  .pp-toggle button { transition: none; }
+}

@@ -1,0 +1,120 @@
+/* ──────────────────────────────────────────────────────────────────────
+   LOG SPLITTER — Midway scoped polish. Namespaced under .log-splitter-midway
+   so it cannot leak into other games or shared shells. The canvas paints the
+   scene (sky, descending tree, lumberjack); this file frames the stage as a
+   recessed screen well, lays a static glass sheen, and styles the two big
+   LEFT / RIGHT chop keycaps. Nothing animates here.
+   ────────────────────────────────────────────────────────────────────── */
+
+.log-splitter-midway .log-splitter-stage {
+  position: relative;
+  border-radius: var(--radius-well);
+  box-shadow:
+    inset 0 2px 8px #000000bb,
+    inset 0 0 26px #00000080,
+    inset 0 0 0 1px #ffffff0a,
+    0 1px 0 var(--bevel-hi),
+    0 6px 0 var(--shadow-color),
+    0 9px 20px #00000055;
+}
+
+/* Static glass sheen over the screen — fixed diagonal gradient, no motion,
+   never intercepts pointer/touch. */
+.log-splitter-midway .log-splitter-stage::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(
+    155deg,
+    #ffffff0e 0%,
+    #ffffff03 22%,
+    transparent 46%
+  );
+  mix-blend-mode: screen;
+}
+
+/* The idle / game-over / error overlay must sit above the sheen. */
+.log-splitter-midway .log-splitter-overlay {
+  z-index: 4;
+}
+
+/* The two chop keycaps below the stage — cream enamel keycaps with real travel,
+   used as the on-screen primary control on touch + as clear affordances on
+   desktop. Hard bevel + offset drop shadow; no glow. */
+.log-splitter-midway .log-splitter-tap {
+  appearance: none;
+  border: none;
+  margin: 0;
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 220px;
+  padding: clamp(12px, 2.4vw, 18px) clamp(14px, 4vw, 30px);
+  border-radius: clamp(10px, 2.4%, 16px);
+  font-family: var(--font-mono-arcade, ui-monospace, monospace);
+  font-weight: 800;
+  font-size: clamp(15px, 4vw, 20px);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #2a1f10;
+  background: linear-gradient(180deg, #fdf6e7 0%, #ecdcbd 100%);
+  box-shadow:
+    inset 0 3px 0 rgba(255, 255, 255, 0.75),
+    inset 0 -5px 6px rgba(120, 92, 46, 0.32),
+    inset 0 0 0 2px rgba(0, 0, 0, 0.16),
+    0 5px 0 #b89b6a,
+    0 7px 10px rgba(0, 0, 0, 0.32);
+  transition:
+    transform 70ms ease,
+    box-shadow 70ms ease,
+    filter 70ms ease;
+}
+.log-splitter-midway .log-splitter-tap:hover {
+  filter: brightness(1.04);
+}
+.log-splitter-midway .log-splitter-tap:active,
+.log-splitter-midway .log-splitter-tap[data-pressed='true'] {
+  transform: translateY(4px);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.6),
+    inset 0 -3px 5px rgba(120, 92, 46, 0.3),
+    inset 0 0 0 2px rgba(0, 0, 0, 0.18),
+    0 1px 0 #b89b6a,
+    0 2px 4px rgba(0, 0, 0, 0.3);
+}
+.log-splitter-midway .log-splitter-tap:focus-visible {
+  outline: none;
+  box-shadow:
+    inset 0 0 0 3px var(--ink, #1c160d),
+    inset 0 3px 0 rgba(255, 255, 255, 0.6),
+    0 5px 0 #b89b6a,
+    0 7px 10px rgba(0, 0, 0, 0.32);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .log-splitter-midway .log-splitter-stage::after {
+    background: linear-gradient(155deg, #ffffff0a 0%, transparent 46%);
+  }
+  .log-splitter-midway .log-splitter-tap {
+    transition: none;
+  }
+}
+
+/* Short phones (e.g. 390x844): the caption under the keycaps repeats the
+   on-canvas coaching, so it drops out first to let the cabinet fit without
+   scrolling. Desktop / taller viewports keep it. */
+@media (max-width: 639px) and (max-height: 860px) {
+  .log-splitter-midway .log-splitter-hint {
+    display: none;
+  }
+}

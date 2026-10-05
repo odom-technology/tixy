@@ -1,0 +1,65 @@
+/* ──────────────────────────────────────────────────────────────────────
+   BOARDWALK HOP — Midway scoped panel. Namespaced under .bh-midway so it can't
+   leak into other games or shells. A chunky 2.5D grid road-hopper: the play
+   field is a single <canvas> that draws the seeded boardwalk / cart-road /
+   log-flume rows and the hopper mascot. This file styles only the cabinet
+   frame, the HUD strip, and the idle/gameover/error overlay. Under
+   prefers-reduced-motion the decorative sheen collapses to a static state.
+   ────────────────────────────────────────────────────────────────────── */
+
+.bh-midway .bh-stage {
+  max-width: 100%;
+  margin-inline: auto;
+}
+
+/* ── HUD strip: score / row / best on a wood rail ── */
+.bh-midway .bh-hud {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px clamp(12px, 3%, 22px);
+  margin-bottom: 10px;
+  border-radius: var(--radius-well);
+  background: linear-gradient(180deg, #6b4a2c 0%, #573a22 100%);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -4px 0 rgba(0, 0, 0, 0.34),
+    inset 0 0 0 2px var(--ink, #1c160d),
+    0 1px 0 var(--bevel-hi),
+    0 6px 0 var(--shadow-color),
+    0 10px 22px #00000055;
+}
+.bh-midway .bh-hud-stat {
+  font-family: var(--font-mono-arcade, ui-monospace, monospace);
+  font-variant-numeric: tabular-nums;
+  font-size: clamp(12px, 3.2vw, 16px);
+  letter-spacing: 0.04em;
+  color: #f0e2c6;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.45);
+}
+.bh-midway .bh-hud-stat b {
+  font-weight: 800;
+  color: #fffaf0;
+}
+
+/* ── The play field frame around the canvas ── */
+.bh-midway .bh-field {
+  position: relative;
+  border-radius: var(--radius-well);
+  overflow: hidden;
+  box-shadow:
+    inset 0 0 0 3px var(--ink, #1c160d),
+    0 6px 0 var(--shadow-color),
+    0 14px 30px #00000055;
+  line-height: 0;
+}
+.bh-midway .bh-canvas {
+  display: block;
+  touch-action: none;
+}
+
+/* ── Idle / gameover / error overlay ── */
+.bh-midway .bh-overlay {
+  backdrop-filter: blur(2px);
+}

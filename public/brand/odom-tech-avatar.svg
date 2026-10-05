@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 256 256" role="img" aria-labelledby="title desc">
+  <title id="title">Odom Tech avatar</title>
+  <desc id="desc">The Odom Tech connected open hexagonal mesh mark in white on a dark background.</desc>
+  <rect width="256" height="256" fill="#0B1220"/>
+  <g fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M40 108V76L128 24l88 52v32" stroke-width="18"/>
+    <path d="M40 148v32l88 52 88-52v-32" stroke-width="18"/>
+    <path d="M128 68l50 29v62l-50 29-50-29V97l50-29Z" stroke-width="10"/>
+    <path d="M128 24v44M216 76l-38 21M216 180l-38-21M128 232v-44M40 180l38-21M40 76l38 21" stroke-width="10"/>
+  </g>
+</svg>

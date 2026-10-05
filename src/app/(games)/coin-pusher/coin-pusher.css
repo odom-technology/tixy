@@ -1,0 +1,174 @@
+/* COIN PUSHER — the screen inside the frame. The canvas draws the machine;
+   this frames it, sets the read-out of coins dropped and won, and floats
+   the +N over the lip while a spill runs. */
+
+.cp-screen {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.cp-stage {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  /* Taps drop coins; the page under the machine stays still. */
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  cursor: crosshair;
+}
+
+.cp-canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+
+/* Phones: the machine needs height above the bet row. */
+.arc-shell[data-game='coin-pusher'] .arc-machine-frame:not([data-wide]) {
+  --machine-screen-min: 22rem;
+}
+
+/* Coins dropped and won this visit, in the top left corner beside the
+   marquee, on a plate. */
+.cp-readout {
+  position: absolute;
+  left: 12px;
+  top: 10px;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 10px;
+  background: var(--tixy-screen);
+  pointer-events: none;
+  color: var(--tixy-paper);
+  font-size: 0.9375rem;
+  font-weight: 700;
+}
+
+.cp-readout-value {
+  margin-right: 6px;
+  color: var(--tixy-ticket);
+  font-family: var(--tixy-font-num);
+  font-weight: 800;
+  font-size: 1.5rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+/* Each coin in the tray punches the count. */
+.cp-readout-value[data-punch] {
+  animation: cp-punch 260ms cubic-bezier(0.2, 1.5, 0.4, 1);
+}
+
+@keyframes cp-punch {
+  from {
+    transform: scale(1.35);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+.cp-readout-value {
+  display: inline-block;
+  transform-origin: 50% 80%;
+}
+
+.cp-readout-value:last-child {
+  margin-right: 0;
+}
+
+/* Dropped is the cost side: paper, not ticket amber. */
+.cp-readout-value[data-quiet] {
+  color: var(--tixy-paper);
+}
+
+/* The spill tag: +N over the tray where the coins went over, counting up
+   while the spill runs on, then rising away. */
+.cp-tags {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.cp-spill {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--tixy-ticket);
+  color: var(--tixy-ink);
+  font-family: var(--tixy-font-num);
+  font-size: 1.375rem;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+  transition: left 160ms ease-out, top 160ms ease-out;
+}
+
+.cp-spill[data-big] {
+  background: var(--tixy-red);
+  color: var(--tixy-paper);
+  font-size: 1.75rem;
+}
+
+.cp-spill.is-punch {
+  animation: cp-spill-punch 240ms cubic-bezier(0.2, 1.5, 0.4, 1);
+}
+
+.cp-spill.is-leaving {
+  animation: cp-spill-leave 400ms ease-in forwards;
+}
+
+@keyframes cp-spill-punch {
+  from {
+    transform: translate(-50%, -50%) scale(1.3);
+  }
+}
+
+@keyframes cp-spill-leave {
+  to {
+    transform: translate(-50%, -160%);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cp-readout-value[data-punch],
+  .cp-spill.is-punch {
+    animation: none;
+  }
+
+  .cp-spill {
+    transition: none;
+  }
+
+  .cp-spill.is-leaving {
+    animation: none;
+    opacity: 0;
+  }
+}
+
+/* Phones: a smaller plate, so it stays clear of the marquee's bulbs. */
+@media (max-width: 40rem) {
+  .cp-readout {
+    left: 8px;
+    top: 6px;
+    gap: 6px;
+    padding: 4px 10px;
+    font-size: 0.8125rem;
+  }
+
+  .cp-readout-value {
+    font-size: 1.125rem;
+  }
+}
