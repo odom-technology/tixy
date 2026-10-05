@@ -1991,7 +1991,7 @@ export default function GopherClient() {
         <div className="mx-auto w-full max-w-5xl">
           <div className="hidden sm:block">
             <PageHeader
-              eyebrow="Arcade"
+              eyebrow="tixy"
               icon={<Hammer aria-hidden className="h-6 w-6" />}
               title="Gopher Pop"
               subtitle="Chain bonks for combo points in 60 seconds — quick hits pay extra, golden gophers pay big, and one bomb ends it all."

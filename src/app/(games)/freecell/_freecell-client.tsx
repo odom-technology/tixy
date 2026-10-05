@@ -832,7 +832,7 @@ export default function FreecellClient() {
       <div className='w-full max-w-xl space-y-3 sm:space-y-4'>
         <div className='hidden sm:block'>
           <PageHeader
-            eyebrow='Arcade'
+            eyebrow='tixy'
             icon='grid'
             title='FreeCell Sprint'
             subtitle='Clear every card to the foundations — race the clock, every deal is solvable.'

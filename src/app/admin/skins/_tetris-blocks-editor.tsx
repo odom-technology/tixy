@@ -20,7 +20,7 @@ type BlocksPreset = {
 const BLOCKS_PRESETS: BlocksPreset[] = [
   {
     id: 'standard',
-    label: 'Arcade Classic',
+    label: 'tixy Classic',
     draft: {
       colorI: '#00f0f0', colorO: '#f0f000', colorT: '#a000f0',
       colorS: '#00f000', colorZ: '#f00000', colorJ: '#0000f0', colorL: '#f0a000',

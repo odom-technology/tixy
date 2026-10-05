@@ -166,7 +166,7 @@ export function ArcadeMarquee({
 }
 
 export function ArcadePageHeader({
-  eyebrow = 'Arcade',
+  eyebrow = 'tixy',
   title,
   subtitle,
   actions,
@@ -186,15 +186,15 @@ export function ArcadePageHeader({
       )}
     >
       <div className='min-w-0'>
-        {/* Below lg the kicker carries a tappable "Arcade" home link (the top
+        {/* Below lg the kicker carries a tappable "tixy" home link (the top
             bar wordmark covers it from lg up); the page-context eyebrow is a
             plain label, not a link — it used to point home, which read as a
             broken breadcrumb. */}
         <p className='arcade-kicker'>
           <Link href='/' className='transition-colors hover:text-strong lg:hidden'>
-            Arcade
+            tixy
           </Link>
-          {eyebrow !== 'Arcade' ? (
+          {eyebrow !== 'tixy' ? (
             <>
               <span aria-hidden className='lg:hidden'>
                 {' · '}

@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// Arcade — Lucky Cage game logic (hand-built carnival lottery cabinet)
+// tixy — Lucky Cage game logic (hand-built carnival lottery cabinet)
 //
 // Twenty numbered balls tumble in a brass cage; five are released in order
 // through a mechanical chute. The draw is a seeded Fisher-Yates shuffle of

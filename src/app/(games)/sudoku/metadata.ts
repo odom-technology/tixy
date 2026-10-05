@@ -1,3 +1,3 @@
 export const metadata = {
-  title: 'Sudoku | Arcade',
+  title: 'Sudoku | tixy',
 };

@@ -4,7 +4,7 @@ import { GamesWalletProvider } from '@/features/arcade/components/shell/games-wa
 import SlotsClient from './_slots-client';
 
 export const metadata: Metadata = {
-  title: 'Slots | Arcade',
+  title: 'Slots | tixy',
 };
 
 // The provider is here so the shell's strip never mounts one of its own:

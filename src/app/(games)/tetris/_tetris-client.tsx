@@ -759,7 +759,7 @@ export default function TetrisClient() {
       <div className='mx-auto flex w-full max-w-6xl flex-col gap-3 sm:gap-4'>
         <div className='hidden sm:block'>
           <PageHeader
-            eyebrow='Arcade'
+            eyebrow='tixy'
             icon='circle-dot'
             title={renameGameNamesInText('Tetris')}
             subtitle='Stack fast, keep combos alive, and chase high-score runs.'

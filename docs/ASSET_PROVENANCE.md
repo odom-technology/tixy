@@ -39,7 +39,7 @@ as an independent asset collection.
 ## Artwork and branding
 
 The repository includes application illustrations, cosmetic artwork, game
-previews, Tixy branding, and the ODOM Tech admin-avatar mark. Some artwork is
+previews, tixy branding, and the ODOM Tech admin-avatar mark. Some artwork is
 generated or produced by project tooling. The source snapshot alone does not
 prove a uniform license for every image. ODOM Tech brand rights are reserved;
 permission to contribute code does not grant permission to claim affiliation

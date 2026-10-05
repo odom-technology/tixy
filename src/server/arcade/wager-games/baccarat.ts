@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// Arcade — Baccarat (punto banco) game logic (server-authoritative)
+// tixy — Baccarat (punto banco) game logic (server-authoritative)
 // ---------------------------------------------------------------------------
 //
 // The world's highest-volume casino card game, single-shot wager shape (like

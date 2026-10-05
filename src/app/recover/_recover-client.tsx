@@ -71,7 +71,7 @@ export function RecoverClient() {
     <ArcadePage narrow>
       <div className='flex min-h-[calc(100vh-5rem)] flex-col justify-center'>
         <Link href='/' className='arcade-kicker mb-6 transition-colors hover:text-strong'>
-          The Arcade
+          tixy
         </Link>
         <ArcadePanel variant='cabinet' className='overflow-hidden'>
           <ArcadeMarquee

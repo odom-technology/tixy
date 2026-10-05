@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// Arcade — Seeded PRNG utilities (mulberry32-based, deterministic)
+// tixy — Seeded PRNG utilities (mulberry32-based, deterministic)
 // ---------------------------------------------------------------------------
 
 import crypto from 'node:crypto';

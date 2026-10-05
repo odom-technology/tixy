@@ -727,7 +727,7 @@ export default function MathClient() {
         <div className='mx-auto w-full max-w-4xl'>
           <div className='hidden sm:block'>
             <PageHeader
-              eyebrow='Arcade'
+              eyebrow='tixy'
               icon={<Calculator aria-hidden className='h-6 w-6' />}
               title='Mental Math Sprint'
               subtitle='Solve as many problems as you can in 60 seconds. Difficulty ramps as you go.'

@@ -1268,7 +1268,7 @@ export default function MelonChopClient() {
         <div className="mx-auto w-full max-w-5xl">
           <div className="hidden sm:block">
             <PageHeader
-              eyebrow="Arcade"
+              eyebrow="tixy"
               icon={<Cherry aria-hidden className="h-6 w-6" />}
               title="Melon Chop"
               subtitle="Swipe to slice the fruit as it flies — chain several in one stroke for a combo. Slice a bomb and the run is over. 60 seconds, one blade."

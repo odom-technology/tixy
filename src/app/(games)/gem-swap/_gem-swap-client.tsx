@@ -1469,7 +1469,7 @@ export default function GemSwapClient() {
         <div className="mx-auto w-full max-w-3xl">
           <div className="hidden sm:block">
             <PageHeader
-              eyebrow="Arcade"
+              eyebrow="tixy"
               icon={<Gem aria-hidden className="h-6 w-6" />}
               title="Gem Swap"
               subtitle="Swap adjacent gems to line up 3 or more of a colour. Matches clear and new gems drop in — chain cascades for bonus points. Score as much as you can in 60 seconds."

@@ -1233,7 +1233,7 @@ export default function TypingTestPage() {
         <div className='mb-3 sm:mb-8 lg:mb-12'>
           <div className='hidden sm:block'>
             <PageHeader
-              eyebrow='Arcade'
+              eyebrow='tixy'
               icon='keyboard'
               title='Typing Test'
               subtitle='Sharpen speed and accuracy across timed modes.'

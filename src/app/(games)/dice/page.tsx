@@ -4,7 +4,7 @@ import { GamesWalletProvider } from '@/features/arcade/components/shell/games-wa
 import DiceClient from './_dice-client';
 
 export const metadata: Metadata = {
-  title: 'Dice | Arcade',
+  title: 'Dice | tixy',
 };
 
 export default function DicePage() {

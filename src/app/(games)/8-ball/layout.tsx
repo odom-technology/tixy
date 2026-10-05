@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 
 export const metadata = {
-  title: '8-Ball Pool | Arcade',
+  title: '8-Ball Pool | tixy',
 };
 
 export default function EightBallLayout({ children }: { children: ReactNode }) {

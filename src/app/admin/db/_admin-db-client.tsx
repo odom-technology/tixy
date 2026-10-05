@@ -856,7 +856,7 @@ export default function AdminDBClient({
                           </div>
                         ) : (
                           <div className='mt-3 rounded-lg border border-dashed border-soft px-4 py-6 text-sm text-faint'>
-                            No per-game arcade economy data is available yet.
+                            No per-game tixy economy data is available yet.
                           </div>
                         )}
                       </div>
@@ -1502,7 +1502,7 @@ export default function AdminDBClient({
                 <option value='8-ball'>8-Ball</option>
                 <option value='tetris'>Tetris</option>
                 <option value='connections'>Connections</option>
-                <option value='arcade'>Arcade</option>
+                <option value='arcade'>tixy</option>
               </select>
               <ArcadeButton
                 type='button'

@@ -813,7 +813,7 @@ export default function ConnectionsPage() {
     return (
       <section className='mx-auto w-full max-w-4xl space-y-4 px-3 pt-3 pb-[calc(8rem+env(safe-area-inset-bottom))] sm:space-y-8 sm:px-4 sm:pt-6 sm:pb-12'>
         <div className='hidden sm:block'>
-          <PageHeader eyebrow='Arcade' icon='grid2x2' title='Connections' subtitle='Loading today&apos;s puzzle...' wallet={walletCard} />
+          <PageHeader eyebrow='tixy' icon='grid2x2' title='Connections' subtitle='Loading today&apos;s puzzle...' wallet={walletCard} />
         </div>
         <div className='sm:hidden'><GamesWalletCard wallet={walletCard} compact /></div>
         <GamesRouteSwitcher />
@@ -829,7 +829,7 @@ export default function ConnectionsPage() {
     return (
       <section className='mx-auto w-full max-w-4xl space-y-4 px-3 pt-3 pb-[calc(8rem+env(safe-area-inset-bottom))] sm:space-y-8 sm:px-4 sm:pt-6 sm:pb-12'>
         <div className='hidden sm:block'>
-          <PageHeader eyebrow='Arcade' icon='grid2x2' title='Connections' wallet={walletCard} />
+          <PageHeader eyebrow='tixy' icon='grid2x2' title='Connections' wallet={walletCard} />
         </div>
         <div className='sm:hidden'><GamesWalletCard wallet={walletCard} compact /></div>
         <GamesRouteSwitcher />
@@ -862,7 +862,7 @@ export default function ConnectionsPage() {
 
       <div className='hidden sm:block'>
         <PageHeader
-          eyebrow='Arcade'
+          eyebrow='tixy'
           icon='grid2x2'
           title='Connections'
           subtitle={`Today\u2019s Puzzle \u2014 ${formatDateDisplay()}`}

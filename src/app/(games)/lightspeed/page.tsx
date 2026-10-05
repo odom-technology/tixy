@@ -4,7 +4,7 @@ import { GamesWalletProvider } from '@/features/arcade/components/shell/games-wa
 import LightspeedClient from './_lightspeed-client';
 
 export const metadata: Metadata = {
-  title: 'Lightspeed | Arcade',
+  title: 'Lightspeed | tixy',
 };
 
 export default function LightspeedPage() {

@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// Arcade — Crash ("Rocket Launch") game logic
+// tixy — Crash ("Rocket Launch") game logic
 // ---------------------------------------------------------------------------
 
 import { CRASH_GROWTH_RATE, CRASH_MAX_MULTIPLIER, ARCADE_RTP } from '../arcade-constants';

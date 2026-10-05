@@ -4,7 +4,7 @@ import { GamesWalletProvider } from '@/features/arcade/components/shell/games-wa
 import DragonClient from './_dragon-client';
 
 export const metadata: Metadata = {
-  title: 'Dragon Tower | Arcade',
+  title: 'Dragon Tower | tixy',
 };
 
 export default function DragonPage() {

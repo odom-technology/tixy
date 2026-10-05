@@ -9,7 +9,7 @@ import {
 import { SignInClient } from './_signin-client';
 
 export const metadata = {
-  title: 'Sign in | Arcade',
+  title: 'Sign in | tixy',
 };
 
 type SignInPageProps = {

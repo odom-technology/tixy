@@ -14,7 +14,7 @@ export default async function SocialModerationPage() {
   return (
     <AdminPageFrame
       title='Social moderation'
-      subtitle='Review reports from the Arcade Lobby.'
+      subtitle='Review reports from tixy Lobby.'
       actions={<ArcadeLinkButton href='/admin' tone='ghost' size='sm'>Admin dashboard</ArcadeLinkButton>}
     >
       <SocialModerationClient />

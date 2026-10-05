@@ -8,7 +8,7 @@ import {
 import { SignInClient } from '../signin/_signin-client';
 
 export const metadata = {
-  title: 'Sign up | Arcade',
+  title: 'Sign up | tixy',
 };
 
 type SignUpPageProps = {

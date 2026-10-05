@@ -27,8 +27,8 @@ export async function GET(request: Request) {
       ),
     });
   } catch (error) {
-    console.error('Failed to load Arcade Lobby:', error);
-    return NextResponse.json({ error: 'Unable to load the Arcade Lobby.' }, { status: 500 });
+    console.error('Failed to load tixy Lobby:', error);
+    return NextResponse.json({ error: 'Unable to load tixy Lobby.' }, { status: 500 });
   }
 }
 

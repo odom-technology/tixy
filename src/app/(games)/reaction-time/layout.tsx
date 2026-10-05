@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import './_reaction-time.css';
 
 export const metadata = {
-  title: 'Reaction Time | Arcade',
+  title: 'Reaction Time | tixy',
 };
 
 type ReactionTimeLayoutProps = {

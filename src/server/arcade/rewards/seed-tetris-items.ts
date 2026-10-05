@@ -20,7 +20,7 @@ const TETRIS_STARTER_ITEMS: SeedItem[] = [
   // ── Blocks ────────────────────────────────────────────────────────
   {
     id: 'tetris-blocks-arcade-classic',
-    name: 'Arcade Classic Blocks',
+    name: 'tixy Classic Blocks',
     rarity: 'common',
     slot: 'blocks',
     assetRef: {

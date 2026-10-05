@@ -1,6 +1,6 @@
 # Credits
 
-Tixy is an ODOM Tech project maintained by
+tixy is an ODOM Tech project maintained by
 [@andrewodom18](https://github.com/andrewodom18) and
 Hunter [@8tp](https://github.com/8tp), with contributions from the community.
 

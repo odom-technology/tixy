@@ -4,7 +4,7 @@ import { GamesWalletProvider } from '@/features/arcade/components/shell/games-wa
 import HiLoClient from './_hilo-client';
 
 export const metadata: Metadata = {
-  title: 'Hi-Lo | Arcade',
+  title: 'Hi-Lo | tixy',
 };
 
 export default function HiLoPage() {

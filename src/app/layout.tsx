@@ -58,8 +58,8 @@ export const metadata: Metadata = {
   // Icons, the manifest and the share image are files in src/app, built by
   // scripts/brand/build-brand-assets.tsx. metadataBase makes their URLs absolute.
   metadataBase: readMetadataBase(),
-  title: 'Arcade',
-  description: 'Arcade games by Odom Tech.',
+  title: 'tixy',
+  description: 'Browser games by ODOM Tech.',
   other: {
     'google-adsense-account': DEFAULT_ADSENSE_CLIENT_ID,
   },

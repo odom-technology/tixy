@@ -71,12 +71,12 @@ const ITEMS: AchItem[] = [
   { id: 'ach-secret-konami', name: 'Cheat Code', slot: 'badge', rarity: 'epic', assetRef: { emoji: '🎮', imageUrl: `${A}/badge-konami.png`, ...pv('#0a0f1a', '#60a5fa') } },
   { id: 'ach-secret-birthday', name: 'Birthday Cake', slot: 'badge', rarity: 'epic', assetRef: { emoji: '🎂', imageUrl: `${A}/badge-birthday.png`, ...pv('#1a060c', '#fb7185') } },
   // Title / color cosmetics need no generated art.
-  { id: 'ach-regular', name: 'Arcade Regular', slot: 'title', rarity: 'legendary', assetRef: { text: 'Arcade Regular', ...pv('#0a0f1a', '#818cf8') } },
+  { id: 'ach-regular', name: 'tixy Regular', slot: 'title', rarity: 'legendary', assetRef: { text: 'tixy Regular', ...pv('#0a0f1a', '#818cf8') } },
   { id: 'ach-tycoon', name: 'Ticket Tycoon', slot: 'title', rarity: 'legendary', assetRef: { text: 'Ticket Tycoon', ...pv('#1a1004', '#fbbf24') } },
   { id: 'ach-flawless', name: 'Flawless', slot: 'frame', rarity: 'legendary', assetRef: { color: '#fde047', ...pv('#1a1407', '#fde047') } },
   { id: 'ach-untouchable', name: 'Untouchable', slot: 'nameColor', rarity: 'legendary', assetRef: { color: '#f43f5e', ...pv('#1a060c', '#f43f5e') } },
   // Avatars / backgrounds guarded on disk.
-  { id: 'ach-arcade-master', name: 'Arcade Master', slot: 'background', rarity: 'legendary', requireAsset: `${A}/bg-arcade-master.png`, assetRef: { imageUrl: `${A}/bg-arcade-master.png`, bgStart: '#0b1120', bgEnd: '#312e81', ...pv('#0b1120', '#6366f1') } },
+  { id: 'ach-arcade-master', name: 'tixy Master', slot: 'background', rarity: 'legendary', requireAsset: `${A}/bg-arcade-master.png`, assetRef: { imageUrl: `${A}/bg-arcade-master.png`, bgStart: '#0b1120', bgEnd: '#312e81', ...pv('#0b1120', '#6366f1') } },
   { id: 'ach-centurion', name: 'Centurion', slot: 'avatar', rarity: 'legendary', requireAsset: `${A}/avatar-centurion.png`, assetRef: { imageUrl: `${A}/avatar-centurion.png`, ...pv('#0b1120', '#1e293b') } },
   { id: 'ach-secret-completionist', name: 'The Completionist', slot: 'avatar', rarity: 'legendary', requireAsset: `${A}/avatar-completionist.png`, assetRef: { imageUrl: `${A}/avatar-completionist.png`, ...pv('#0b1120', '#1e293b') } },
 ];

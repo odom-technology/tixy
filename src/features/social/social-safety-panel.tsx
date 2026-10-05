@@ -55,7 +55,7 @@ export function SocialSafetyPanel() {
     <section className='arcade-card mx-auto max-w-3xl p-5'>
       <div className='flex items-start gap-3'>
         <span className='flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-ink bg-prize text-prize-on shadow-chip'><ShieldCheck size={19} /></span>
-        <div><h2 className='text-lg font-bold text-strong'>Blocked players</h2><p className='mt-1 text-sm leading-6 text-faint'>Blocked players cannot message or send friend requests, and their posts are hidden from your Arcade Lobby.</p></div>
+        <div><h2 className='text-lg font-bold text-strong'>Blocked players</h2><p className='mt-1 text-sm leading-6 text-faint'>Blocked players cannot message or send friend requests, and their posts are hidden from your tixy Lobby.</p></div>
       </div>
       {error ? <ArcadeNotice tone='danger' className='mt-4'>{error}</ArcadeNotice> : null}
       <div className='mt-5 space-y-2'>

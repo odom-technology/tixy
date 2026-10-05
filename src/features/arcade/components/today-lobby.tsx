@@ -344,7 +344,7 @@ export function TodayLobby({ className }: TodayLobbyProps) {
     <ArcadePanel
       variant='cabinet'
       className={cx('overflow-hidden p-0', className)}
-      aria-label='Your arcade today'
+      aria-label='Your tixy today'
       aria-busy={rankingLoading}
     >
       <ArcadeMarquee
@@ -352,7 +352,7 @@ export function TodayLobby({ className }: TodayLobbyProps) {
         size='md'
         trailing={<Sparkles size={16} aria-hidden />}
       >
-        Your arcade today
+        Your tixy today
       </ArcadeMarquee>
 
       <div
@@ -455,7 +455,7 @@ export function TodayLobby({ className }: TodayLobbyProps) {
             ?? (recommendation.kind === 'multiplayer' ? Users : Gamepad2);
           const title = game?.title
             ?? multiplayer?.label
-            ?? (recommendation.kind === 'daily-puzzle' ? DAILY_PUZZLE.title : 'Arcade pick');
+            ?? (recommendation.kind === 'daily-puzzle' ? DAILY_PUZZLE.title : 'tixy pick');
           const description = recommendation.kind === 'quest-game' && nearestQuest
             ? nearestQuest.label
             : recommendation.kind === 'multiplayer' && multiplayer

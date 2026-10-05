@@ -586,7 +586,7 @@ export default function PangramPage() {
     return (
       <section className='mx-auto w-full max-w-4xl space-y-4 px-3 pt-3 pb-[calc(8rem+env(safe-area-inset-bottom))] sm:space-y-8 sm:px-4 sm:pt-6 sm:pb-12'>
         <div className='hidden sm:block'>
-          <PageHeader eyebrow='Arcade' icon={<Hexagon size={22} />} title='Pangram' subtitle='Loading today&apos;s letters...' wallet={walletCard} />
+          <PageHeader eyebrow='tixy' icon={<Hexagon size={22} />} title='Pangram' subtitle='Loading today&apos;s letters...' wallet={walletCard} />
         </div>
         <div className='sm:hidden'><GamesWalletCard wallet={walletCard} compact /></div>
         <GamesRouteSwitcher />
@@ -602,7 +602,7 @@ export default function PangramPage() {
     return (
       <section className='mx-auto w-full max-w-4xl space-y-4 px-3 pt-3 pb-[calc(8rem+env(safe-area-inset-bottom))] sm:space-y-8 sm:px-4 sm:pt-6 sm:pb-12'>
         <div className='hidden sm:block'>
-          <PageHeader eyebrow='Arcade' icon={<Hexagon size={22} />} title='Pangram' wallet={walletCard} />
+          <PageHeader eyebrow='tixy' icon={<Hexagon size={22} />} title='Pangram' wallet={walletCard} />
         </div>
         <div className='sm:hidden'><GamesWalletCard wallet={walletCard} compact /></div>
         <GamesRouteSwitcher />
@@ -624,7 +624,7 @@ export default function PangramPage() {
     >
       <div className='hidden sm:block'>
         <PageHeader
-          eyebrow='Arcade'
+          eyebrow='tixy'
           icon={<Hexagon size={22} />}
           title='Pangram'
           subtitle={`Today’s Letters — ${formatDateDisplay()}`}

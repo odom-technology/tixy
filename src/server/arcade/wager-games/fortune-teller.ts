@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// Arcade — Fortune Teller game logic (tarot-style 3-card wager)
+// tixy — Fortune Teller game logic (tarot-style 3-card wager)
 // ---------------------------------------------------------------------------
 //
 // The player picks a TIER (apprentice / seer / oracle / mystic), bets, and

@@ -9,7 +9,7 @@ import { AdminFeedbackClient } from './_admin-feedback-client';
 export const dynamic = 'force-dynamic';
 
 export const metadata = {
-  title: 'Feedback admin | Arcade',
+  title: 'Feedback admin | tixy',
 };
 
 export default async function AdminFeedbackPage() {

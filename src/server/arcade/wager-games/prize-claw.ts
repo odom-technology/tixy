@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// Arcade — Prize Claw (hand-built walnut-and-brass claw cabinet)
+// tixy — Prize Claw (hand-built walnut-and-brass claw cabinet)
 //
 // The first cabinet on the floor where PLAYER AIM CHANGES EXPECTED VALUE while
 // the server stays authoritative and the outcome stays replayable.

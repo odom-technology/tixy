@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import './_tetris-midway.css';
 
 export const metadata = {
-  title: `${getGameTitle('tetris', 'Tetris')} | Arcade`,
+  title: `${getGameTitle('tetris', 'Tetris')} | tixy`,
 };
 
 export default function TetrisLayout({ children }: { children: ReactNode }) {

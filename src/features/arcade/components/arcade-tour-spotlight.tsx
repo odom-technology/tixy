@@ -28,7 +28,7 @@ export function ArcadeTourSpotlight() {
   return (
     <ArcadePanel variant='cabinet' className='overflow-hidden p-0'>
       <ArcadeMarquee tone='tickets' trailing={<Trophy size={16} aria-hidden />}>
-        This week’s Arcade Tour
+        This week’s tixy Tour
       </ArcadeMarquee>
       <div className='grid gap-4 p-4 sm:p-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center'>
         <div className='min-w-0'>

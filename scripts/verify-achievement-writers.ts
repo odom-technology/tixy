@@ -10,7 +10,7 @@
  * - the listed and retired counts match the plan: 7 floor-game series, 11 general
  *   series, the standalones, the 17 secrets with a writer and the 3 new series' worth listed (ticket stop's with rules 2),
  *   and flappy bird's again now it is back on the floor;
- *   28 series (25 for games off the floor, Strongman, Bell Ringer and Duck Hunter), Flawless, Speed Demon, Tetris Deity, Master of the Arcade, Gotta
+ *   28 series (25 for games off the floor, Strongman, Bell Ringer and Duck Hunter), Flawless, Speed Demon, Tetris Deity, tixy Master, Gotta
  *   Get Them All, High Roller, Lab and Comeback Kid (no writer) retired
  * - every LISTED achievement has a stat writer that can unlock it: the stat
  *   it reads is written by a score route, a match settle, a wager settle, a

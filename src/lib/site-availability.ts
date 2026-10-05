@@ -1,3 +1,4 @@
+import { rebrandSiteText } from '@/lib/site-branding';
 import { ARCADE_GAMES } from '@/features/arcade/components/arcade-game-registry';
 import { canonicalGamePath } from '@/features/arcade/lib/game-renames';
 
@@ -6,7 +7,7 @@ export const SITE_SECTIONS = [
   { id: 'store', label: 'Store', description: 'Store browsing and new purchases. Owned items remain available.' },
   { id: 'social', label: 'Social', description: 'Chat, friends, player directory, and social activity.' },
   { id: 'leaderboards', label: 'Leaderboards', description: 'Public scores and rankings.' },
-  { id: 'tour', label: 'Arcade Tour', description: 'Weekly tour pages and progress views.' },
+  { id: 'tour', label: 'tixy Tour', description: 'Weekly tour pages and progress views.' },
   { id: 'seasonPass', label: 'Season Pass', description: 'Season pass, quests, and reward claims.' },
 ] as const;
 
@@ -26,7 +27,7 @@ export const DEFAULT_SITE_AVAILABILITY: SiteAvailabilityConfig = {
   ticketBundlesEnabled: true,
   disabledGames: [],
   disabledGameDisplay: 'visible',
-  message: 'This part of the Arcade is temporarily unavailable. Please check back soon.',
+  message: 'This part of tixy is temporarily unavailable. Please check back soon.',
 };
 
 const GAME_SLUGS = new Set(ARCADE_GAMES.map((game) => game.slug));
@@ -44,7 +45,7 @@ export function normalizeSiteAvailabilityConfig(value: unknown): SiteAvailabilit
       ? [...new Set(record.disabledGames.filter((slug): slug is string => typeof slug === 'string' && GAME_SLUGS.has(slug)))] : [],
     disabledGameDisplay: record.disabledGameDisplay === 'hidden' ? 'hidden' : 'visible',
     message: typeof record.message === 'string' && record.message.trim()
-      ? record.message.trim().slice(0, 1200) : DEFAULT_SITE_AVAILABILITY.message,
+      ? rebrandSiteText(record.message.trim()).slice(0, 1200) : DEFAULT_SITE_AVAILABILITY.message,
   };
 }
 
@@ -114,7 +115,7 @@ export function validateSiteAvailabilityConfig(value: unknown): SiteAvailability
   }
   if (typeof record.registrationEnabled !== 'boolean' || typeof record.ticketBundlesEnabled !== 'boolean') throw new Error('Signup and ticket bundle controls must be enabled or disabled.');
   if (record.disabledGameDisplay !== 'visible' && record.disabledGameDisplay !== 'hidden') throw new Error('Choose how unavailable games should appear.');
-  if (!Array.isArray(record.disabledGames) || record.disabledGames.some((slug) => typeof slug !== 'string' || !GAME_SLUGS.has(slug))) throw new Error('Choose games from the Arcade game list.');
+  if (!Array.isArray(record.disabledGames) || record.disabledGames.some((slug) => typeof slug !== 'string' || !GAME_SLUGS.has(slug))) throw new Error('Choose games from the tixy game list.');
   if (typeof record.message !== 'string' || record.message.length > 1200) throw new Error('The visitor message must be at most 1200 characters.');
   return normalizeSiteAvailabilityConfig(record);
 }

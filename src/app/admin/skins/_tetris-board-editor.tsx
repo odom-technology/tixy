@@ -50,7 +50,7 @@ const BOARD_PRESETS: BoardPreset[] = [
   },
   {
     id: 'retro-arcade',
-    label: 'Retro Arcade',
+    label: 'Retro tixy',
     draft: {
       boardBgMode: 'solid', boardBgStart: '#000000', boardBgEnd: '#000000',
       gridLineColor: '#ff00ff', gridLineWidth: 1, gridVisible: true,

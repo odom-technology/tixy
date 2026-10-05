@@ -48,4 +48,4 @@ assert.deepEqual(
 assert.equal(standings[1].games[0].rank, 2);
 assert.equal(standings[2].games[0].rank, 2, 'ties share the same per-game rank');
 
-console.log('Arcade Tour rotation, week boundaries, tie ranks, and combined scoring passed.');
+console.log('tixy Tour rotation, week boundaries, tie ranks, and combined scoring passed.');

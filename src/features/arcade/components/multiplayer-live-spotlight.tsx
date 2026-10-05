@@ -91,7 +91,7 @@ export function MultiplayerLiveSpotlight({
           <p className='text-sm text-body'>
             {failed
               ? 'Live counts are taking a breather. Every multiplayer lobby is still open.'
-              : 'Checking the arcade floor for players and open matches…'}
+              : 'Checking the tixy floor for players and open matches…'}
           </p>
           <ArcadeLinkButton href='/?section=multiplayer' tone='key' size='sm'>
             Browse multiplayer
@@ -154,7 +154,7 @@ export function MultiplayerLiveSpotlight({
           <ArcadeStat
             label='Connected'
             value={snapshot.connectedNow}
-            sub='arcade-wide'
+            sub='across tixy'
             tone='info'
             icon={Users}
           />

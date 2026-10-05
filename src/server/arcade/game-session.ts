@@ -33,7 +33,7 @@ setInterval(() => {
     void import('@/server/arcade/arcade-session')
       .then(({ cleanupStaleArcadeSessions }) => cleanupStaleArcadeSessions())
       .catch(() => {
-        // Arcade module may not be loaded yet on cold start.
+        // tixy module may not be loaded yet on cold start.
       });
 
     // Auto-forfeit pool matches where a player hasn't moved in 24 hours

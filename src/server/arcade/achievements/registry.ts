@@ -432,7 +432,7 @@ const SERIES: AchievementDef[] = [
   // minutes), so a heavy machine session moves this faster than skill play.
   // A first session is 10 to 15 games, a regular's day is about 30. 3,000 is
   // 100 such days. The old 10,000 was a year of them, or 3 days of plinko.
-  ...series({ id: 'global-games', name: 'Arcade Regular', category: 'global', stat: GLOBAL.games, thresholds: [10, 50, 250, 1000, 3000], topCosmetic: 'ach-regular', blurb: (t) => `Play ${t.toLocaleString()} games.` }),
+  ...series({ id: 'global-games', name: 'tixy Regular', category: 'global', stat: GLOBAL.games, thresholds: [10, 50, 250, 1000, 3000], topCosmetic: 'ach-regular', blurb: (t) => `Play ${t.toLocaleString()} games.` }),
   ...series({ id: 'global-streak', name: 'Daily Devotion', category: 'dedication', stat: GLOBAL.playStreakBest, thresholds: [3, 7, 30, 100, 365], topCosmetic: 'ach-devotion', blurb: (t) => `Play on ${t} days in a row.` }),
   // 1 hour is a first week of casual play, 5 a month, 20 a season, 60 a
   // regular's half year, 150 two hours a day for 75 days. The old 500 hours
@@ -461,7 +461,7 @@ const SERIES: AchievementDef[] = [
 const STANDALONE: AchievementDef[] = [
   standalone({ id: 'first-game', name: 'Hello, World', description: 'Play a game.', category: 'meta', rarity: 'common', xp: 50, icon: 'first-game', condition: { stat: GLOBAL.games, gte: 1 } }),
   standalone({ id: 'jack-of-all', name: 'Jack of All Trades', description: 'Play 10 different games.', category: 'meta', rarity: 'rare', xp: 400, icon: 'jack-of-all', condition: { stat: GLOBAL.distinctGames, gte: 10 } }),
-  standalone({ retired: true, id: 'arcade-master', name: 'Master of the Arcade', description: 'Play every game in the arcade.', category: 'meta', rarity: 'legendary', xp: 2500, icon: 'arcade-master', cosmeticId: 'ach-arcade-master', condition: { stat: GLOBAL.distinctGames, gte: 25 } }),
+  standalone({ retired: true, id: 'arcade-master', name: 'tixy Master', description: 'Play every game on tixy.', category: 'meta', rarity: 'legendary', xp: 2500, icon: 'arcade-master', cosmeticId: 'ach-arcade-master', condition: { stat: GLOBAL.distinctGames, gte: 25 } }),
   standalone({ retired: true, id: 'flawless-typist', name: 'Flawless', description: 'Type 120+ WPM at 100% accuracy.', category: 'mastery', rarity: 'legendary', xp: 2000, icon: 'flawless', cosmeticId: 'ach-flawless', condition: { all: [{ stat: gameStat('typing-test', 'best_wpm'), gte: 120 }, { stat: gameStat('typing-test', 'best_accuracy'), gte: 100 }] } }),
   standalone({ retired: true, id: 'speed-demon', name: 'Speed Demon', description: 'React in under 180ms.', category: 'mastery', rarity: 'epic', xp: 1200, icon: 'speed-demon', condition: { stat: gameStat('reaction-time', 'best_ms'), lte: 180 } }),
   standalone({ retired: true, id: 'tetris-deity', name: 'Tetris Deity', description: 'Clear 100 four-line Tetrises.', category: 'mastery', rarity: 'legendary', xp: 2000, icon: 'tetris-deity', cosmeticId: 'ach-tetris-deity', condition: { stat: gameStat('tetris', 'tetrises'), gte: 100 } }),

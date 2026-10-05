@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// Arcade — Video Poker (Jacks or Better) game logic
+// tixy — Video Poker (Jacks or Better) game logic
 // ---------------------------------------------------------------------------
 //
 // Provably-fair model: the session seed deterministically shuffles a standard

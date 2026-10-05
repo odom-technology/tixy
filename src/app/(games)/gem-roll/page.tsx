@@ -4,7 +4,7 @@ import { GamesWalletProvider } from '@/features/arcade/components/shell/games-wa
 import GemRollClient from './_gem-roll-client';
 
 export const metadata: Metadata = {
-  title: 'Gem Roll | Arcade',
+  title: 'Gem Roll | tixy',
 };
 
 export default function GemRollPage() {

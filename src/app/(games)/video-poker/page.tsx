@@ -4,7 +4,7 @@ import { GamesWalletProvider } from '@/features/arcade/components/shell/games-wa
 import VideoPokerClient from './_video-poker-client';
 
 export const metadata: Metadata = {
-  title: 'Video Poker | Arcade',
+  title: 'Video Poker | tixy',
 };
 
 export default function VideoPokerPage() {

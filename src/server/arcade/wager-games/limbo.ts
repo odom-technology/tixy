@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// Arcade — Limbo game logic
+// tixy — Limbo game logic
 //
 // Single-action settle-only game. The player picks a target multiplier M; the
 // server rolls a crash-point R from the session seed. WIN iff R >= M, paying

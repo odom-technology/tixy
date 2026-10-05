@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 
 export const metadata = {
-  title: 'Connections | Arcade',
+  title: 'Connections | tixy',
 };
 
 export default function ConnectionsLayout({ children }: { children: ReactNode }) {

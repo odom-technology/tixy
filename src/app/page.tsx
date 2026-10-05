@@ -19,7 +19,7 @@ import { DEFAULT_SITE_AVAILABILITY } from '@/lib/site-availability';
 import { getSiteAvailabilitySettings } from '@/server/site-settings';
 
 export const metadata = {
-  title: 'Dashboard | Arcade',
+  title: 'Dashboard | tixy',
 };
 
 export const dynamic = 'force-dynamic';
@@ -111,8 +111,8 @@ export default async function HomePage() {
       showMobileWallet={false}
       showRouteSwitcher={false}
       headerProps={{
-        eyebrow: 'Arcade',
-        title: 'Arcade Dashboard',
+        eyebrow: 'tixy',
+        title: 'tixy Dashboard',
       }}
     >
       <ArcadeDashboardContent

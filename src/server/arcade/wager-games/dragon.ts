@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// Arcade — Dragon Tower game logic
+// tixy — Dragon Tower game logic
 // ---------------------------------------------------------------------------
 //
 // A 9-row tower. Each row has N tiles, K of which are safe (the rest hide a

@@ -4,7 +4,7 @@ import { GamesWalletProvider } from '@/features/arcade/components/shell/games-wa
 import ChickenClient from './_chicken-client';
 
 export const metadata: Metadata = {
-  title: 'Crossy Chicken | Arcade',
+  title: 'Crossy Chicken | tixy',
 };
 
 export default function ChickenPage() {

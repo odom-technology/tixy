@@ -4,7 +4,7 @@ import { GamesWalletProvider } from '@/features/arcade/components/shell/games-wa
 import PrizeWheelClient from './_prize-wheel-client';
 
 export const metadata: Metadata = {
-  title: 'Prize Wheel | Arcade',
+  title: 'Prize Wheel | tixy',
 };
 
 export default function PrizeWheelPage() {

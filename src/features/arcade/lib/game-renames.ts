@@ -57,7 +57,7 @@ export function getGameDisplayName(slug: string, currentTitle: string, enabled: 
 }
 
 /* The same, in title case, for surfaces that still use the registry's title
-   case ("Ring Roll | Arcade", leaderboard rows, store labels). */
+   case ("Ring Roll | tixy", leaderboard rows, store labels). */
 export function getGameTitle(slug: string, currentTitle: string, enabled: boolean = GAME_RENAMES_ENABLED): string {
   const rename = getGameRename(slug, enabled);
   return rename ? titleCase(rename.name) : currentTitle;

@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// Arcade — Lightspeed (hyperspace navigation) game logic
+// tixy — Lightspeed (hyperspace navigation) game logic
 // ---------------------------------------------------------------------------
 
 import {

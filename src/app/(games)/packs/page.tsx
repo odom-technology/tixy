@@ -4,7 +4,7 @@ import { GamesWalletProvider } from '@/features/arcade/components/shell/games-wa
 import PacksClient from './_packs-client';
 
 export const metadata: Metadata = {
-  title: 'Packs | Arcade',
+  title: 'Packs | tixy',
 };
 
 export default function PacksPage() {

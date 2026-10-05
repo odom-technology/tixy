@@ -4,7 +4,7 @@ import { getSiteAvailabilitySettings } from '@/server/site-settings';
 import { ArcadePanel } from '@/features/arcade/components/ui/arcade-ui';
 
 export const dynamic = 'force-dynamic';
-export const metadata = { title: 'Temporarily unavailable | Arcade', robots: { index: false, follow: true } };
+export const metadata = { title: 'Temporarily unavailable | tixy', robots: { index: false, follow: true } };
 
 export default async function UnavailablePage({ searchParams }: { searchParams: Promise<{ path?: string }> }) {
   const params = await searchParams;
@@ -16,7 +16,7 @@ export default async function UnavailablePage({ searchParams }: { searchParams: 
         <p className='arcade-kicker'>Temporarily unavailable</p>
         <h1 className='arcade-display mt-3 text-2xl uppercase'>{restriction?.label ?? 'This section'} is taking a break</h1>
         <p className='mt-4 text-body'>{config.message}</p>
-        <Link href='/' className='arcade-link mt-6 inline-block'>Back to the Arcade</Link>
+        <Link href='/' className='arcade-link mt-6 inline-block'>Back to tixy</Link>
       </ArcadePanel>
     </div>
   );

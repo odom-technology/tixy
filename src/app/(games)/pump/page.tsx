@@ -4,7 +4,7 @@ import { GamesWalletProvider } from '@/features/arcade/components/shell/games-wa
 import PumpClient from './_pump-client';
 
 export const metadata: Metadata = {
-  title: 'Pump | Arcade',
+  title: 'Pump | tixy',
 };
 
 export default function PumpPage() {

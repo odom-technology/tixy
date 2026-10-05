@@ -1,6 +1,6 @@
 import { assertGameAvailable } from '@/server/arcade/game-availability';
 // ---------------------------------------------------------------------------
-// Arcade — Session lifecycle: create (hold wager) → play → settle (payout)
+// tixy — Session lifecycle: create (hold wager) → play → settle (payout)
 // ---------------------------------------------------------------------------
 
 import crypto from "node:crypto";
@@ -450,7 +450,7 @@ export async function settleArcadeSession(
     userId,
     score: result.payout,
     result: "pass",
-    reason: `Arcade round settled: wager=${session.wager} payout=${result.payout} mult=${multiplier}`,
+    reason: `tixy round settled: wager=${session.wager} payout=${result.payout} mult=${multiplier}`,
     stage: "arcade-settle",
     checks: [],
   });

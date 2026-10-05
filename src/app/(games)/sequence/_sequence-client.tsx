@@ -679,7 +679,7 @@ export default function SequenceMemoryPage() {
         <div className='mx-auto w-full max-w-4xl'>
           <div className='hidden sm:block'>
             <PageHeader
-              eyebrow='Arcade'
+              eyebrow='tixy'
               icon='brain'
               title='Sequence Memory'
               subtitle='Watch the pattern, then play it back. One miss ends the run.'

@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// Arcade — Darts game logic (single-action, like Stoplight)
+// tixy — Darts game logic (single-action, like Stoplight)
 // ---------------------------------------------------------------------------
 
 import {

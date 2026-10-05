@@ -1536,7 +1536,7 @@ export default function TumblerClient() {
         <div className="mx-auto w-full max-w-5xl">
           <div className="hidden sm:block">
             <PageHeader
-              eyebrow="Arcade"
+              eyebrow="tixy"
               icon={<LockKeyhole aria-hidden className="h-6 w-6" />}
               title="Tumbler"
               subtitle="Crack the safe — tap as the marker crosses the gold notch. Dead-center CLEAN PICKS pay extra, and every 5 pins opens a lock layer."

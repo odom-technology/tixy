@@ -133,7 +133,7 @@ add('gopher', 'effects', 'gopher-effects-spark', 'Spark Burst', 'rare', {
   bonkFlashColor: '#fff7cc', particleColor: '#facc15',
   particleColors: ['#facc15', '#fb923c', '#fef3c7'], ...pv('#1a1407', '#facc15'),
 });
-add('gopher', 'effects', 'gopher-effects-arcade', 'Arcade Pop', 'epic', {
+add('gopher', 'effects', 'gopher-effects-arcade', 'tixy Pop', 'epic', {
   bonkFlashColor: '#ffffff', particleColor: '#ec4899',
   particleColors: ['#ec4899', '#22d3ee', '#a855f7', '#fde047'], ...pv('#16071a', '#ec4899'),
 });
@@ -405,7 +405,7 @@ add('log-splitter', 'background', 'log-splitter-background-emerald', 'Emerald Da
 
 /* ──────────────────────────── BREAKOUT ────────────────────────────
    slots: paddle, ball, bricks, background */
-add('breakout', 'paddle', 'breakout-paddle-arcade', 'Arcade Slab', 'common', {
+add('breakout', 'paddle', 'breakout-paddle-arcade', 'tixy Slab', 'common', {
   paddleColor: '#e2e8f0', paddleAccent: '#94a3b8', ...pv('#0a0f1a', '#e2e8f0'),
 });
 add('breakout', 'paddle', 'breakout-paddle-laser', 'Laser Slab', 'rare', {
@@ -613,7 +613,7 @@ add('connect-four', 'board', 'connect-four-board-ocean', 'Ocean Cabinet', 'rare'
   boardColor: '#1d4ed8', boardColorDeep: '#1e3a8a', holeColor: '#0b1120', holeColorDeep: '#020617',
   frameTop: '#1e40af', frameBottom: '#172554', frameEdge: '#0f172a', ...pv('#020617', '#1d4ed8'),
 });
-add('connect-four', 'background', 'connect-four-background-arcade', 'Arcade Mat', 'common', {
+add('connect-four', 'background', 'connect-four-background-arcade', 'tixy Mat', 'common', {
   bgTop: '#1e1b4b', bgBottom: '#020617', accent: '#818cf8', ...pv('#020617', '#1e1b4b'),
 });
 /* wave-d cluster-b additions (connect-four) */
@@ -981,7 +981,7 @@ add('profile', 'background', 'profile-background-store2-neon-boardwalk', 'Neon B
 add('profile', 'background', 'profile-background-store2-retro-grid-sunset', 'Retro Grid Sunset', 'rare', {
   bgStyle: 'image', bgStart: '#f43f5e', bgEnd: '#4c1d95', imageUrl: '/cosmetics/banners/store2-retro-grid-sunset.png', ...pv('#1a060c', '#f43f5e'),
 });
-add('profile', 'background', 'profile-background-store2-deep-sea-arcade', 'Deep Sea Arcade', 'rare', {
+add('profile', 'background', 'profile-background-store2-deep-sea-arcade', 'Deep Sea tixy', 'rare', {
   bgStyle: 'image', bgStart: '#38bdf8', bgEnd: '#020617', imageUrl: '/cosmetics/banners/store2-deep-sea-arcade.png', ...pv('#020617', '#38bdf8'),
 });
 add('profile', 'background', 'profile-background-store2-cosmic-pinball', 'Cosmic Pinball', 'epic', {

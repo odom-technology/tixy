@@ -1,4 +1,4 @@
-# Tixy
+# tixy
 
 An arcade by ODOM Tech: skill games, multiplayer, ticket machines, player cards,
 and a cosmetic prize counter. Play at [tixy.lol](https://tixy.lol).
@@ -71,6 +71,6 @@ credentials, and production access are never needed to contribute.
 
 Project code is **AGPL-3.0-only**. Branding and assets have separate terms:
 [Licensing](LICENSING.md), [asset provenance](docs/ASSET_PROVENANCE.md), and
-[Credits](CREDITS.md). ODOM Tech and Tixy branding are reserved.
+[Credits](CREDITS.md). ODOM Tech and tixy branding are reserved.
 
 Report vulnerabilities using the [security policy](SECURITY.md).

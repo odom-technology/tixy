@@ -4,7 +4,7 @@ import { GamesWalletProvider } from '@/features/arcade/components/shell/games-wa
 import LimboClient from './_limbo-client';
 
 export const metadata: Metadata = {
-  title: 'Limbo | Arcade',
+  title: 'Limbo | tixy',
 };
 
 export default function LimboPage() {

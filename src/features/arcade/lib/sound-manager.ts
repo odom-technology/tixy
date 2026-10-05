@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// Arcade Sound Manager — shared audio system for all games.
+// tixy Sound Manager — shared audio system for all games.
 //
 // - Programmatic Web Audio synthesis for fast, repeatable gameplay feedback
 // - Tiny sampled "hero" cues for high-value moments, fetched only after unmute
@@ -1144,7 +1144,7 @@ const SOUNDS: Record<string, SoundFn> = {
     }
   },
 
-  // ── Arcade — shared ────────────────────────────────────────
+  // ── tixy — shared ────────────────────────────────────────
 
   /** Place-your-bet click / button press. */
   arcadeBet: (ctx, master, _n, vol, pitch = 1) => {
@@ -1234,7 +1234,7 @@ const SOUNDS: Record<string, SoundFn> = {
     });
   },
 
-  /** Arcade win — ascending chime. */
+  /** tixy win — ascending chime. */
   arcadeWin: (ctx, master, _n, vol, pitch = 1) => {
     const t = ctx.currentTime;
     const notes = [523, 659, 784, 1047]; // C5 E5 G5 C6
@@ -1269,7 +1269,7 @@ const SOUNDS: Record<string, SoundFn> = {
     });
   },
 
-  /** Arcade loss — descending dull tone. */
+  /** tixy loss — descending dull tone. */
   arcadeLose: (ctx, master, _n, vol) => {
     const t = ctx.currentTime;
     const notes = [330, 262, 196]; // E4 C4 G3
@@ -1287,7 +1287,7 @@ const SOUNDS: Record<string, SoundFn> = {
     }
   },
 
-  /** Big arcade win — sparkly ascending arpeggio. */
+  /** Big tixy win — sparkly ascending arpeggio. */
   arcadeBigWin: (ctx, master, _n, vol) => {
     const t = ctx.currentTime;
     const notes = [523, 659, 784, 1047, 1319, 1568]; // C5 E5 G5 C6 E6 G6

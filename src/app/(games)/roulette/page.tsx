@@ -4,7 +4,7 @@ import { GamesWalletProvider } from '@/features/arcade/components/shell/games-wa
 import RouletteClient from './_roulette-client';
 
 export const metadata: Metadata = {
-  title: 'Roulette | Arcade',
+  title: 'Roulette | tixy',
 };
 
 export default function RoulettePage() {

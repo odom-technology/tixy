@@ -41,7 +41,7 @@ export async function PUT(request: Request) {
   const favoriteGameSlugs = readFavoriteGameSlugs(rawSlugs);
   if (favoriteGameSlugs.length !== rawSlugs.length) {
     return NextResponse.json(
-      { error: 'Favorites must be unique games from the arcade floor.' },
+      { error: 'Favorites must be unique games from the tixy floor.' },
       { status: 400 },
     );
   }

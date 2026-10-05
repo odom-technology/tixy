@@ -4,7 +4,7 @@ import { GamesWalletProvider } from '@/features/arcade/components/shell/games-wa
 import MinesClient from './_mines-client';
 
 export const metadata: Metadata = {
-  title: 'Mines | Arcade',
+  title: 'Mines | tixy',
 };
 
 export default function MinesPage() {

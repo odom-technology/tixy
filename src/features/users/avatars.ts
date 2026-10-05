@@ -36,7 +36,7 @@ const LEGACY_DEFAULT_AVATARS: DefaultAvatar[] = [
   { id: 'default-anime-hero', name: 'Anime Hero', src: src('default-anime-hero') },
   { id: 'default-anime-heroine', name: 'Anime Heroine', src: src('default-anime-heroine') },
   { id: 'default-pixel-bot', name: 'Pixel Bot', src: src('default-pixel-bot') },
-  { id: 'default-arcade-cat', name: 'Arcade Cat', src: src('default-arcade-cat') },
+  { id: 'default-arcade-cat', name: 'tixy Cat', src: src('default-arcade-cat') },
   { id: 'default-astro', name: 'Astro', src: src('default-astro') },
   { id: 'default-ghost', name: 'Spooky', src: src('default-ghost') },
 ];
@@ -119,7 +119,7 @@ export const STORE_AVATARS: StoreAvatar[] = [
   { id: 'profile-avatar-store2-retro-bot', name: 'Retro Bot', rarity: 'epic', src: src('store2-avatar-retro-bot') },
   // wave-d: store2 avatar batch #2 (6 committed PNGs). Rarities spread sensibly.
   { id: 'profile-avatar-store2-carnival-strongman', name: 'The Strongman', rarity: 'common', src: src('store2-avatar-carnival-strongman') },
-  { id: 'profile-avatar-store2-arcade-yeti', name: 'Arcade Yeti', rarity: 'rare', src: src('store2-avatar-arcade-yeti') },
+  { id: 'profile-avatar-store2-arcade-yeti', name: 'tixy Yeti', rarity: 'rare', src: src('store2-avatar-arcade-yeti') },
   { id: 'profile-avatar-store2-deep-mermaid', name: 'Abyssal Siren', rarity: 'rare', src: src('store2-avatar-deep-mermaid') },
   { id: 'profile-avatar-store2-neon-knight', name: 'Neon Knight', rarity: 'epic', src: src('store2-avatar-neon-knight') },
   { id: 'profile-avatar-store2-pixel-wizard', name: 'Pixel Wizard', rarity: 'epic', src: src('store2-avatar-pixel-wizard') },

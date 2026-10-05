@@ -1646,7 +1646,7 @@ export default function KnifeBoothClient() {
         <div className="mx-auto w-full max-w-5xl">
           <div className="hidden sm:block">
             <PageHeader
-              eyebrow="Arcade"
+              eyebrow="tixy"
               icon={<Target aria-hidden className="h-6 w-6" />}
               title="Knife Booth"
               subtitle="Throw the instant the target opens a gap. Fill the quota to clear the stage, slice the fruit for bonus — but land on a lodged blade and it's over."

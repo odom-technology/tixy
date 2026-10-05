@@ -104,7 +104,7 @@ let queue: Promise<unknown> = Promise.resolve();
 let childProc: ChildProcess | null = null;
 
 const STOCKFISH_VARIANT = 'stockfish-18-lite-single.js';
-// All supported runtimes start Arcade from the project root (`/app` in the
+// All supported runtimes start tixy from the project root (`/app` in the
 // production image). Keeping this path statically scoped also prevents Next's
 // file tracer from following a dynamic package-resolution fallback and
 // accidentally tracing the whole repository.

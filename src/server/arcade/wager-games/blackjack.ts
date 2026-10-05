@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// Arcade — Blackjack game logic (server-authoritative)
+// tixy — Blackjack game logic (server-authoritative)
 // ---------------------------------------------------------------------------
 //
 // All card draws and dealer play happen on the server from a seeded shoe.

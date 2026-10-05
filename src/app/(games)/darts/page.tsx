@@ -4,7 +4,7 @@ import { GamesWalletProvider } from '@/features/arcade/components/shell/games-wa
 import DartsClient from './_darts-client';
 
 export const metadata: Metadata = {
-  title: 'Darts | Arcade',
+  title: 'Darts | tixy',
 };
 
 export default function DartsPage() {

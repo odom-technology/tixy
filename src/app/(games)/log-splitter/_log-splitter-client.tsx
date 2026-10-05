@@ -1757,7 +1757,7 @@ export default function LogSplitterClient() {
         <div className="mx-auto w-full max-w-5xl">
           <div className="hidden sm:block">
             <PageHeader
-              eyebrow="Arcade"
+              eyebrow="tixy"
               icon={<Axe aria-hidden className="h-6 w-6" />}
               title="Log Splitter"
               subtitle="Two-button panic rhythm: tap the branch-free side to chop and switch. Every chop refills the draining time bar — speed is survival. One bad side ends it."

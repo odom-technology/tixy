@@ -705,7 +705,7 @@ export default function SudokuClient() {
       <div className='w-full max-w-2xl space-y-3 sm:space-y-4'>
         <div className='hidden sm:block'>
           <PageHeader
-            eyebrow='Arcade'
+            eyebrow='tixy'
             icon='grid'
             title='Sudoku'
             subtitle='Fill the grid, race the clock, climb each difficulty board.'

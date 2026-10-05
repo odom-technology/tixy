@@ -69,7 +69,7 @@ export function SocialModerationClient() {
         <ArcadeStat
           label='Open reports'
           value={loading ? '—' : reports.length.toLocaleString()}
-          sub='Arcade Lobby moderation queue'
+          sub='tixy Lobby moderation queue'
           tone={reports.length > 0 ? 'danger' : 'prize'}
           icon={MessagesSquare}
           className='min-w-52'

@@ -1,3 +1,3 @@
 export const metadata = {
-  title: 'Log Splitter | Arcade',
+  title: 'Log Splitter | tixy',
 };

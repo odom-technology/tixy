@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 
 export const metadata = {
-  title: 'Chess | Arcade',
+  title: 'Chess | tixy',
 };
 
 export default function ChessLayout({ children }: { children: ReactNode }) {

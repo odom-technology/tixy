@@ -347,7 +347,7 @@ export function ArcadeTicketDispenser({
             +{claimAmount}
           </text>
           <text className='arc-ticket-name' x='160' y='52'>
-            ARCADE
+            tixy
           </text>
           <text className='arc-ticket-name' x='160' y='80'>
             TICKET

@@ -258,7 +258,7 @@ export default function DerbyClient({ userId }: { userId: string | null }) {
       <div className="mx-auto w-full max-w-[1500px] space-y-3">
         <div className="hidden sm:block">
           <PageHeader
-            eyebrow="Arcade · Live"
+            eyebrow="tixy · Live"
             icon={<Flag aria-hidden className="h-6 w-6" />}
             title="Derby Royale"
             subtitle="Eight toy horses. One shared race, every three minutes. Back your pick and watch it run."

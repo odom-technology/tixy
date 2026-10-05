@@ -1,4 +1,4 @@
-# Contributing to Tixy
+# Contributing to tixy
 
 Bug fixes, accessibility, performance, game polish, and new game ideas are welcome.
 
@@ -28,6 +28,6 @@ See [the game guide](docs/contributing-games.md) for integration points.
 Submit only material you have the right to contribute. Unless explicitly noted
 otherwise, code contributions are offered under AGPL-3.0-only. Preserve third-party
 notices and document asset licenses separately. Contributing does not grant rights
-to ODOM Tech or Tixy trademarks.
+to ODOM Tech or tixy trademarks.
 
 Report security findings privately using [SECURITY.md](SECURITY.md).

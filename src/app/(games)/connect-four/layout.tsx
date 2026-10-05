@@ -2,7 +2,7 @@ import { getGameTitle } from '@/features/arcade/lib/game-renames';
 import type { ReactNode } from 'react';
 
 export const metadata = {
-  title: `${getGameTitle('connect-four', 'Connect Four')} | Arcade`,
+  title: `${getGameTitle('connect-four', 'Connect Four')} | tixy`,
 };
 
 export default function ConnectFourLayout({ children }: { children: ReactNode }) {

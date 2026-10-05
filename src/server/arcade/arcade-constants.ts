@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// Arcade — Shared constants and configuration
+// tixy — Shared constants and configuration
 // ---------------------------------------------------------------------------
 
 export type ArcadeGameType =

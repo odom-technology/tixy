@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// Arcade — Cases (CS:GO-style box opening) game logic
+// tixy — Cases (CS:GO-style box opening) game logic
 // ---------------------------------------------------------------------------
 
 import {

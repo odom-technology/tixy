@@ -1189,7 +1189,7 @@ export default function ReactionTimePage() {
         <div className='mx-auto w-full max-w-4xl'>
           <div className='hidden md:block'>
             <PageHeader
-              eyebrow='Arcade'
+              eyebrow='tixy'
               icon='target'
               title='Reaction Time'
               subtitle='Train reflexes, improve consistency, and climb the board.'

@@ -1716,7 +1716,7 @@ export default function SkyClimberClient() {
         <div className="mx-auto w-full max-w-3xl">
           <div className="hidden sm:block">
             <PageHeader
-              eyebrow="Arcade"
+              eyebrow="tixy"
               icon={<Rocket aria-hidden className="h-6 w-6" />}
               title="Sky Climber"
               subtitle="Steer a non-stop jumper left and right (the screen wraps) and bounce from platform to platform. Catch springs to launch past several at once. Re-bounce on a lower plank to recover — you only fall if you drop off the bottom."

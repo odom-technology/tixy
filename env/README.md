@@ -180,7 +180,7 @@ in the host's private `.env`, never in Git. Stripe hosted Checkout uses inline
 prices from the ticket pack configuration, so it does not require a publishable
 key or manually created Stripe Products/Prices.
 
-Paid ticket packs require a signed-in local Arcade account and always grant
+Paid ticket packs require a signed-in local tixy account and always grant
 Store Tickets. Checkout stays unavailable until both the API key and webhook
 signing secret are configured.
 

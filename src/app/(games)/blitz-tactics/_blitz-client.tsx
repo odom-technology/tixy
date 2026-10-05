@@ -565,7 +565,7 @@ export default function BlitzTacticsClient() {
         <div className='mx-auto w-full max-w-4xl'>
           <div className='hidden sm:block'>
             <PageHeader
-              eyebrow='Arcade'
+              eyebrow='tixy'
               icon={<Zap aria-hidden className='h-6 w-6' />}
               title='Blitz Tactics'
               subtitle='Solve as many chess mate puzzles as you can in five minutes. Difficulty ramps; three misses ends the run.'

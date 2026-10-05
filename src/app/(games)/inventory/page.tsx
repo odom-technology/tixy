@@ -3,7 +3,7 @@ import { GamesInventoryPage } from '@/features/arcade/components/games-inventory
 import './inventory-midway.css';
 
 export const metadata = {
-  title: 'Inventory | Arcade',
+  title: 'Inventory | tixy',
 };
 
 export default function ArcadeInventoryPage() {

@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// Arcade — Prize Wheel game logic (carnival wheel-of-fortune, single spin)
+// tixy — Prize Wheel game logic (carnival wheel-of-fortune, single spin)
 // ---------------------------------------------------------------------------
 //
 // The player picks a wheel: a segment COUNT ∈ {10,20,30,40,50} and a RISK ∈

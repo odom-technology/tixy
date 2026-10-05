@@ -574,7 +574,7 @@ export default function PacksClient() {
                   size={64}
                   accent="var(--enamel-tickets)"
                 />
-                <div className="pk-pack-plate text-sm">ARCADE</div>
+                <div className="pk-pack-plate text-sm">tixy</div>
                 <div className="pk-pack-sub text-[10px]">PACK</div>
               </div>
             </div>

@@ -183,7 +183,7 @@ export async function GET(request: Request) {
       })),
     }, { headers: { 'Cache-Control': 'no-store' } });
   } catch (error) {
-    console.error('Arcade leaderboard error:', error);
+    console.error('tixy leaderboard error:', error);
     return NextResponse.json({ error: 'Failed to load leaderboard.' }, { status: 500 });
   }
 }

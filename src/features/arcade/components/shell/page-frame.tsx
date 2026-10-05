@@ -23,7 +23,7 @@ const WIDTH_CLASS: Record<FrameWidth, string> = {
 export function AppPageFrame({
   title,
   subtitle,
-  eyebrow = 'Arcade',
+  eyebrow = 'tixy',
   actions,
   rail,
   children,
@@ -114,7 +114,7 @@ export function AdminPageFrame({
 export function GamePageFrame({
   title,
   subtitle,
-  eyebrow = 'Arcade',
+  eyebrow = 'tixy',
   wallet,
   actions,
   stage,

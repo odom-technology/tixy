@@ -1104,7 +1104,7 @@ export default function AirHockeyClient() {
         <div className='mx-auto w-full max-w-3xl'>
           <div className='hidden sm:block'>
             <PageHeader
-              eyebrow='Arcade'
+              eyebrow='tixy'
               title='Air Hockey'
               subtitle='Hot-seat two-player or take on the house. First to 7 wins.'
               wallet={walletCard}

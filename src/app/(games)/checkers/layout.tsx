@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 
 export const metadata = {
-  title: 'Checkers | Arcade',
+  title: 'Checkers | tixy',
 };
 
 export default function CheckersLayout({ children }: { children: ReactNode }) {

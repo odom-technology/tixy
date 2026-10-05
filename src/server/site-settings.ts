@@ -1,3 +1,4 @@
+import { rebrandSiteText } from '@/lib/site-branding';
 import { query } from '@/server/db/client';
 import {
   DEFAULT_SITE_AVAILABILITY,
@@ -239,7 +240,7 @@ export function normalizeWarningBannerConfig(
   const record = value as Record<string, unknown>;
   const message =
     typeof record.message === 'string'
-      ? record.message.trim().slice(0, 1200)
+      ? rebrandSiteText(record.message.trim()).slice(0, 1200)
       : '';
   const startAt = normalizeTimestamp(record.startAt);
   let endAt = normalizeTimestamp(record.endAt);
@@ -265,7 +266,7 @@ export function normalizeWarningBannerConfig(
       variant === 'maintenance'
         ? ''
         : typeof record.ctaLabel === 'string'
-          ? record.ctaLabel.trim().slice(0, 60)
+          ? rebrandSiteText(record.ctaLabel.trim()).slice(0, 60)
           : '',
     ctaHref: variant === 'maintenance' ? '' : normalizeCtaHref(record.ctaHref),
     dismissMode:
@@ -285,7 +286,7 @@ export function normalizeMaintenanceModeConfig(
   const record = value as Record<string, unknown>;
   const message =
     typeof record.message === 'string'
-      ? record.message.trim().slice(0, 1200)
+      ? rebrandSiteText(record.message.trim()).slice(0, 1200)
       : DEFAULT_MAINTENANCE_MODE.message;
   const startAt = normalizeTimestamp(record.startAt);
   let endAt = normalizeTimestamp(record.endAt);

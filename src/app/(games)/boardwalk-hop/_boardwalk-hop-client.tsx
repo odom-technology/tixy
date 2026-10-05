@@ -855,7 +855,7 @@ export default function BoardwalkHopClient() {
         <div className="mx-auto w-full max-w-5xl">
           <div className="hidden sm:block">
             <PageHeader
-              eyebrow="Arcade"
+              eyebrow="tixy"
               icon={<Rabbit aria-hidden className="h-6 w-6" />}
               title="Boardwalk Hop"
               subtitle="Hop the carnival boardwalk row by row — dodge the carts, ride the flume logs, and keep moving before the gull swoops. Catch a log by its very end for close-call bonuses."

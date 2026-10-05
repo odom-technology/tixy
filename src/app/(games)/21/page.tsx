@@ -4,7 +4,7 @@ import { GamesWalletProvider } from '@/features/arcade/components/shell/games-wa
 import BlackjackClient from './_blackjack-client';
 
 export const metadata: Metadata = {
-  title: '21 | Arcade',
+  title: '21 | tixy',
 };
 
 export default function BlackjackPage() {

@@ -18,11 +18,11 @@ export function ArcadeTourShare({
   const share = async () => {
     const url = `${window.location.origin}/tour`;
     const text = rank
-      ? `I’m #${rank} in the Arcade Tour for the week of ${weekKey}. Can you beat me?`
-      : `This week’s Arcade Tour is live. Three games, one combined leaderboard.`;
+      ? `I’m #${rank} in tixy Tour for the week of ${weekKey}. Can you beat me?`
+      : `This week’s tixy Tour is live. Three games, one combined leaderboard.`;
     try {
       if (navigator.share) {
-        await navigator.share({ title: 'Arcade Tour', text, url });
+        await navigator.share({ title: 'tixy Tour', text, url });
       } else {
         await navigator.clipboard.writeText(`${text} ${url}`);
         setCopied(true);

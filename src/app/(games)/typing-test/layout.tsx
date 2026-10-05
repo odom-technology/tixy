@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import './_typing-test.css';
 
 export const metadata = {
-  title: 'Typing Test | Arcade',
+  title: 'Typing Test | tixy',
 };
 
 export default function TypingTestLayout({ children }: { children: ReactNode }) {

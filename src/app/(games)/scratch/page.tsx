@@ -4,7 +4,7 @@ import { GamesWalletProvider } from '@/features/arcade/components/shell/games-wa
 import ScratchClient from './_scratch-client';
 
 export const metadata: Metadata = {
-  title: 'Scratch Cards | Arcade',
+  title: 'Scratch Cards | tixy',
 };
 
 export default function ScratchPage() {

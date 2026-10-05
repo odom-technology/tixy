@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 
 export const metadata = {
-  title: 'Coin Flip | Arcade',
+  title: 'Coin Flip | tixy',
 };
 
 type CoinFlipLayoutProps = {

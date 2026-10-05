@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// Arcade — Pump ("Balloon") game logic
+// tixy — Pump ("Balloon") game logic
 // ---------------------------------------------------------------------------
 //
 // Inflate a balloon: every PUMP multiplies the running multiplier by that

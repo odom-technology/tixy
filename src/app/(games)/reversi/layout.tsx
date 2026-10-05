@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 
 export const metadata = {
-  title: 'Reversi | Arcade',
+  title: 'Reversi | tixy',
 };
 
 export default function ReversiLayout({ children }: { children: ReactNode }) {

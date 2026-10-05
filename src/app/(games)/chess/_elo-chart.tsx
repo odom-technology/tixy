@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 /**
  * Compact line chart of a player's chess ELO over time. Pure SVG, no deps —
- * mirrors the reaction-time chart pattern so Arcade-wide styling stays
+ * mirrors the reaction-time chart pattern so tixy-wide styling stays
  * consistent. Accepts a list of rating checkpoints (after each match).
  */
 

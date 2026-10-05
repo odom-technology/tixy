@@ -1,3 +1,3 @@
 export const metadata = {
-  title: 'Ricochet | Arcade',
+  title: 'Ricochet | tixy',
 };

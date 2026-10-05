@@ -4,7 +4,7 @@ import { GamesWalletProvider } from '@/features/arcade/components/shell/games-wa
 import CrashClient from './_crash-client';
 
 export const metadata: Metadata = {
-  title: 'Crash | Arcade',
+  title: 'Crash | tixy',
 };
 
 export default function CrashPage() {

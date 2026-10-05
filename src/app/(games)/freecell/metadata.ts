@@ -1,3 +1,3 @@
 export const metadata = {
-  title: 'FreeCell Sprint | Arcade',
+  title: 'FreeCell Sprint | tixy',
 };

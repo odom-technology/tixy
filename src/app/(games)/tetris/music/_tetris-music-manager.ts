@@ -100,7 +100,7 @@ export class TetrisMusicManager {
     } catch {
       // Ignore localStorage read failures (privacy mode, restricted storage, etc.)
     }
-    // Tetris owns a richer music graph, but the Arcade master mute remains the
+    // Tetris owns a richer music graph, but tixy master mute remains the
     // single source of truth across routes and browser tabs.
     SoundManager.subscribe(() => this.updateVolume());
   }

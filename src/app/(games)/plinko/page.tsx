@@ -5,7 +5,7 @@ import { GamesWalletProvider } from '@/features/arcade/components/shell/games-wa
 import PlinkoClient from './_plinko-client';
 
 export const metadata: Metadata = {
-  title: `${getGameTitle('plinko', 'Plinko')} | Arcade`,
+  title: `${getGameTitle('plinko', 'Plinko')} | tixy`,
 };
 
 export default function PlinkoPage() {

@@ -2073,7 +2073,7 @@ export default function GunrushClient() {
         <div className="mx-auto w-full max-w-3xl">
           <div className="hidden sm:block">
             <PageHeader
-              eyebrow="Arcade"
+              eyebrow="tixy"
               icon={<Crosshair aria-hidden className="h-6 w-6" />}
               title="Gunrush"
               subtitle="Steer your squad through the gates, evolve the arsenal, and hold the ring when the horde arrives."

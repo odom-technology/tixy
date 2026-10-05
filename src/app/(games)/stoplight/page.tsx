@@ -4,7 +4,7 @@ import { GamesWalletProvider } from '@/features/arcade/components/shell/games-wa
 import StoplightClient from './_stoplight-client';
 
 export const metadata: Metadata = {
-  title: 'Lucky Wheel | Arcade',
+  title: 'Lucky Wheel | tixy',
 };
 
 export default function StoplightPage() {

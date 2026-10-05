@@ -2,7 +2,7 @@ import { getGameTitle } from '@/features/arcade/lib/game-renames';
 import type { ReactNode } from 'react';
 
 export const metadata = {
-  title: `${getGameTitle('flappy-bird', 'Flappy Bird')} | Arcade`,
+  title: `${getGameTitle('flappy-bird', 'Flappy Bird')} | tixy`,
 };
 
 type FlappyBirdLayoutProps = {

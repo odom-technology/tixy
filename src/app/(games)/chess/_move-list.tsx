@@ -194,8 +194,8 @@ function buildPgn(sans: string[], meta?: Props['pgnMeta']): string {
   const timeControl = meta?.timeControl ?? '';
 
   const headers = [
-    `[Event "Arcade Chess"]`,
-    `[Site "Arcade"]`,
+    `[Event "tixy Chess"]`,
+    `[Site "tixy.lol"]`,
     `[Date "${today}"]`,
     `[White "${white}"]`,
     `[Black "${black}"]`,

@@ -2,7 +2,7 @@ import { getGameTitle } from '@/features/arcade/lib/game-renames';
 import type { ReactNode } from 'react';
 
 export const metadata = {
-  title: `${getGameTitle('battleship', 'Battleship')} | Arcade`,
+  title: `${getGameTitle('battleship', 'Battleship')} | tixy`,
 };
 
 export default function BattleshipLayout({ children }: { children: ReactNode }) {

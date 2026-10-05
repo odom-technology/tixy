@@ -4,7 +4,7 @@ import { GamesWalletProvider } from '@/features/arcade/components/shell/games-wa
 import KenoClient from './_keno-client';
 
 export const metadata: Metadata = {
-  title: 'Keno | Arcade',
+  title: 'Keno | tixy',
 };
 
 export default function KenoPage() {

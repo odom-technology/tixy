@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// Arcade — Scratch Cards game logic
+// tixy — Scratch Cards game logic
 // ---------------------------------------------------------------------------
 //
 // A scratch card is a 3x3 grid (9 cells) of prize symbols. MATCH 3 of the same

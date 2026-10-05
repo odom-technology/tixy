@@ -101,7 +101,7 @@ export function PageHeader({
   /* Legacy callers pass lucide names as strings; the logotype chip is the
      mark, so string "icons" are not rendered as text. */
   const iconNode = typeof icon === 'string' ? null : icon;
-  const showEyebrow = Boolean(eyebrow && eyebrow !== 'Arcade' && eyebrow !== title);
+  const showEyebrow = Boolean(eyebrow && eyebrow !== 'tixy' && eyebrow !== title);
 
   return (
     <header className='flex min-h-[4.75rem] flex-col gap-4 sm:min-h-[5.5rem] sm:flex-row sm:items-start sm:justify-between'>

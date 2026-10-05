@@ -19,7 +19,7 @@ export async function POST(request: Request) {
     });
   } catch {
     return NextResponse.json(
-      { error: 'Sign in to your Arcade account to buy ticket packs.' },
+      { error: 'Sign in to your tixy account to buy ticket packs.' },
       { status: 401 },
     );
   }

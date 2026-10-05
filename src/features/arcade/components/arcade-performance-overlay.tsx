@@ -27,11 +27,11 @@ function ArcadePerformanceOverlay() {
 
   return (
     <aside
-      aria-label='Arcade performance diagnostics'
+      aria-label='tixy performance diagnostics'
       className='pointer-events-none fixed top-2 left-2 z-[200] w-60 rounded-md border border-white/25 bg-black/90 p-2 font-mono text-[10px] leading-4 text-white shadow-lg'
     >
       <div className='mb-1 flex items-center justify-between text-[11px] font-bold uppercase tracking-wide'>
-        <span>Arcade perf</span>
+        <span>tixy perf</span>
         <span className='text-emerald-300'>live</span>
       </div>
       <div className='grid grid-cols-2 gap-x-2'>

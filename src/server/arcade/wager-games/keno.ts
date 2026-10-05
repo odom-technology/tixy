@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// Arcade — Keno game logic
+// tixy — Keno game logic
 //
 // 40-number board, player picks 1..10, 10 drawn without replacement via a
 // seeded Fisher-Yates shuffle of 1..40 (the same seededShuffle the rest of the

@@ -125,15 +125,15 @@ export function SignInClient({
     <ArcadePage narrow>
       <div className='flex min-h-[calc(100vh-5rem)] flex-col justify-center'>
         <Link href='/' className='arcade-kicker mb-6 transition-colors hover:text-strong'>
-          The Arcade
+          tixy
         </Link>
         <ArcadePanel variant='cabinet' className='overflow-hidden'>
           <ArcadeMarquee tone='primary' size='md'>
-            {mode === 'signin' ? 'Enter the arcade' : 'New player card'}
+            {mode === 'signin' ? 'Enter tixy' : 'New player card'}
           </ArcadeMarquee>
           <div className='p-6'>
             <h1 className='sr-only'>
-              {mode === 'signin' ? 'Enter the arcade' : 'Create player card'}
+              {mode === 'signin' ? 'Enter tixy' : 'Create player card'}
             </h1>
             {!registrationEnabled ? (
               <ArcadeNotice className='mb-4'>

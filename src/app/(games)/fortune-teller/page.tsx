@@ -4,7 +4,7 @@ import { GamesWalletProvider } from '@/features/arcade/components/shell/games-wa
 import FortuneTellerClient from './_fortune-teller-client';
 
 export const metadata: Metadata = {
-  title: 'Fortune Teller | Arcade',
+  title: 'Fortune Teller | tixy',
 };
 
 export default function FortuneTellerPage() {

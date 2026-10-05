@@ -4,7 +4,7 @@ import { GamesWalletProvider } from '@/features/arcade/components/shell/games-wa
 import BaccaratClient from './_baccarat-client';
 
 export const metadata: Metadata = {
-  title: 'Baccarat | Arcade',
+  title: 'Baccarat | tixy',
 };
 
 export default function BaccaratPage() {

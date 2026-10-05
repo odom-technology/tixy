@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// Arcade — Roulette game logic (European single-zero, single-action settle)
+// tixy — Roulette game logic (European single-zero, single-action settle)
 // ---------------------------------------------------------------------------
 //
 // The player places chips to build a bet set; the sum of all chip amounts is

@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Gopher Pop | Arcade',
+  title: 'Gopher Pop | tixy',
 };

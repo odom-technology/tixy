@@ -4,7 +4,7 @@ import { GamesWalletProvider } from '@/features/arcade/components/shell/games-wa
 import CasesClient from './_cases-client';
 
 export const metadata: Metadata = {
-  title: 'Cases | Arcade',
+  title: 'Cases | tixy',
 };
 
 export default function CasesPage() {

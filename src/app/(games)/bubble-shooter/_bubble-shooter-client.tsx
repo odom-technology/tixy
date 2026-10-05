@@ -1302,7 +1302,7 @@ export default function GumballDropClient() {
         <div className="mx-auto w-full max-w-3xl">
           <div className="hidden sm:block">
             <PageHeader
-              eyebrow="Arcade"
+              eyebrow="tixy"
               icon={<Candy aria-hidden className="h-6 w-6" />}
               title="Gumball Drop"
               subtitle="Slide the dropper and release gumballs into the jar. Two of the same size merge into a bigger one — chase big merges and chains. Let the pile spill over the line and the run ends."

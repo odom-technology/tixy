@@ -264,7 +264,7 @@ export async function postMessage(input: {
     };
   }
   if (conversation.kind === 'channel' && /(?:https?:\/\/|www\.)/i.test(content)) {
-    return { ok: false, status: 400, error: 'Links are not allowed in the Arcade Lobby.' };
+    return { ok: false, status: 400, error: 'Links are not allowed in the tixy Lobby.' };
   }
 
   const memberIds = await listMemberIds(input.conversationId);

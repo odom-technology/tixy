@@ -717,7 +717,7 @@ export default function PunchCardClient() {
       <div className='w-full max-w-xl space-y-3 sm:space-y-4'>
         <div className='hidden sm:block'>
           <PageHeader
-            eyebrow='Arcade'
+            eyebrow='tixy'
             icon='grid'
             title='Punch Card'
             subtitle='Read the clues, punch out the hidden picture, race the clock.'

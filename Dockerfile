@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 # ---------------------------------------------------------------------------
-# Arcade production image.
+# tixy production image.
 #
 # Build:  docker build -t arcade .
 # Run:    docker run -p 3000:3000 --env-file <prod-env-file> arcade

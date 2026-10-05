@@ -1,3 +1,3 @@
 export const metadata = {
-  title: 'Air Hockey | Arcade',
+  title: 'Air Hockey | tixy',
 };

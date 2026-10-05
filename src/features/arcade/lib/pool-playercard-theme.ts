@@ -33,7 +33,7 @@ export const DEFAULT_PLAYERCARD_THEME: PlayercardTheme = {
 };
 
 /**
- * Bot-tier playercard themes shared across Arcade games that render
+ * Bot-tier playercard themes shared across tixy games that render
  * opponent playercards (8-ball, chess). Keyed by difficulty name so any
  * game with `bot:easy|medium|hard` user ids can look up a themed card.
  */

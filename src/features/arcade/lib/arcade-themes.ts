@@ -1,4 +1,4 @@
-/* Arcade themes. Two systems sit under one account setting:
+/* tixy themes. Two systems sit under one account setting:
 
    - `tixy` (the rev. 2 brand) and its colour schemes: the same layout and
      type with a different set of --tixy-* colour tokens. The scheme lives

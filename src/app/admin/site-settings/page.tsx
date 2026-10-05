@@ -14,7 +14,7 @@ import { AdminSiteSettingsClient } from './_site-settings-client';
 export const dynamic = 'force-dynamic';
 
 export const metadata = {
-  title: 'Site settings | Arcade',
+  title: 'Site settings | tixy',
 };
 
 export default async function AdminSiteSettingsPage() {

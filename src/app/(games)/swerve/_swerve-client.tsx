@@ -1621,7 +1621,7 @@ export default function SwerveClient() {
         <div className="mx-auto w-full max-w-3xl">
           <div className="hidden sm:block">
             <PageHeader
-              eyebrow="Arcade"
+              eyebrow="tixy"
               icon={<Navigation aria-hidden className="h-6 w-6" />}
               title="Swerve"
               subtitle="Weave through oncoming traffic. Thread the forced gaps for close-call streak bonuses."

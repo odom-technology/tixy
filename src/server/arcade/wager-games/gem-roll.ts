@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// Arcade — Gem Roll game logic (instant one-roll pattern wager)
+// tixy — Gem Roll game logic (instant one-roll pattern wager)
 //
 // Five gems roll from 7 possible colours (5 independent uniform draws off the
 // session seed). Colours have NO order, so the hand is scored purely by its

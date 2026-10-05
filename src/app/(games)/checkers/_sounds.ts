@@ -17,7 +17,7 @@ const CUES: Record<MoveSoundKind, string> = {
   select: 'boardSelect',
 };
 
-/** Checkers keeps its semantic cue API while sharing Arcade's context and mixer. */
+/** Checkers keeps its semantic cue API while sharing tixy's context and mixer. */
 export function playMoveSound(kind: MoveSoundKind): void {
   SoundManager.play(CUES[kind], { volume: 0.5 });
 }

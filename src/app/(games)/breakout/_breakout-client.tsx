@@ -1343,7 +1343,7 @@ export default function BreakoutClient() {
         <div className="mx-auto w-full max-w-5xl">
           <div className="hidden sm:block">
             <PageHeader
-              eyebrow="Arcade"
+              eyebrow="tixy"
               icon="blocks"
               title={renameGameNamesInText('Breakout')}
               subtitle="Clear every brick, climb the levels, push your best run."

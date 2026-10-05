@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 
 export const metadata = {
-  title: 'Air Hockey | Arcade',
+  title: 'Air Hockey | tixy',
 };
 
 export default function AirHockeyLayout({ children }: { children: ReactNode }) {

@@ -214,7 +214,7 @@ const RAW_GAME_TIME_DISPLAY_GAMES: GameTimeDisplayDefinition[] = [
   { id: 'bumper-cars', label: 'Bumper Cars', rawGameTypes: ['bumper-cars'] },
   { id: 'punch-card', label: 'Punch Card', rawGameTypes: ['punch-card'] },
   { id: 'freecell', label: 'FreeCell Sprint', rawGameTypes: ['freecell'] },
-  { id: 'arcade-legacy', label: 'Arcade (Legacy)', rawGameTypes: ['arcade'] },
+  { id: 'arcade-legacy', label: 'tixy (Legacy)', rawGameTypes: ['arcade'] },
 ];
 
 export const GAME_TIME_DISPLAY_GAMES: GameTimeDisplayDefinition[] = RAW_GAME_TIME_DISPLAY_GAMES.map((game) => ({

@@ -720,7 +720,7 @@ export default function MinesweeperClient() {
       <div className='w-full max-w-2xl space-y-3 sm:space-y-4'>
         <div className='hidden sm:block'>
           <PageHeader
-            eyebrow='Arcade'
+            eyebrow='tixy'
             icon='grid'
             title='Minesweeper'
             subtitle='Clear every safe cell, race the clock, climb each difficulty board.'
