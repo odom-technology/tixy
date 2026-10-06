@@ -37,6 +37,9 @@ npm run dev
 
 Open <http://localhost:3000> and register your test account. Use synthetic data.
 Ads and payments are optional; contributors do not need production credentials.
+Ticket purchases use standard Stripe-hosted Checkout with cards, eligible Apple
+Pay/Google Pay card wallets, and Link. Buy-now-pay-later methods and paid Checkout
+add-ons are not enabled; normal payment processing fees still apply.
 Local PostgreSQL binds to loopback. For another development hostname, configure
 `ARCADE_ALLOWED_DEV_ORIGINS` as described in the environment reference.
 
