@@ -246,20 +246,21 @@ export function PrizeCounter() {
   const [packs, setPacks] = useState<TicketPack[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [refreshAfterCheckout, setRefreshAfterCheckout] = useState(false);
   const [busy, setBusy] = useState<Busy>(null);
   const [busyPack, setBusyPack] = useState<string | null>(null);
   const [justBought, setJustBought] = useState<string | null>(null);
   const [openId, setOpenId] = useState<string | null>(null);
   const [group, setGroup] = useState<string>('all');
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (signal?: AbortSignal) => {
     try {
-      const res = await fetch('/api/store', { cache: 'no-store' });
+      const res = await fetch('/api/store', { cache: 'no-store', signal });
       const payload = await res.json();
       if (!res.ok) throw new Error(payload.error || 'The counter did not load.');
-      setState(payload as CounterState);
+      if (!signal?.aborted) setState(payload as CounterState);
     } catch (err) {
-      setError((err as Error).message);
+      if (!signal?.aborted) setError((err as Error).message);
     }
   }, []);
 
@@ -290,7 +291,7 @@ export function PrizeCounter() {
     const purchase = params.get('ticket_purchase');
     if (purchase === 'success') {
       setNotice('Your tickets are on the way. The balance updates when Stripe confirms the payment.');
-      void load();
+      setRefreshAfterCheckout(true);
     } else if (purchase === 'cancelled') {
       setNotice('Checkout cancelled. Nothing was charged.');
     }
@@ -301,6 +302,30 @@ export function PrizeCounter() {
       window.history.replaceState(null, '', `${window.location.pathname}${next ? `?${next}` : ''}${window.location.hash}`);
     }
   }, [load]);
+
+  // Checkout can return before its webhook grants tickets. Refresh briefly while
+  // confirmation arrives, with one request at a time and no work after unmount.
+  useEffect(() => {
+    if (!refreshAfterCheckout) return;
+    const controller = new AbortController();
+    let refreshTimer: ReturnType<typeof setTimeout>;
+    const refresh = async () => {
+      await load(controller.signal);
+      if (!controller.signal.aborted) {
+        refreshTimer = setTimeout(() => void refresh(), 2000);
+      }
+    };
+    refreshTimer = setTimeout(() => void refresh(), 2000);
+    const stopTimer = setTimeout(() => {
+      controller.abort();
+      clearTimeout(refreshTimer);
+    }, 60000);
+    return () => {
+      controller.abort();
+      clearTimeout(refreshTimer);
+      clearTimeout(stopTimer);
+    };
+  }, [load, refreshAfterCheckout]);
 
   const signedIn = Boolean(state && !state.isGuest);
   const { account } = useAccountSummary();
