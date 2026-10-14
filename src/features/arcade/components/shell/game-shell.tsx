@@ -3,8 +3,10 @@
 /* The game shell. Every game page is one ink cabinet: a strip on top
    (back, the game's name, your best or the clock, tickets, ?, sound) and
    the stage under it, sized to the screen. No page header, no wallet card,
-   no paragraph, no start card. The stage shows the game's real first frame
-   with one line under it, and the first input starts the run.
+   no paragraph, no start card inside the cabinet. The stage shows the game's
+   real first frame with one line under it, and the first input starts the run.
+   An expandable how-to below the cabinet keeps the same instructions available
+   in the initial HTML, including before the game or its help dialog loads.
 
      <GameShell game='stack' stat={<GameStat value={best} label='best' />} howTo={HOW_TO}>
        <GameStage phase={phase} hint={HINT} onStart={start} aspect={W / H} onSize={fit} end={result}>
@@ -202,6 +204,16 @@ function GameShellFrame({
           {children}
         </div>
         {below ? <div className='arc-shell-below'>{below}</div> : null}
+        {howTo ? (
+          <details className='my-4 rounded-panel border border-soft bg-panel px-4 py-3 text-sm text-body'>
+            <summary className='cursor-pointer font-semibold text-strong'>
+              How to play {name}
+            </summary>
+            <div className='mt-3 space-y-2 leading-relaxed'>
+              {howTo.lines.map((line) => <p key={line}>{line}</p>)}
+            </div>
+          </details>
+        ) : null}
       </div>
     </ShellContext.Provider>
   );
