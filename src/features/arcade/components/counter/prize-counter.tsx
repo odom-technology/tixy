@@ -240,7 +240,11 @@ function HeadLine({ state, signedIn }: { state: CounterState | null; signedIn: b
   );
 }
 
-export function PrizeCounter() {
+export function PrizeCounter({
+  rewardedAds,
+}: {
+  rewardedAds: { enabled: boolean; ticketsAmount: number };
+}) {
   const { ticketBundlesEnabled } = useSiteAvailability();
   const [state, setState] = useState<CounterState | null>(null);
   const [packs, setPacks] = useState<TicketPack[]>([]);
@@ -606,22 +610,28 @@ export function PrizeCounter() {
         </section>
       ) : null}
 
-      {/* The rewarded ad stays whether or not ticket packs are on sale. */}
-      <section className='pc-packs pc-ad' aria-labelledby='pc-ad-title'>
-        <div className='pc-ad-copy'>
-          <h2 id='pc-ad-title'>optional ad reward</h2>
-          <p>Watch a rewarded ad for tickets you spend at the counter.</p>
-        </div>
-        <RewardedAdButton
-          rewardType='store_tickets'
-          onReward={() => {
-            setNotice('Tickets added.');
-            void load();
-          }}
-        >
-          watch ad
-        </RewardedAdButton>
-      </section>
+      {rewardedAds.enabled ? (
+        <section className='pc-packs pc-ad' aria-labelledby='pc-ad-title'>
+          <div className='pc-ad-copy'>
+            <h2 id='pc-ad-title'>optional ad reward</h2>
+            <p>
+              Complete an optional rewarded ad for{' '}
+              {rewardedAds.ticketsAmount.toLocaleString('en-US')} Store Tickets
+              you spend at the counter.
+            </p>
+          </div>
+          <RewardedAdButton
+            enabled={rewardedAds.enabled}
+            rewardType='store_tickets'
+            onReward={() => {
+              setNotice('Tickets added.');
+              void load();
+            }}
+          >
+            {`watch ad for ${rewardedAds.ticketsAmount.toLocaleString('en-US')} tickets`}
+          </RewardedAdButton>
+        </section>
+      ) : null}
 
       {openEntry ? (
         <PrizePreview

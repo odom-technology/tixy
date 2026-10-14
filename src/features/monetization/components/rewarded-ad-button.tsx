@@ -88,11 +88,13 @@ async function postJson<T>(url: string, body: Record<string, unknown>) {
 }
 
 export function RewardedAdButton({
+  enabled,
   rewardType,
   gameType = null,
   children,
   onReward,
 }: {
+  enabled: boolean;
   rewardType: RewardedAdRewardType;
   gameType?: string | null;
   children: string;
@@ -234,8 +236,7 @@ export function RewardedAdButton({
             ? 'Reward claimed'
             : children;
 
-  const configured = Boolean(process.env.NEXT_PUBLIC_GAM_REWARDED_AD_UNIT_PATH);
-  if (!configured) return null;
+  if (!enabled) return null;
 
   return (
     <div className='flex flex-col items-start gap-2'>
