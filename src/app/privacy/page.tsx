@@ -21,7 +21,7 @@ export default function PrivacyPage() {
       contentClassName='space-y-4'
     >
       <ArcadePanel variant='raised' className='space-y-5 p-4 text-sm leading-7 text-body sm:p-5'>
-        <p className='font-semibold text-strong'>Last updated: June 24, 2026.</p>
+        <p className='font-semibold text-strong'>Last updated: October 14, 2026.</p>
 
         <section className='space-y-2'>
           <h2 className='arcade-display text-lg text-strong uppercase'>Information collected</h2>
@@ -37,11 +37,28 @@ export default function PrivacyPage() {
           <h2 className='arcade-display text-lg text-strong uppercase'>Ads and cookies</h2>
           <p>
             Guests may see Google ads on game pages. Google and other advertising partners
-            may use cookies or similar technologies to show ads based on visits to tixy
-            and other websites. You can manage personalized ad choices through Google Ads
-            Settings or broader industry opt-out tools.
+            may place and read cookies on your browser and use web beacons, IP addresses,
+            device/browser information, and other identifiers to deliver and measure ads,
+            prevent fraud, and personalize ads where permitted. These partners may use
+            information about your visits to tixy and other websites.
+          </p>
+          <p>
+            Where a consent message is shown, you can choose whether to consent and manage
+            your advertising preferences there. You can also manage personalized ad choices
+            through Google Ads Settings or broader industry opt-out tools. Google&apos;s partner
+            data policy explains how Google collects, shares, and uses information when you
+            visit a site that uses its services.
           </p>
           <div className='flex flex-wrap gap-2'>
+            <ArcadeAnchorButton
+              href='https://policies.google.com/technologies/partner-sites'
+              target='_blank'
+              rel='noopener noreferrer'
+              size='sm'
+              tone='ghost'
+            >
+              How Google uses partner-site data
+            </ArcadeAnchorButton>
             <ArcadeAnchorButton
               href='https://adssettings.google.com/'
               target='_blank'
