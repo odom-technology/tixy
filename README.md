@@ -4,7 +4,10 @@ An arcade by ODOM Tech: skill games, multiplayer, ticket machines, player cards,
 and a cosmetic prize counter. Play at [tixy.lol](https://tixy.lol).
 
 Contributions that improve existing games or add thoughtful new games are welcome.
-See [Contributing](CONTRIBUTING.md) and the [game guide](docs/contributing-games.md).
+Developers contribute source through a PR to `dev`; maintainers review and release
+it. Start with [Contributing](CONTRIBUTING.md), the playable
+[first-game tutorial](docs/first-game.md), and the
+[game review checklist](docs/game-review-checklist.md).
 
 ## Local development
 
@@ -53,10 +56,13 @@ npm run test:themes
 npm run test:floor-registry
 npm run test:weekly-boards
 npm run test:profile-showcase
+npm run test:starter-game
 ```
 
 Run the relevant replay/invariant checks for changed games. Integration tests
 require explicitly named disposable databases; CI creates its own databases.
+The [tutorial](docs/first-game.md#5-verify-a-clean-checkout) includes starter-game
+database and browser checks and a clean-checkout verification procedure.
 
 ## Architecture
 

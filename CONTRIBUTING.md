@@ -8,12 +8,17 @@ Bug fixes, accessibility, performance, game polish, and new game ideas are welco
 2. For a new game or substantial gameplay change, open an issue describing its
    controls, scoring, replay validation, and assets first.
 3. Develop against your own disposable PostgreSQL database with synthetic accounts.
-4. Run typecheck, lint, build, and relevant game tests.
+4. Run typecheck, lint, build, and relevant game tests. Follow the
+   [game review checklist](docs/game-review-checklist.md) for a new game.
 5. Open a PR targeting `dev`. Explain changes and verification, with screenshots
    or a recording for visible changes.
-6. Maintainers review contributions; releases move reviewed changes to `main`.
+6. Maintainers review contributions; releases move reviewed changes to `main`
+   through the separate private ops repository. Contributors need no ops access.
 
-See [the game guide](docs/contributing-games.md) for integration points.
+Build and play the complete Pattern Match example with the
+[first-game tutorial](docs/first-game.md). See [the game guide](docs/contributing-games.md)
+for the supported game interface and integration points. PRs into `dev` and pushes
+to `dev` run contribution CI; keep contributions focused enough to review alone.
 
 ## Requirements
 
