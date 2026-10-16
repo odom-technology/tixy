@@ -158,6 +158,11 @@ Maintenance redirects and public banners are stored in Postgres and managed from
 : Maximum claimed rewards per user in a rolling 24 hours. Defaults to `10`.
   Failed or unfilled ad requests do not consume this allowance.
 
+`AD_REWARD_DAILY_ATTEMPT_LIMIT`
+: Maximum rewarded ad starts per user in a rolling 24 hours. Defaults to `10`.
+  Every intent request counts, including closed, unfilled, or abandoned ads.
+  This separate cap prevents repeated viewing without claiming a reward.
+
 `AD_REWARD_COOLDOWN_MS`
 : Minimum time between rewarded ad intent requests, including unfilled
   attempts. Defaults to `60000`.

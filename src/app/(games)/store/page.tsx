@@ -12,6 +12,8 @@ export default function ArcadeStorePage() {
       rewardedAds={{
         enabled: Boolean(rewardedAds.adUnitPath),
         ticketsAmount: rewardedAds.storeTicketsAmount,
+        dailyAttemptLimit: rewardedAds.dailyAttemptLimit,
+        cooldownSeconds: Math.ceil(rewardedAds.cooldownMs / 1000),
       }}
     />
   );

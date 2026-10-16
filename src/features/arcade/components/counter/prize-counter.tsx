@@ -243,7 +243,7 @@ function HeadLine({ state, signedIn }: { state: CounterState | null; signedIn: b
 export function PrizeCounter({
   rewardedAds,
 }: {
-  rewardedAds: { enabled: boolean; ticketsAmount: number };
+  rewardedAds: { enabled: boolean; ticketsAmount: number; dailyAttemptLimit: number; cooldownSeconds: number };
 }) {
   const { ticketBundlesEnabled } = useSiteAvailability();
   const [state, setState] = useState<CounterState | null>(null);
@@ -618,6 +618,11 @@ export function PrizeCounter({
               Complete an optional rewarded ad for{' '}
               {rewardedAds.ticketsAmount.toLocaleString('en-US')} Store Tickets
               you spend at the counter.
+            </p>
+            <p>
+              Up to {rewardedAds.dailyAttemptLimit.toLocaleString('en-US')} ad attempts
+              per account every 24 hours, with {rewardedAds.cooldownSeconds.toLocaleString('en-US')}{' '}
+              seconds between attempts. Closed or unavailable ads count toward this limit.
             </p>
           </div>
           {signedIn ? (

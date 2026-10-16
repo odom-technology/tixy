@@ -47,6 +47,7 @@ export const getRewardedAdConfig = () => ({
   adUnitPath: process.env.NEXT_PUBLIC_GAM_REWARDED_AD_UNIT_PATH?.trim() || '',
   storeTicketsAmount: readPositiveIntEnv('AD_REWARD_STORE_TICKETS', 25),
   dailyLimit: readPositiveIntEnv('AD_REWARD_DAILY_LIMIT', 10),
+  dailyAttemptLimit: readPositiveIntEnv('AD_REWARD_DAILY_ATTEMPT_LIMIT', 10),
   cooldownMs: readPositiveIntEnv('AD_REWARD_COOLDOWN_MS', 60_000),
   intentTtlMs: readPositiveIntEnv('AD_REWARD_INTENT_TTL_MS', 10 * 60_000),
 });
@@ -138,6 +139,16 @@ export async function createRewardedAdIntent({
       `rewarded-ad:${userId}`,
     ]);
     const now = Date.now();
+    // Count every start, including abandoned/unfilled ads, so closing before
+    // the grant event cannot allow unlimited video requests.
+    const attemptsResult = await client.query<{ count: string | number }>(
+      `SELECT COUNT(*) AS count FROM ad_reward_intents
+       WHERE user_id = $1 AND created_at >= $2`,
+      [userId, now - 24 * 60 * 60 * 1000],
+    );
+    if (Number(attemptsResult.rows[0]?.count ?? 0) >= config.dailyAttemptLimit) {
+      throw new Error('Daily rewarded ad viewing limit reached. Try again later.');
+    }
     const recentResult = await client.query<{ count: string | number }>(
       `SELECT COUNT(*) AS count FROM ad_reward_intents
        WHERE user_id = $1 AND status = 'claimed' AND claimed_at >= $2`,

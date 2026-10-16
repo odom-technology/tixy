@@ -21,6 +21,7 @@ process.env.DATABASE_URL = databaseUrl;
 process.env.NEXT_PUBLIC_GAM_REWARDED_AD_UNIT_PATH = '/isolated-regression/rewarded';
 process.env.AD_REWARD_STORE_TICKETS = '25';
 process.env.AD_REWARD_DAILY_LIMIT = '2';
+process.env.AD_REWARD_DAILY_ATTEMPT_LIMIT = '100';
 process.env.AD_REWARD_COOLDOWN_MS = '60000';
 process.env.AD_REWARD_INTENT_TTL_MS = '600000';
 
@@ -49,7 +50,7 @@ try {
     );
   }
 
-  const { createRewardedAdIntent, claimRewardedAdIntent } =
+  const { createRewardedAdIntent, claimRewardedAdIntent, getRewardedAdConfig } =
     await import('../src/server/monetization/rewarded-ads');
   const start = (rewardType: string = 'store_tickets', gameType?: string) =>
     createRewardedAdIntent({ userId, rewardType, gameType });
@@ -73,6 +74,7 @@ try {
   );
   async function reset() {
     process.env.AD_REWARD_DAILY_LIMIT = '2';
+    process.env.AD_REWARD_DAILY_ATTEMPT_LIMIT = '100';
     process.env.AD_REWARD_STORE_TICKETS = '25';
     await pool.query('TRUNCATE arcade_accounts, wallets, store_credit_ledger CASCADE');
     for (const id of [userId, otherUserId]) {
@@ -95,6 +97,60 @@ try {
       if (result.status === 'rejected') assert.match(String(result.reason), pattern);
     }
   };
+
+  await test('daily viewing limit defaults to ten attempts', async () => {
+    delete process.env.AD_REWARD_DAILY_ATTEMPT_LIMIT;
+    assert.equal(getRewardedAdConfig().dailyAttemptLimit, 10);
+    process.env.AD_REWARD_DAILY_ATTEMPT_LIMIT = '3';
+    assert.equal(getRewardedAdConfig().dailyAttemptLimit, 3);
+  });
+
+  await test('no-fill, abandoned and expired attempts all consume the daily viewing allowance', async () => {
+    process.env.AD_REWARD_DAILY_ATTEMPT_LIMIT = '3';
+    for (let index = 0; index < 3; index++) {
+      const { intent } = await start();
+      // No-fill and abandoned attempts stay pending; expiration also counts.
+      if (index === 2) {
+        await pool.query("UPDATE ad_reward_intents SET status = 'expired', expires_at = $1 WHERE id = $2", [Date.now() - 1, intent.id]);
+      }
+      await ageAttempts();
+    }
+    await assert.rejects(start(), /Daily rewarded ad viewing limit reached/);
+    assert.equal(await count('ad_reward_intents'), 3);
+    assert.equal(await count('ad_reward_events', "event_type = 'created'"), 3);
+    assert.equal(await count('store_credit_ledger'), 0);
+    // Viewing allowances belong to the player, not the whole application.
+    await createRewardedAdIntent({ userId: otherUserId, rewardType: 'store_tickets' });
+    assert.equal(await count('ad_reward_intents'), 4);
+    assert.deepEqual(await balance(), { credits: 100, storeCredits: 0 });
+  });
+
+  await test('concurrent starts cannot exceed the final daily viewing slot', async () => {
+    process.env.AD_REWARD_DAILY_ATTEMPT_LIMIT = '3';
+    for (let index = 0; index < 2; index++) {
+      await start();
+      await ageAttempts();
+    }
+    const results = await Promise.allSettled(Array.from({ length: 8 }, () => start()));
+    assert.equal(results.filter((result) => result.status === 'fulfilled').length, 1);
+    rejected(results, /Daily rewarded ad viewing limit reached/);
+    assert.equal(await count('ad_reward_intents'), 3);
+    assert.equal(await count('ad_reward_events', "event_type = 'created'"), 3);
+    assert.equal(await count('store_credit_ledger'), 0);
+  });
+
+  await test('viewing attempts age out of the rolling 24-hour allowance', async () => {
+    process.env.AD_REWARD_DAILY_ATTEMPT_LIMIT = '2';
+    for (let index = 0; index < 2; index++) {
+      await start();
+      await ageAttempts();
+    }
+    await assert.rejects(start(), /Daily rewarded ad viewing limit reached/);
+    await pool.query('UPDATE ad_reward_intents SET created_at = $1 WHERE user_id = $2', [Date.now() - day - 60_000, userId]);
+    await start();
+    assert.equal(await count('ad_reward_intents'), 3);
+    assert.equal(await count('store_credit_ledger'), 0);
+  });
 
   await test('concurrent starts admit one attempt and preserve the 60-second cooldown', async () => {
     const results = await Promise.allSettled(Array.from({ length: 8 }, () => start()));
