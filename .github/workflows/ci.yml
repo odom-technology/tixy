@@ -33,6 +33,9 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Rewarded ad lifecycle regressions
+        run: npm run test:rewarded-ad-lifecycle
+
       - name: Game availability regression checks
         run: npx tsx scripts/verify-game-availability.ts
 
@@ -85,6 +88,13 @@ jobs:
         run: |
           node --input-type=module -e "import pg from 'pg'; const pool = new pg.Pool({connectionString: process.env.DATABASE_URL}); await pool.query('CREATE DATABASE arcade_payment_regression'); await pool.end();"
           npm run test:stripe-payments
+
+      - name: Rewarded ad server regressions
+        env:
+          REWARDED_AD_TEST_DATABASE_URL: postgres://arcade:arcade@localhost:5432/arcade_rewarded_ad_regression
+        run: |
+          node --input-type=module -e "import pg from 'pg'; const pool = new pg.Pool({connectionString: process.env.DATABASE_URL}); await pool.query('CREATE DATABASE arcade_rewarded_ad_regression'); await pool.end();"
+          npm run test:rewarded-ads
 
       - name: Leaderboard identity regressions
         env:

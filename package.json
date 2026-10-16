@@ -29,6 +29,8 @@
     "test:admin-routes": "tsx scripts/verify-admin-routes.ts",
     "test:site-availability": "tsx scripts/verify-site-availability.ts",
     "test:stripe-payments": "tsx scripts/verify-stripe-payments.ts",
+    "test:rewarded-ads": "tsx scripts/verify-rewarded-ads.ts",
+    "test:rewarded-ad-lifecycle": "tsx scripts/verify-rewarded-ad-lifecycle.ts",
     "test:store-hiding": "tsx scripts/verify-store-hiding.ts",
     "test:counter": "tsx scripts/verify-counter.ts",
     "test:bet-presets": "tsx scripts/verify-bet-presets.ts",

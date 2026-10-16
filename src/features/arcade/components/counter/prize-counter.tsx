@@ -620,16 +620,22 @@ export function PrizeCounter({
               you spend at the counter.
             </p>
           </div>
-          <RewardedAdButton
-            enabled={rewardedAds.enabled}
-            rewardType='store_tickets'
-            onReward={() => {
-              setNotice('Tickets added.');
-              void load();
-            }}
-          >
-            {`watch ad for ${rewardedAds.ticketsAmount.toLocaleString('en-US')} tickets`}
-          </RewardedAdButton>
+          {signedIn ? (
+            <RewardedAdButton
+              enabled={rewardedAds.enabled}
+              rewardType='store_tickets'
+              onReward={() => {
+                setNotice('Tickets added.');
+                void load();
+              }}
+            >
+              {`watch ad for ${rewardedAds.ticketsAmount.toLocaleString('en-US')} tickets`}
+            </RewardedAdButton>
+          ) : (
+            <a className='pc-btn' href='/signin?next=%2Fstore'>
+              sign in for ad rewards
+            </a>
+          )}
         </section>
       ) : null}
 
