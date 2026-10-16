@@ -98,8 +98,10 @@ and maintainer-approved reward design.
 
 ## 3. Copy the example into a proposed game
 
-Open an issue with your rules, controls, scoring, replay approach, and asset
-sources before substantial work. Pick a unique slug; this example uses
+Propose your rules, controls, scoring, replay approach, and asset sources before
+substantial work. External contributions use an issue; a maintainer-run local
+pilot can record its proposal in the repository, as in the
+[Lights Out pilot](contributor-pilot.md). Pick a unique slug; this example uses
 `shape-sort`. Copy the game-owned files, retaining the working starter:
 
 ```sh
@@ -108,6 +110,8 @@ cp -R src/features/arcade/lib/starter-match src/features/arcade/lib/shape-sort
 cp -R src/app/api/games/starter-match src/app/api/games/shape-sort
 cp src/server/arcade/starter-match.ts src/server/arcade/shape-sort.ts
 cp scripts/verify-starter-game.ts scripts/verify-shape-sort.ts
+cp scripts/verify-starter-game-integration.ts scripts/verify-shape-sort-integration.ts
+cp scripts/verify-starter-game-browser.mjs scripts/verify-shape-sort-browser.mjs
 ```
 
 Use PowerShell `Copy-Item -Recurse` for directory copies. Rename the copied client
@@ -116,6 +120,18 @@ slug, `starter_match` table prefix, `StarterMatch` types, `Pattern` function nam
 metadata, visible title, CSS prefix, and `/api/games/...` URLs **inside the copies**.
 Use `rg 'starter-match|starter_match|StarterMatch|Pattern'` on your copied paths to
 find references. Do not globally rename the original starter or shared helpers.
+
+Copying the tests is a starting point, not a passing contribution. Replace their
+fixed eight-round/800-point fixtures, labels, selectors, and click sequence with
+your actual rules and controls. A puzzle that ends on a solved state or move
+limit needs terminal-state validation, not the starter's fixed action count.
+Update the UI's response types and saved-result display if your API returns
+extra result fields. In the integration test, update the explicit
+migration list, SQL table names, rollback constraint name, environment variable,
+and exact disposable database-name guard. Retain the shared prerequisite
+migrations. In the browser test, keep the explicit loopback-origin guard and
+synthetic account creation, and use game-specific account and screenshot prefixes.
+Exercise a real played run, save failure/retry, and board recovery with the new UI.
 
 Implement rules in the pure engine first. Keep database access, secrets, time,
 network calls, and browser APIs outside it. Pass explicit seeded state and
@@ -149,6 +165,8 @@ Make these explicit changes; copying a directory does not register it:
    per-player/per-rules best-score tables. Use your own table names and
    constraints, and update `src/server/db/schema.ts`. Do not edit an already-applied
    migration or reuse the starter's tables.
+   Replace the starter's 800-point SQL bounds with your own score range. Keep the
+   migration, engine, replay result, and test assertions consistent.
 4. Update every copied SQL query to the new table names. Keep result persistence
    and session consumption atomic. Preserve idempotent retry behavior and stable
    account IDs. Filter the board by rules version and resolve current usernames.
@@ -161,6 +179,16 @@ Make these explicit changes; copying a directory does not register it:
 6. Add test commands to `package.json`, register deterministic checks in
    `scripts/run-game-invariants.mjs`, and wire integration/browser checks into
    `.github/workflows/ci.yml` with disposable data and no repository secrets.
+   Preserve the workflow's **pushes to `main` only** trigger. Contributions to
+   `dev` run these commands locally; do not add `dev` or pull-request triggers.
+
+For example, the pilot's commands are `test:lights-out`,
+`test:lights-out-integration`, and `test:lights-out-browser`. Its integration test
+uses `LIGHTS_OUT_TEST_DATABASE_URL` and accepts only a database named
+`arcade_lights_out_test`. Register filename/slug patterns in the invariant runner
+so changed-game checks select your new engine suite; package scripts alone do
+not register it. The main workflow separately creates the disposable integration
+database, runs that suite, then runs browser checks against its migrated local app.
 
 Run `npm run db:migrate` after adding the migration. Keep the new game score-only
 until maintainers explicitly approve tickets, XP, achievements, quests, or
@@ -179,10 +207,26 @@ new game. In the checkout with dependencies installed:
 npm run typecheck
 npm run lint
 npm run test:starter-game
-npm run test:floor-registry
+FLOOR_REGISTRY_BASE_REF=origin/dev FLOOR_REGISTRY_REQUIRE_BASE=1 npm run test:floor-registry
 npm run test:game-invariants:changed
 npm run build
 ```
+
+The floor check must compare against the `dev` baseline from before your
+contribution. `origin/dev` works for a fresh fork/clone whose `dev` still points
+to that baseline; fetch it with `git fetch origin dev` if the ref is missing.
+If your fork's `dev` already contains the game, fetch the upstream repository's
+`dev` into a separate remote and use that ref, or use the recorded pre-change
+commit. Reuse the same baseline throughout the pilot. Setting
+`FLOOR_REGISTRY_REQUIRE_BASE=1` makes a missing comparison fail instead of silently
+skipping stored-key compatibility checks.
+
+On PowerShell, set `$env:FLOOR_REGISTRY_BASE_REF = 'origin/dev'` and
+`$env:FLOOR_REGISTRY_REQUIRE_BASE = '1'`, then run
+`npm run test:floor-registry`. The changed-game runner compares against local
+`main` by default; if it cannot resolve that baseline, it safely runs all game
+invariant suites. Set `GAME_INVARIANT_BASE_SHA` to your recorded baseline commit
+to select checks against the same pre-contribution state explicitly.
 
 The starter integration suite requires its own explicitly named disposable
 PostgreSQL database, separate from the app database. Never use production or a
@@ -218,6 +262,8 @@ On PowerShell, set `$env:QA_BASE_URL = 'http://127.0.0.1:3000'` before running
 
 Set `QA_SCREENSHOTS=1` to save browser evidence under
 `output/playwright/starter-match-desktop.png` and `starter-match-mobile.png`.
+Keep raw QA output out of source control. Check `git status --short` before
+staging; include only deliberately selected synthetic evidence in a review.
 
 On Linux, Playwright may require `npx playwright install --with-deps chromium`.
 Also manually play with the keyboard, a narrow viewport, reduced motion, and the
@@ -239,7 +285,15 @@ existing service can host another database created with `createdb`; set the new
 checkout's `DATABASE_URL` to it. Run migrations and the checks above, start the
 app, register a synthetic account, and complete a browser run. Do not copy
 `node_modules`, `.next`, `env/.env.local`, or database contents from your working
-checkout. Record the commands and results in your PR.
+checkout. Set the floor-registry baseline to the same pre-contribution ref or
+commit; do not use the new game commit as its own baseline. Record the commands
+and results in your PR.
+
+An uncommitted pilot needs an explicit snapshot: a plain clone contains only
+commits. Record the base commit and how the intended tracked changes and new
+source files were transferred into the clean clone. Exclude ignored env files,
+build output, dependencies, and QA data. Distinguish checks of that snapshot from
+checks of the committed branch; see the [pilot report](contributor-pilot.md).
 
 ## 6. Submit for review
 

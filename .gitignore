@@ -51,3 +51,6 @@ id_ed25519*
 *.pfx
 **/tunnel.env
 **/credentials.json
+
+# Local browser verification evidence.
+output/playwright/

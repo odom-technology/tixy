@@ -8,6 +8,8 @@ Developers contribute source through a PR to `dev`; maintainers review and relea
 it. Start with [Contributing](CONTRIBUTING.md), the playable
 [first-game tutorial](docs/first-game.md), and the
 [game review checklist](docs/game-review-checklist.md).
+See the [Lights Out contributor pilot](docs/contributor-pilot.md) for a second
+small game's proposal, integration choices, and clean-clone verification.
 
 ## Local development
 
@@ -53,7 +55,7 @@ npm run typecheck
 npm run lint
 npm run build
 npm run test:themes
-npm run test:floor-registry
+FLOOR_REGISTRY_BASE_REF=origin/dev FLOOR_REGISTRY_REQUIRE_BASE=1 npm run test:floor-registry
 npm run test:weekly-boards
 npm run test:profile-showcase
 npm run test:starter-game
@@ -64,6 +66,8 @@ require explicitly named disposable databases; CI creates its own databases.
 Run checks locally for `dev`; GitHub Actions runs only on pushes to `main`.
 The [tutorial](docs/first-game.md#5-verify-a-clean-checkout) includes starter-game
 database and browser checks and a clean-checkout verification procedure.
+Use the pre-contribution `dev` baseline for registry comparison; the tutorial
+explains fetching it and the equivalent PowerShell environment setup.
 
 ## Architecture
 

@@ -6,7 +6,8 @@ Bug fixes, accessibility, performance, game polish, and new game ideas are welco
 
 1. Fork the public repository and branch from `dev`.
 2. For a new game or substantial gameplay change, open an issue describing its
-   controls, scoring, replay validation, and assets first.
+   controls, scoring, replay validation, and assets first. Maintainer-authorized
+   local pilots may record that proposal in the repository instead.
 3. Develop against your own disposable PostgreSQL database with synthetic accounts.
 4. Run typecheck, lint, build, and relevant game tests. Follow the
    [game review checklist](docs/game-review-checklist.md) for a new game.

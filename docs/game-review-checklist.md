@@ -51,13 +51,23 @@ inapplicable items with an explanation.
 ## Evidence and release
 
 - [ ] Typecheck, lint, build, relevant game checks, and registry checks pass.
+- [ ] Stored registry keys are compared against the recorded pre-contribution
+      `dev` baseline using `FLOOR_REGISTRY_BASE_REF` and
+      `FLOOR_REGISTRY_REQUIRE_BASE=1`; a missing comparison was not skipped.
 - [ ] Engine tests cover deterministic replay, valid boundaries, and invalid inputs.
 - [ ] Disposable-database checks cover ownership, forgery/expiry, one-use races,
       identity changes, and server gates. Browser checks cover a full played run.
+- [ ] Copied checks use the new rules/fixtures, migration, SQL names, disposable
+      database guard, account prefixes, and browser selectors. They exercise the
+      new game rather than the unchanged starter.
 - [ ] Tutorial/setup works from a clean checkout with `npm ci`, fresh migrations,
       synthetic data, and newly generated local secrets. Record any required tools.
+- [ ] Clean-clone evidence identifies the source commit and any uncommitted
+      snapshot transfer, including new source files. Dependencies, build output,
+      env files, and database contents were created afresh.
 - [ ] Local verification results are recorded in the PR to `dev`. Actions runs
       only on pushes to `main`; new tests are included in that CI workflow and
       changed-game selection where applicable, without repository secrets.
+      No `dev` or pull-request Actions trigger was introduced.
 - [ ] Maintainer review is complete before release to `main` through private ops.
       Contributors never need production data, credentials, or deployment access.

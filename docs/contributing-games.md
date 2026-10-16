@@ -7,8 +7,9 @@ runtime: contributed code runs as part of Tixy and must meet the same trust rule
 
 Start with the [first-game tutorial](first-game.md) and use the
 [review checklist](game-review-checklist.md) before submission. New games start
-with an issue describing controls, scoring, replay validation, and assets. Keep
-them in the reserve catalog until maintainers approve floor placement. Reserve is
+with a proposal describing controls, scoring, replay validation, and assets
+(an issue for external contributions; a repository note for a maintainer pilot).
+Keep them in the reserve catalog until maintainers approve floor placement. Reserve is
 a discovery setting: its routes remain accessible and it provides no isolation.
 
 ## Supported starting point
@@ -18,6 +19,12 @@ It includes browser UI, a deterministic engine, signed sessions, server replay,
 database persistence, a game leaderboard, and regressions. Copy its structure for
 a short game with bounded inputs. Multiplayer, wagers, paid entries, and rewards
 need additional design and maintainer review.
+
+The [Lights Out pilot](contributor-pilot.md) demonstrates adapting that structure
+to a different game at `/lights-out`: a solvable 3×3 toggle puzzle with a bounded
+move transcript. It remains score-only and in reserve. The report records the
+documentation gaps found and clean-clone verification; this is an assisted local
+pilot, not evidence that an independent contributor has completed onboarding.
 
 | Game supplies | Tixy supplies through shared helpers |
 | --- | --- |
@@ -48,6 +55,7 @@ the appropriate gates; the tutorial lists the explicit mappings to update.
 | Global leaderboard presentation, when applicable | `src/features/arcade/components/leaderboards/page-boards.ts` |
 | Windowed boards, when approved | `src/features/arcade/components/leaderboard-games.ts`, `src/server/arcade/score-events.ts` |
 | Tests and changed-game suite selection | `scripts/verify-*.ts`, `scripts/run-game-invariants.mjs`, `package.json` |
+| Release-only CI test wiring | `.github/workflows/ci.yml` (pushes to `main` only) |
 
 ## Rules, results, and identity
 
@@ -82,3 +90,7 @@ engine, integration, and browser checks. Registry changes also need
 `test:floor-registry`. Integration tests require explicitly named disposable
 databases and synthetic accounts; read their setup requirements before running.
 Provide exact commands, outcomes, and screenshots or a recording in the PR.
+Copy and adapt all three starter checks: engine, integration, and browser. Update
+the integration test's migration list and exact disposable database guard, then
+adapt its fixtures and the browser's selectors to the new game. Run these checks
+locally on `dev`; adding a game must not enable Actions for `dev` or PRs.
