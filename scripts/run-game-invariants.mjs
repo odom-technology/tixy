@@ -9,6 +9,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const tsxCli = path.join(root, 'node_modules', 'tsx', 'dist', 'cli.mjs');
 
 const suites = [
+  { script: 'verify-lights-out.ts', patterns: [/lights-out/, /verify-lights-out/] },
   { script: 'verify-starter-game.ts', patterns: [/starter-match/, /verify-starter-game/] },
   { script: 'verify-2048-replay.ts', patterns: [/(^|\/)2048/, /game-2048/, /rewards\/wallet/] },
   { script: 'verify-audio-cues.ts', patterns: [/sound-manager/, /use-game-feedback/, /\(games\)\//] },

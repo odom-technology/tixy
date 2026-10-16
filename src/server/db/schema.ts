@@ -51,6 +51,28 @@ export const starterMatchScores = pgTable('starter_match_scores', {
   score: integer('score').notNull(),
   createdAt: ts('created_at').notNull(),
 }, (table) => [primaryKey({ columns: [table.userId, table.rules] })]);
+export const lightsOutSessions = pgTable('lights_out_sessions', {
+  id: text('id').primaryKey(),
+  rules: integer('rules').notNull(),
+});
+export const lightsOutRuns = pgTable('lights_out_runs', {
+  id: text('id').primaryKey(),
+  userId: text('user_id').notNull(),
+  tokenHash: text('token_hash').notNull().unique(),
+  rules: integer('rules').notNull(),
+  movesJson: text('moves_json').notNull(),
+  score: integer('score').notNull(),
+  solved: boolean('solved').notNull(),
+  moveCount: integer('move_count').notNull(),
+  createdAt: ts('created_at').notNull(),
+});
+export const lightsOutScores = pgTable('lights_out_scores', {
+  userId: text('user_id').notNull(),
+  rules: integer('rules').notNull(),
+  userName: text('user_name').notNull(),
+  score: integer('score').notNull(),
+  createdAt: ts('created_at').notNull(),
+}, (table) => [primaryKey({ columns: [table.userId, table.rules] })]);
 export const flappyBirdScores = scoreTable('flappy_bird_scores');
 // One row per player per rules version (migration 0060): rules 1 is last
 // season's endless stack, rules 2 the time-based one that gets harder as you

@@ -25,6 +25,7 @@ import {
   Hexagon,
   Keyboard,
   LayoutGrid,
+  Lightbulb,
   Layers,
   LineSquiggle,
   LockKeyhole,
@@ -1076,6 +1077,17 @@ const RAW_ARCADE_GAMES: ArcadeGameEntry[] = [
     mobileRouteLabel: 'Hockey',
     placement: { status: 'reserve', group: 'with-friends' },
   },
+  {
+    slug: 'lights-out',
+    title: 'Lights Out',
+    description: 'Switch every light off in 24 moves. Fewer moves score more points.',
+    href: '/lights-out',
+    sectionId: 'casual',
+    icon: Lightbulb,
+    routeLabel: 'Lights Out',
+    mobileRouteLabel: 'Lights Out',
+    placement: { status: 'reserve', group: 'quick-play' },
+  },
 ];
 
 /* The games as players see them. While the rename map is off this is the raw
@@ -1165,6 +1177,7 @@ const RESERVE_ORDER: readonly string[] = [
   'dice',
   'coin-flip',
   'prize-wheel',
+  'lights-out',
 ];
 
 function entriesFor(slugs: readonly string[]): ArcadeGameEntry[] {

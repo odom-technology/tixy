@@ -98,7 +98,10 @@
     "test:sha256": "tsx scripts/verify-sha256.ts",
     "test:starter-game": "tsx scripts/verify-starter-game.ts",
     "test:starter-game-integration": "tsx scripts/verify-starter-game-integration.ts",
-    "test:starter-game-browser": "node scripts/verify-starter-game-browser.mjs"
+    "test:starter-game-browser": "node scripts/verify-starter-game-browser.mjs",
+    "test:lights-out": "tsx scripts/verify-lights-out.ts",
+    "test:lights-out-integration": "tsx scripts/verify-lights-out-integration.ts",
+    "test:lights-out-browser": "node scripts/verify-lights-out-browser.mjs"
   },
   "dependencies": {
     "chess.js": "1.4.0",

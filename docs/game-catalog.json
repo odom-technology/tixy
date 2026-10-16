@@ -716,6 +716,15 @@
       "work": "contributor starter",
       "threeD": false,
       "reason": "Minimal score-only reference game for reviewed source contributions."
+    },
+    {
+      "slug": "lights-out",
+      "title": "Lights Out",
+      "decision": "reserve",
+      "group": "quick play",
+      "work": "contributor pilot",
+      "threeD": false,
+      "reason": "Score-only 3x3 toggle puzzle built by following the public contribution tutorial."
     }
   ]
 }
