@@ -151,6 +151,13 @@ jobs:
           node --input-type=module -e "import pg from 'pg'; const pool = new pg.Pool({connectionString: process.env.DATABASE_URL}); await pool.query('CREATE DATABASE arcade_starter_game_test'); await pool.end();"
           npm run test:starter-game-integration
 
+      - name: Lights Out server regressions
+        env:
+          LIGHTS_OUT_TEST_DATABASE_URL: postgres://arcade:arcade@localhost:5432/arcade_lights_out_test
+        run: |
+          node --input-type=module -e "import pg from 'pg'; const pool = new pg.Pool({connectionString: process.env.DATABASE_URL}); await pool.query('CREATE DATABASE arcade_lights_out_test'); await pool.end();"
+          npm run test:lights-out-integration
+
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium
 
@@ -198,6 +205,9 @@ jobs:
 
       - name: Starter game browser regressions
         run: npm run test:starter-game-browser
+
+      - name: Lights Out browser pilot
+        run: npm run test:lights-out-browser
 
       - name: Seed QA player account
         run: |
