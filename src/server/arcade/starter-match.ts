@@ -24,7 +24,13 @@ function receiptScore(receipt: RunReceipt, choicesJson: string): number {
 
 export async function startPatternRun(userId: string) {
   const session = await createGameSession(userId, STARTER_GAME);
-  await query('INSERT INTO starter_match_sessions (id, rules) VALUES ($1, $2)', [session.sessionId, RULES_VERSION]);
+  try {
+    await query('INSERT INTO starter_match_sessions (id, rules) VALUES ($1, $2)', [session.sessionId, RULES_VERSION]);
+  } catch (error) {
+    // Do not leave a session behind when its game-specific rules cannot be saved.
+    await query('DELETE FROM game_sessions WHERE id = $1 AND od_user_id = $2 AND game_type = $3', [session.sessionId, userId, STARTER_GAME]);
+    throw error;
+  }
   return { sessionToken: session.token, seed: deriveSessionSeed(session.sessionId), rulesVersion: RULES_VERSION };
 }
 

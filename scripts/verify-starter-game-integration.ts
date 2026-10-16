@@ -35,6 +35,14 @@ try {
     await pool.query('INSERT INTO wallets (user_id, credits, updated_at) VALUES ($1, 100, $2)', [user, Date.now()]);
   }
   const ledgerBefore = Number((await pool.query('SELECT count(*) FROM currency_ledger')).rows[0].count);
+  const sessionsBefore = Number((await pool.query('SELECT count(*) FROM game_sessions WHERE od_user_id = $1', [users[0]])).rows[0].count);
+  await pool.query('ALTER TABLE starter_match_sessions ADD CONSTRAINT starter_start_failure CHECK (false) NOT VALID');
+  try {
+    await assert.rejects(startPatternRun(users[0]));
+    assert.equal(Number((await pool.query('SELECT count(*) FROM game_sessions WHERE od_user_id = $1', [users[0]])).rows[0].count), sessionsBefore, 'A failed rules write leaves no orphan session.');
+  } finally {
+    await pool.query('ALTER TABLE starter_match_sessions DROP CONSTRAINT starter_start_failure');
+  }
   const run = await startPatternRun(users[0]);
   const payload = { sessionToken: run.sessionToken, rulesVersion: RULES_VERSION, choices: createPattern(run.seed), score: 99999999, seed: 0 };
   await assert.rejects(submitPatternRun(users[1], 'Other player', payload), (error: unknown) => error instanceof StarterMatchError && error.status === 403);
@@ -99,6 +107,7 @@ try {
 } catch (error) {
   failure = error;
 } finally {
+  await pool.query('ALTER TABLE IF EXISTS starter_match_sessions DROP CONSTRAINT IF EXISTS starter_start_failure');
   await pool.query('ALTER TABLE IF EXISTS starter_match_scores DROP CONSTRAINT IF EXISTS starter_regression_failure');
   for (const table of ['game_bans', 'game_rate_events', 'wallets']) await pool.query(`DELETE FROM ${table} WHERE user_id = ANY($1)`, [users]);
   await pool.query('DELETE FROM game_sessions WHERE od_user_id = ANY($1)', [users]);
