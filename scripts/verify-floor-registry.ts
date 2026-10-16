@@ -242,11 +242,12 @@ function checkFloor() {
   ok(`the floor has ${floor.length} games in group order (${groups.map(({ games }) => games.length).join(', ')})`);
 
   const reserve = getReserveGames();
-  const plannedReserve = catalog.games.filter((game) => game.decision === 'reserve');
+  const plannedReserve = [...catalog.games, ...catalog.newGames]
+    .filter((game) => game.decision === 'reserve' && ARCADE_GAMES.some((entry) => entry.slug === game.slug));
   assert.equal(reserve.length, plannedReserve.length, `the reserve has ${plannedReserve.length} games`);
   assert.deepEqual(
     [...reserve.map((game) => game.slug)].sort(),
-    catalog.games.filter((game) => game.decision === 'reserve').map((game) => game.slug).sort(),
+    plannedReserve.map((game) => game.slug).sort(),
   );
   assert.equal(new Set(reserve.map((game) => game.slug)).size, reserve.length);
   ok(`the reserve list is the ${reserve.length} reserve games`);

@@ -707,6 +707,15 @@
       "work": "new",
       "dim": "3D",
       "pitch": "Toss rings at a crate of bottles. Short, physical, good on a phone."
+    },
+    {
+      "slug": "starter-match",
+      "title": "Pattern Match",
+      "decision": "reserve",
+      "group": "quick play",
+      "work": "contributor starter",
+      "threeD": false,
+      "reason": "Minimal score-only reference game for reviewed source contributions."
     }
   ]
 }

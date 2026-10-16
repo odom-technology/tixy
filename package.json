@@ -95,7 +95,10 @@
     "art:build": "tsx scripts/brand/build-art-kit.tsx",
     "art:check": "tsx scripts/check-art-kit.ts",
     "art:badges": "tsx scripts/brand/badge-sheet.tsx",
-    "test:sha256": "tsx scripts/verify-sha256.ts"
+    "test:sha256": "tsx scripts/verify-sha256.ts",
+    "test:starter-game": "tsx scripts/verify-starter-game.ts",
+    "test:starter-game-integration": "tsx scripts/verify-starter-game-integration.ts",
+    "test:starter-game-browser": "node scripts/verify-starter-game-browser.mjs"
   },
   "dependencies": {
     "chess.js": "1.4.0",

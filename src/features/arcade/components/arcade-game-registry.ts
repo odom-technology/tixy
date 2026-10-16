@@ -33,6 +33,7 @@ import {
   Rabbit,
   Rocket,
   Spade,
+  Shapes,
   Sparkles,
   Target,
   Ticket,
@@ -179,6 +180,17 @@ export const ARCADE_WAGER_SUBSECTION_META: Record<
 };
 
 const RAW_ARCADE_GAMES: ArcadeGameEntry[] = [
+  {
+    slug: 'starter-match',
+    title: 'Pattern Match',
+    description: 'Match eight symbols. A score-only starter for game contributors.',
+    href: '/starter-match',
+    sectionId: 'casual',
+    icon: Shapes,
+    routeLabel: 'Pattern Match',
+    mobileRouteLabel: 'Patterns',
+    placement: { status: 'reserve', group: 'quick-play' },
+  },
   {
     slug: 'typing-duel',
     title: 'Typing Duel',
@@ -1134,6 +1146,7 @@ export const RESERVE_ON_FLOOR = false;
 
 /* The reserve list behind "more games", in PLAN.md's reserve order. */
 const RESERVE_ORDER: readonly string[] = [
+  'starter-match',
   'crash',
   'typing-test',
   'typing-duel',

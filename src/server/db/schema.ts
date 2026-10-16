@@ -6,6 +6,7 @@ import {
   integer,
   pgTable,
   text,
+  primaryKey,
 } from 'drizzle-orm/pg-core';
 
 const ts = (name: string) => pgBigint(name, { mode: 'number' });
@@ -30,6 +31,26 @@ export const gameScoreEvents = pgTable('game_score_events', {
 }) as any;
 
 export const snakeScores = scoreTable('snake_scores');
+export const starterMatchSessions = pgTable('starter_match_sessions', {
+  id: text('id').primaryKey(),
+  rules: integer('rules').notNull(),
+});
+export const starterMatchRuns = pgTable('starter_match_runs', {
+  id: text('id').primaryKey(),
+  userId: text('user_id').notNull(),
+  tokenHash: text('token_hash').notNull().unique(),
+  rules: integer('rules').notNull(),
+  choicesJson: text('choices_json').notNull(),
+  score: integer('score').notNull(),
+  createdAt: ts('created_at').notNull(),
+});
+export const starterMatchScores = pgTable('starter_match_scores', {
+  userId: text('user_id').notNull(),
+  rules: integer('rules').notNull(),
+  userName: text('user_name').notNull(),
+  score: integer('score').notNull(),
+  createdAt: ts('created_at').notNull(),
+}, (table) => [primaryKey({ columns: [table.userId, table.rules] })]);
 export const flappyBirdScores = scoreTable('flappy_bird_scores');
 // One row per player per rules version (migration 0060): rules 1 is last
 // season's endless stack, rules 2 the time-based one that gets harder as you

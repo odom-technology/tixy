@@ -9,6 +9,7 @@ type LimitResult = {
 
 const SESSION_WINDOW_MS = 60_000;
 const SESSION_LIMITS: Record<GameType, number> = {
+  'starter-match': 10,
   snake: 30,
   'flappy-bird': 25,
   'reaction-time': 40,
@@ -49,6 +50,7 @@ const SESSION_LIMITS: Record<GameType, number> = {
 };
 
 const SCORE_COOLDOWN_MS: Record<GameType, number> = {
+  'starter-match': 1_000,
   snake: 1_500,
   'flappy-bird': 1_500,
   'reaction-time': 1_000,
