@@ -6,7 +6,7 @@ import {
   mutateStoreCreditsForTransaction,
   type EntitlementType,
 } from '@/server/arcade/rewards';
-import { query, withTransaction } from '@/server/db/client';
+import { withTransaction } from '@/server/db/client';
 
 export type RewardedAdRewardType = 'store_tickets' | 'free_play' | 'continue';
 
@@ -128,75 +128,54 @@ export async function createRewardedAdIntent({
     throw new Error('Rewarded ads are not configured.');
   }
 
-  const now = Date.now();
-  const dayAgo = now - 24 * 60 * 60 * 1000;
-  const recentResult = await query<{ count: string | number }>(
-    `
-      SELECT COUNT(*) AS count
-      FROM ad_reward_intents
-      WHERE user_id = $1 AND created_at >= $2
-    `,
-    [userId, dayAgo],
-  );
-  if (Number(recentResult.rows[0]?.count ?? 0) >= config.dailyLimit) {
-    throw new Error('Daily rewarded ad limit reached.');
-  }
-
-  const cooldownResult = await query<RewardIntentRow>(
-    `
-      SELECT id, user_id, reward_type, game_type, amount, status, created_at, expires_at, claimed_at
-      FROM ad_reward_intents
-      WHERE user_id = $1
-      ORDER BY created_at DESC
-      LIMIT 1
-    `,
-    [userId],
-  );
-  const latest = cooldownResult.rows[0];
-  if (latest && now - Number(latest.created_at ?? 0) < config.cooldownMs) {
-    throw new Error('Wait a moment before requesting another rewarded ad.');
-  }
-
   const amount = normalizedRewardType === 'store_tickets'
     ? config.storeTicketsAmount
     : 1;
   const intentId = crypto.randomUUID();
-  const expiresAt = now + config.intentTtlMs;
+  const { now, expiresAt } = await withTransaction(async (client) => {
+    // Serialize starts and grants for the same player across tabs and servers.
+    await client.query('SELECT pg_advisory_xact_lock(hashtext($1))', [
+      `rewarded-ad:${userId}`,
+    ]);
+    const now = Date.now();
+    const recentResult = await client.query<{ count: string | number }>(
+      `SELECT COUNT(*) AS count FROM ad_reward_intents
+       WHERE user_id = $1 AND status = 'claimed' AND claimed_at >= $2`,
+      [userId, now - 24 * 60 * 60 * 1000],
+    );
+    if (Number(recentResult.rows[0]?.count ?? 0) >= config.dailyLimit) {
+      throw new Error('Daily rewarded ad limit reached.');
+    }
 
-  await query(
-    `
-      INSERT INTO ad_reward_intents (
-        id,
-        user_id,
-        reward_type,
-        game_type,
-        amount,
-        status,
-        created_at,
-        expires_at,
-        meta_json
-      ) VALUES ($1, $2, $3, $4, $5, 'pending', $6, $7, $8)
-    `,
-    [
-      intentId,
-      userId,
-      normalizedRewardType,
-      normalizedGameType,
-      amount,
-      now,
-      expiresAt,
-      JSON.stringify({ adUnitPath: config.adUnitPath }),
-    ],
-  );
+    // Failed/no-fill attempts do not consume the reward allowance. Throttle
+    // requests separately so repeated clicks cannot flood the ad provider.
+    const cooldownResult = await client.query<{ created_at: number | string }>(
+      `SELECT created_at FROM ad_reward_intents
+       WHERE user_id = $1 ORDER BY created_at DESC LIMIT 1`,
+      [userId],
+    );
+    const latest = cooldownResult.rows[0];
+    if (latest && now - Number(latest.created_at) < config.cooldownMs) {
+      throw new Error('Wait a moment before requesting another rewarded ad.');
+    }
 
-  await withTransaction((client) =>
-    recordRewardEvent(client, {
+    const expiresAt = now + config.intentTtlMs;
+    await client.query(
+      `INSERT INTO ad_reward_intents (
+        id, user_id, reward_type, game_type, amount, status,
+        created_at, expires_at, meta_json
+      ) VALUES ($1, $2, $3, $4, $5, 'pending', $6, $7, $8)`,
+      [intentId, userId, normalizedRewardType, normalizedGameType, amount,
+        now, expiresAt, JSON.stringify({ adUnitPath: config.adUnitPath })],
+    );
+    await recordRewardEvent(client, {
       intentId,
       userId,
       eventType: 'created',
       meta: { rewardType: normalizedRewardType, gameType: normalizedGameType },
-    }),
-  );
+    });
+    return { now, expiresAt };
+  });
 
   return {
     intent: {
@@ -229,6 +208,9 @@ export async function claimRewardedAdIntent({
   }
 
   return withTransaction(async (client) => {
+    await client.query('SELECT pg_advisory_xact_lock(hashtext($1))', [
+      `rewarded-ad:${userId}`,
+    ]);
     const result = await client.query<RewardIntentRow>(
       `
         SELECT id, user_id, reward_type, game_type, amount, status, created_at, expires_at, claimed_at
@@ -255,6 +237,17 @@ export async function claimRewardedAdIntent({
         [intent.id],
       );
       throw new Error('Reward intent expired.');
+    }
+
+    // Web GPT has no server-side verification callback. Keep the browser grant
+    // bounded by a server-owned amount, expiry, deduplication and atomic cap.
+    const recentResult = await client.query<{ count: string | number }>(
+      `SELECT COUNT(*) AS count FROM ad_reward_intents
+       WHERE user_id = $1 AND status = 'claimed' AND claimed_at >= $2`,
+      [userId, now - 24 * 60 * 60 * 1000],
+    );
+    if (Number(recentResult.rows[0]?.count ?? 0) >= getRewardedAdConfig().dailyLimit) {
+      throw new Error('Daily rewarded ad limit reached.');
     }
 
     let grantResult:
