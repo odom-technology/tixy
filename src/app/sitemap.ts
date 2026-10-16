@@ -24,7 +24,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const gamePaths = ARCADE_GAMES
     .filter((game) => isGameListed(game.slug) && !getGameRestriction(availability.config, game.slug))
     .map((game) => getGameDisplayRoute(game.slug, game.href));
-  const paths = [...new Set(['/', '/privacy', '/terms', '/feedback', ...gamePaths])]
+  const paths = [...new Set(['/', '/developers', '/privacy', '/terms', '/feedback', ...gamePaths])]
     .filter((pathname) => !getPathRestriction(availability.config, pathname));
   const baseUrl = getAppBaseUrl();
   return paths.map((pathname) => ({ url: new URL(pathname, baseUrl).toString() }));

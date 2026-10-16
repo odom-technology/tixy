@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 
-const LEGAL_LINKS = [
+const FOOTER_LINKS = [
+  { href: '/developers', label: 'Build for Tixy' },
   { href: '/privacy', label: 'Privacy' },
   { href: '/terms', label: 'Terms' },
   { href: '/feedback', label: 'Feedback' },
@@ -22,8 +23,8 @@ export function LegalFooter() {
           </a>{' '}
           product
         </p>
-        <nav aria-label='Legal and support' className='flex flex-wrap items-center gap-3'>
-          {LEGAL_LINKS.map((link) => (
+        <nav aria-label='Site links and support' className='flex flex-wrap items-center gap-3'>
+          {FOOTER_LINKS.map((link) => (
             link.href === '/privacy' ? (
               <a
                 key={link.href}
