@@ -2,7 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [dev, main]
+  pull_request:
+    branches: [dev, main]
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
@@ -14,9 +16,32 @@ permissions:
 jobs:
   verify:
     runs-on: ubuntu-latest
+    env:
+      CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+      FLOOR_REGISTRY_REQUIRE_BASE: '1'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # PRs check the merge commit; the base and full push range must exist
+          # locally for stored-key protection and changed-game selection.
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Resolve comparison base
+        shell: bash
+        run: |
+          if [[ -n "$CI_BASE_SHA" && ! "$CI_BASE_SHA" =~ ^0+$ ]] && git cat-file -e "${CI_BASE_SHA}^{commit}"; then
+            echo "FLOOR_REGISTRY_BASE_REF=$CI_BASE_SHA" >> "$GITHUB_ENV"
+            echo "GAME_INVARIANT_BASE_SHA=$CI_BASE_SHA" >> "$GITHUB_ENV"
+            echo "GAME_INVARIANT_MODE=changed" >> "$GITHUB_ENV"
+          else
+            # A newly created branch has no before SHA. Exercise every game;
+            # still compare stored keys to its parent when one exists.
+            base=$(git rev-parse --verify HEAD^ 2>/dev/null || git rev-parse HEAD)
+            echo "FLOOR_REGISTRY_BASE_REF=$base" >> "$GITHUB_ENV"
+            echo "GAME_INVARIANT_MODE=all" >> "$GITHUB_ENV"
+          fi
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -38,6 +63,21 @@ jobs:
 
       - name: Game availability regression checks
         run: npx tsx scripts/verify-game-availability.ts
+
+      - name: Floor registry and stored game keys
+        run: npm run test:floor-registry
+
+      - name: Starter game regressions
+        run: npm run test:starter-game
+
+      - name: Relevant game invariants
+        shell: bash
+        run: |
+          if [[ "$GAME_INVARIANT_MODE" == 'all' ]]; then
+            npm run test:game-invariants
+          else
+            npm run test:game-invariants:changed
+          fi
 
   smoke:
     name: Smoke test game routes
@@ -72,6 +112,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -102,6 +144,13 @@ jobs:
         run: |
           node --input-type=module -e "import pg from 'pg'; const pool = new pg.Pool({connectionString: process.env.DATABASE_URL}); await pool.query('CREATE DATABASE arcade_leaderboard_test'); await pool.end();"
           npm run test:leaderboard-identities
+
+      - name: Starter game server regressions
+        env:
+          STARTER_GAME_TEST_DATABASE_URL: postgres://arcade:arcade@localhost:5432/arcade_starter_game_test
+        run: |
+          node --input-type=module -e "import pg from 'pg'; const pool = new pg.Pool({connectionString: process.env.DATABASE_URL}); await pool.query('CREATE DATABASE arcade_starter_game_test'); await pool.end();"
+          npm run test:starter-game-integration
 
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium
@@ -147,6 +196,9 @@ jobs:
             -H 'content-type: application/json' \
             -d '{"email":"qa-cards@example.com","username":"qa-cards","password":"QaPass!2026"}' \
             || echo "register returned non-2xx (account may already exist) - continuing"
+
+      - name: Starter game browser regressions
+        run: npm run test:starter-game-browser
 
       - name: Seed QA player account
         run: |
