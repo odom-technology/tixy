@@ -17,8 +17,9 @@ Bug fixes, accessibility, performance, game polish, and new game ideas are welco
 
 Build and play the complete Pattern Match example with the
 [first-game tutorial](docs/first-game.md). See [the game guide](docs/contributing-games.md)
-for the supported game interface and integration points. PRs into `dev` and pushes
-to `dev` run contribution CI; keep contributions focused enough to review alone.
+for the supported game interface and integration points. Run checks locally and
+include the results in PRs to `dev`. GitHub Actions runs only on pushes to `main`
+to limit usage; keep contributions focused enough to review alone.
 
 ## Requirements
 

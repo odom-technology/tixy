@@ -169,6 +169,9 @@ See [integration points](contributing-games.md#integration-points) for their bou
 
 ## 5. Verify a clean checkout
 
+Run these checks locally for contributions to `dev` and include results in the PR.
+GitHub Actions runs only on pushes to `main` to limit Actions usage.
+
 Verify the starter before changing its design, then run equivalent tests for your
 new game. In the checkout with dependencies installed:
 

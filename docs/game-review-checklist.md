@@ -56,7 +56,8 @@ inapplicable items with an explanation.
       identity changes, and server gates. Browser checks cover a full played run.
 - [ ] Tutorial/setup works from a clean checkout with `npm ci`, fresh migrations,
       synthetic data, and newly generated local secrets. Record any required tools.
-- [ ] CI runs on the PR to `dev` and passes without repository secrets. New tests
-      are included in CI and changed-game selection where applicable.
+- [ ] Local verification results are recorded in the PR to `dev`. Actions runs
+      only on pushes to `main`; new tests are included in that CI workflow and
+      changed-game selection where applicable, without repository secrets.
 - [ ] Maintainer review is complete before release to `main` through private ops.
       Contributors never need production data, credentials, or deployment access.

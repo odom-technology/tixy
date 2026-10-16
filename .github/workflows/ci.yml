@@ -1,10 +1,9 @@
 name: CI
 
 on:
+  # Keep Actions usage for releases. Verify dev contributions locally.
   push:
-    branches: [dev, main]
-  pull_request:
-    branches: [dev, main]
+    branches: [main]
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
@@ -17,14 +16,14 @@ jobs:
   verify:
     runs-on: ubuntu-latest
     env:
-      CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+      CI_BASE_SHA: ${{ github.event.before }}
       FLOOR_REGISTRY_REQUIRE_BASE: '1'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          # PRs check the merge commit; the base and full push range must exist
-          # locally for stored-key protection and changed-game selection.
+          # The full push range must exist locally for stored-key protection
+          # and changed-game selection.
           fetch-depth: 0
           persist-credentials: false
 

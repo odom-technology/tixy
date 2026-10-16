@@ -61,6 +61,7 @@ npm run test:starter-game
 
 Run the relevant replay/invariant checks for changed games. Integration tests
 require explicitly named disposable databases; CI creates its own databases.
+Run checks locally for `dev`; GitHub Actions runs only on pushes to `main`.
 The [tutorial](docs/first-game.md#5-verify-a-clean-checkout) includes starter-game
 database and browser checks and a clean-checkout verification procedure.
 
