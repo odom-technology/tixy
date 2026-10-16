@@ -1,9 +1,9 @@
 name: CI
 
 on:
-  # Keep Actions usage for releases. Verify dev contributions locally.
   push:
     branches: [main]
+  workflow_dispatch:
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
@@ -14,6 +14,7 @@ permissions:
 
 jobs:
   verify:
+    if: ${{ github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}
     runs-on: ubuntu-latest
     env:
       CI_BASE_SHA: ${{ github.event.before }}
@@ -79,6 +80,7 @@ jobs:
           fi
 
   smoke:
+    if: ${{ github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}
     name: Smoke test game routes
     runs-on: ubuntu-latest
     timeout-minutes: 20
