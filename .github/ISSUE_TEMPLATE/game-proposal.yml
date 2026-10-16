@@ -1,0 +1,73 @@
+name: Game proposal
+description: Propose a small game before building it for Tixy.
+title: "[Game proposal] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Tell us what you want to build. Short answers are welcome; sketches and open questions are fine.
+        Start with the [first-game tutorial](https://github.com/odom-technology/tixy/blob/dev/docs/first-game.md) and [game guide](https://github.com/odom-technology/tixy/blob/dev/docs/contributing-games.md).
+        Proposal feedback helps agree on scope. It does not approve implementation or release; submitted code still needs review.
+
+        **This issue is public.** Never include credentials, cookies, real user data, or private deployment details. Report security findings privately through [SECURITY.md](https://github.com/odom-technology/tixy/blob/dev/SECURITY.md).
+  - type: input
+    id: game
+    attributes:
+      label: Game name and route slug
+      description: Choose a short name and a lowercase, hyphenated slug.
+      placeholder: "Example: Orbit Jump — orbit-jump"
+    validations:
+      required: true
+  - type: textarea
+    id: pitch
+    attributes:
+      label: What does the player do?
+      description: Describe the goal, main decisions, and what makes a round fun. A few sentences are enough.
+    validations:
+      required: true
+  - type: textarea
+    id: controls
+    attributes:
+      label: Controls and accessibility
+      description: How will keyboard and touch players play? Explain visible focus and feedback that does not rely on color, sound, or animation alone.
+    validations:
+      required: true
+  - type: textarea
+    id: scoring
+    attributes:
+      label: Scoring and run completion
+      description: What starts and ends a run, how long can it last, and how is the score calculated? Include win/failure conditions and tie handling if relevant.
+    validations:
+      required: true
+  - type: textarea
+    id: replay
+    attributes:
+      label: Server validation and input limits
+      description: Explain the server-chosen seed, deterministic rules, and bounded input log the server can replay to derive the result. Note input count/size/timing limits and likely abuse or automation. If unsure, say where you need help; replay alone cannot prove a human played.
+    validations:
+      required: true
+  - type: dropdown
+    id: integrations
+    attributes:
+      label: Planned integrations
+      description: Start score-only and in reserve. Rewards, progression, multiplayer, and paid entries require additional design and explicit maintainer review.
+      options:
+        - Score-only game and standalone leaderboard
+        - Request additional integration review (explain below)
+    validations:
+      required: true
+  - type: textarea
+    id: assets_and_requests
+    attributes:
+      label: Assets, extra integrations, and optional sketches
+      description: List planned asset sources, licenses, and attribution (or say no external assets). Explain any tickets, XP, quests, payouts, multiplayer, or paid-entry request. Optional screenshots or sketches must use synthetic data only.
+      placeholder: "Assets: original CSS shapes; no external assets. Extra integrations: none."
+  - type: checkboxes
+    id: acknowledgements
+    attributes:
+      label: Contribution expectations
+      options:
+        - label: I will submit only material I have the right to contribute, follow AGPL-3.0-only contribution terms and asset notices, and respect the separate Tixy/ODOM Tech branding terms in CONTRIBUTING.md.
+          required: true
+        - label: I will develop with synthetic data, run checks locally, and submit code for review to dev. GitHub Actions must remain main-only; contributors do not need private ops access.
+          required: true
