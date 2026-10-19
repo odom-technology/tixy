@@ -16,13 +16,16 @@ small game's proposal, integration choices, and clean-clone verification.
 Requires Node.js 24, npm, and Docker Compose (or PostgreSQL 18).
 
 ```sh
-git clone https://github.com/odom-technology/tixy.git
+git clone --branch dev https://github.com/odom-technology/tixy.git
 cd tixy
-git switch dev
 npm ci
 cp env/.env.example env/.env.local
 npm run db:up
 ```
+
+To submit a contribution from your own fork, follow the
+[tutorial setup](docs/first-game.md#1-start-from-a-fresh-public-checkout), which
+fetches upstream `dev` even when the fork contains only `main`.
 
 PowerShell users can use `Copy-Item env/.env.example env/.env.local`.
 Generate two different secrets with:
@@ -61,9 +64,14 @@ npm run test:profile-showcase
 npm run test:starter-game
 ```
 
+The weekly-board command checks pure rules when `DATABASE_URL` is unset. Its
+optional database checks require a separate, migrated disposable database whose
+name ends in `_weekly`; never point them at your app database.
+
 Run the relevant replay/invariant checks for changed games. Integration tests
 require explicitly named disposable databases; CI creates its own databases.
-Run checks locally for `dev`; GitHub Actions runs only on pushes to `main`.
+Run checks locally for `dev`; GitHub Actions runs only on pushes to `main`
+or guarded manual runs targeting `main`.
 The [tutorial](docs/first-game.md#5-verify-a-clean-checkout) includes starter-game
 database and browser checks and a clean-checkout verification procedure.
 Use the pre-contribution `dev` baseline for registry comparison; the tutorial

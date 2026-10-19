@@ -11,17 +11,24 @@ required.
 
 Install Node.js 24, npm, and Docker with Compose, or PostgreSQL 18. Fork
 [odom-technology/tixy](https://github.com/odom-technology/tixy), then clone your
-fork and branch from `dev`:
+fork and create your feature branch from the public upstream `dev`:
 
 ```sh
 git clone https://github.com/YOUR-USERNAME/tixy.git
 cd tixy
-git switch dev
-git switch -c game/your-game
+git remote add upstream https://github.com/odom-technology/tixy.git
+git fetch upstream dev
+git switch --no-track -c game/your-game upstream/dev
+git rev-parse upstream/dev
 npm ci
 cp env/.env.example env/.env.local
 npm run db:up
 ```
+
+The upstream fetch works even if your fork contains only `main`. Keep `origin`
+pointing to your fork so you can push your feature branch there. Record the
+commit printed by `git rev-parse upstream/dev` as your pre-contribution baseline;
+use that same commit for registry and changed-game checks throughout your work.
 
 On PowerShell, replace `cp` with
 `Copy-Item env/.env.example env/.env.local`. If using your own PostgreSQL instance,
@@ -179,8 +186,9 @@ Make these explicit changes; copying a directory does not register it:
 6. Add test commands to `package.json`, register deterministic checks in
    `scripts/run-game-invariants.mjs`, and wire integration/browser checks into
    `.github/workflows/ci.yml` with disposable data and no repository secrets.
-   Preserve the workflow's **pushes to `main` only** trigger. Contributions to
-   `dev` run these commands locally; do not add `dev` or pull-request triggers.
+   Preserve the workflow's main-only policy: only pushes to `main` and guarded
+   manual runs targeting `main` may execute jobs. Contributions to `dev` run
+   these commands locally; do not add `dev` or pull-request triggers.
 
 For example, the pilot's commands are `test:lights-out`,
 `test:lights-out-integration`, and `test:lights-out-browser`. Its integration test
@@ -198,7 +206,8 @@ See [integration points](contributing-games.md#integration-points) for their bou
 ## 5. Verify a clean checkout
 
 Run these checks locally for contributions to `dev` and include results in the PR.
-GitHub Actions runs only on pushes to `main` to limit Actions usage.
+GitHub Actions runs only on pushes to `main` or guarded manual runs targeting
+`main` to limit Actions usage.
 
 Verify the starter before changing its design, then run equivalent tests for your
 new game. In the checkout with dependencies installed:
@@ -207,21 +216,21 @@ new game. In the checkout with dependencies installed:
 npm run typecheck
 npm run lint
 npm run test:starter-game
-FLOOR_REGISTRY_BASE_REF=origin/dev FLOOR_REGISTRY_REQUIRE_BASE=1 npm run test:floor-registry
+FLOOR_REGISTRY_BASE_REF=upstream/dev FLOOR_REGISTRY_REQUIRE_BASE=1 npm run test:floor-registry
 npm run test:game-invariants:changed
 npm run build
 ```
 
 The floor check must compare against the `dev` baseline from before your
-contribution. `origin/dev` works for a fresh fork/clone whose `dev` still points
-to that baseline; fetch it with `git fetch origin dev` if the ref is missing.
-If your fork's `dev` already contains the game, fetch the upstream repository's
-`dev` into a separate remote and use that ref, or use the recorded pre-change
-commit. Reuse the same baseline throughout the pilot. Setting
+contribution. `upstream/dev` is the public upstream ref fetched in step 1; your
+fork does not need its own `dev` branch. If the ref is missing, fetch it with
+`git fetch upstream dev`. If upstream has advanced since you recorded the
+baseline, set `FLOOR_REGISTRY_BASE_REF` to that recorded commit instead. Do not
+compare your contribution against a branch that already includes it. Setting
 `FLOOR_REGISTRY_REQUIRE_BASE=1` makes a missing comparison fail instead of silently
 skipping stored-key compatibility checks.
 
-On PowerShell, set `$env:FLOOR_REGISTRY_BASE_REF = 'origin/dev'` and
+On PowerShell, set `$env:FLOOR_REGISTRY_BASE_REF = 'upstream/dev'` and
 `$env:FLOOR_REGISTRY_REQUIRE_BASE = '1'`, then run
 `npm run test:floor-registry`. The changed-game runner compares against local
 `main` by default; if it cannot resolve that baseline, it safely runs all game
@@ -285,9 +294,10 @@ existing service can host another database created with `createdb`; set the new
 checkout's `DATABASE_URL` to it. Run migrations and the checks above, start the
 app, register a synthetic account, and complete a browser run. Do not copy
 `node_modules`, `.next`, `env/.env.local`, or database contents from your working
-checkout. Set the floor-registry baseline to the same pre-contribution ref or
-commit; do not use the new game commit as its own baseline. Record the commands
-and results in your PR.
+checkout. Remote aliases such as `upstream` are not copied by Git clone. Set
+`FLOOR_REGISTRY_BASE_REF` and `GAME_INVARIANT_BASE_SHA` to the recorded
+pre-contribution commit in this checkout; do not use the new game commit as its
+own baseline. Record the commands and results in your PR.
 
 An uncommitted pilot needs an explicit snapshot: a plain clone contains only
 commits. Record the base commit and how the intended tracked changes and new
@@ -296,6 +306,13 @@ build output, dependencies, and QA data. Distinguish checks of that snapshot fro
 checks of the committed branch; see the [pilot report](contributor-pilot.md).
 
 ## 6. Submit for review
+
+Push your feature branch explicitly to your fork, leaving the public upstream
+repository unchanged:
+
+```sh
+git push -u origin game/your-game
+```
 
 Open a PR to `dev` with the proposal, controls/scoring, rules version and replay
 limits, test results, screenshots or a recording, and asset licenses. Complete the

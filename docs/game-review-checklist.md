@@ -66,8 +66,9 @@ inapplicable items with an explanation.
       snapshot transfer, including new source files. Dependencies, build output,
       env files, and database contents were created afresh.
 - [ ] Local verification results are recorded in the PR to `dev`. Actions runs
-      only on pushes to `main`; new tests are included in that CI workflow and
-      changed-game selection where applicable, without repository secrets.
+      only on pushes to `main` or guarded manual runs targeting `main`; new tests
+      are included in that CI workflow and changed-game selection where applicable,
+      without repository secrets.
       No `dev` or pull-request Actions trigger was introduced.
 - [ ] Maintainer review is complete before release to `main` through private ops.
       Contributors never need production data, credentials, or deployment access.

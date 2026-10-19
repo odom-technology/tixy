@@ -55,7 +55,7 @@ the appropriate gates; the tutorial lists the explicit mappings to update.
 | Global leaderboard presentation, when applicable | `src/features/arcade/components/leaderboards/page-boards.ts` |
 | Windowed boards, when approved | `src/features/arcade/components/leaderboard-games.ts`, `src/server/arcade/score-events.ts` |
 | Tests and changed-game suite selection | `scripts/verify-*.ts`, `scripts/run-game-invariants.mjs`, `package.json` |
-| Release-only CI test wiring | `.github/workflows/ci.yml` (pushes to `main` only) |
+| Release-only CI test wiring | `.github/workflows/ci.yml` (pushes to `main` or guarded manual runs targeting `main`) |
 
 ## Rules, results, and identity
 

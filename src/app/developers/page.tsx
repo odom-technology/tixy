@@ -153,13 +153,15 @@ export default function DevelopersPage() {
           </h2>
           <p className='text-sm leading-7 text-body'>
             Use Node.js 24 and Docker Compose, or your own PostgreSQL 18
-            instance. Fork the public repo, clone your fork, and branch from dev.
+            instance. Fork the public repo and clone your fork. Fetch the public upstream
+            dev branch even if your fork contains only main.
           </p>
           <pre className='whitespace-pre-wrap break-words rounded-xl border border-soft bg-well p-4 text-xs leading-7 text-strong'>
             <code>{`git clone https://github.com/YOUR-USERNAME/tixy.git
 cd tixy
-git switch dev
-git switch -c game/your-game
+git remote add upstream https://github.com/odom-technology/tixy.git
+git fetch upstream dev
+git switch --no-track -c game/your-game upstream/dev
 npm ci
 cp env/.env.example env/.env.local
 npm run db:up`}</code>
@@ -187,8 +189,8 @@ npm run db:up`}</code>
             </li>
           </ol>
           <p>
-            Run development checks locally. GitHub Actions runs only on main;
-            submitting a PR to dev does not run CI.
+            Run development checks locally. GitHub Actions runs on pushes to main
+            or guarded manual runs targeting main; submitting a PR to dev does not run CI.
           </p>
           <a href={TUTORIAL} className='arcade-link inline-flex items-center gap-2'>
             Follow the complete setup and test commands
