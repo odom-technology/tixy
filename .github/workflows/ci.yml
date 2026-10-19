@@ -109,6 +109,8 @@ jobs:
       QA_SMOKE_EMAIL: qa-cards@example.com
       QA_SMOKE_PASSWORD: QaPass!2026
       QA_BASE_URL: http://127.0.0.1:3000
+      # Match the HTTP test origin so API requests receive usable session cookies.
+      NEXT_PUBLIC_APP_URL: http://127.0.0.1:3000
       ARCADE_ADMIN_EMAILS: qa-cards@example.com
     steps:
       - name: Checkout
