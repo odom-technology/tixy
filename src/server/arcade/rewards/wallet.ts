@@ -322,11 +322,17 @@ export const getArcadeEconomyStats = async () => {
   const [walletTotals, storeTotals, arcadeTotals, perGameRows] =
     await Promise.all([
       queryOne<{
-        wallet_count: string | number;
+        account_wallet_count: string | number;
+        guest_wallet_count: string | number;
         total_credits_in_wallets: string | number;
       }>(`
         SELECT
-          COUNT(*) AS wallet_count,
+          COUNT(*) FILTER (
+            WHERE user_id NOT LIKE 'guest:%' AND EXISTS (
+              SELECT 1 FROM arcade_accounts a WHERE a.id = wallets.user_id
+            )
+          ) AS account_wallet_count,
+          COUNT(*) FILTER (WHERE user_id LIKE 'guest:%') AS guest_wallet_count,
           COALESCE(SUM(credits), 0) AS total_credits_in_wallets
         FROM wallets
       `),
@@ -388,7 +394,8 @@ export const getArcadeEconomyStats = async () => {
   });
 
   return {
-    walletCount: Number(walletTotals?.wallet_count ?? 0),
+    accountWalletCount: Number(walletTotals?.account_wallet_count ?? 0),
+    guestWalletCount: Number(walletTotals?.guest_wallet_count ?? 0),
     totalCreditsInWallets: Number(walletTotals?.total_credits_in_wallets ?? 0),
 
     arcadeRoundsPlayed,

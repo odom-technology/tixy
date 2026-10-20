@@ -174,7 +174,8 @@ type ArcadePerGameStats = {
 };
 
 export type ArcadeEconomyStats = {
-  walletCount: number;
+  accountWalletCount: number;
+  guestWalletCount: number;
   totalCreditsInWallets: number;
   arcadeRoundsPlayed: number;
   arcadeCreditsWagered: number;

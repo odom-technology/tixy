@@ -162,7 +162,8 @@ export default function AdminDBClient({
     StoreCatalogGroup[]
   >([]);
   const [arcadeStats, setArcadeStats] = useState<ArcadeEconomyStats>({
-    walletCount: 0,
+    accountWalletCount: 0,
+    guestWalletCount: 0,
     totalCreditsInWallets: 0,
     arcadeRoundsPlayed: 0,
     arcadeCreditsWagered: 0,
@@ -258,7 +259,8 @@ export default function AdminDBClient({
         setLedgerRows(data.entries);
         setArcadeStats(
           data.arcadeStats ?? {
-            walletCount: 0,
+            accountWalletCount: 0,
+            guestWalletCount: 0,
             totalCreditsInWallets: 0,
             arcadeRoundsPlayed: 0,
             arcadeCreditsWagered: 0,
@@ -711,8 +713,9 @@ export default function AdminDBClient({
                     Try again
                   </ArcadeButton>
                 ) : (
-                  <div className='grid gap-3 sm:grid-cols-3' aria-busy='true'>
-                    <ConsoleMetric label='Wallets' value='—' loading />
+                  <div className='grid gap-3 sm:grid-cols-2 xl:grid-cols-4' aria-busy='true'>
+                    <ConsoleMetric label='Account wallets' value='—' loading />
+                    <ConsoleMetric label='Guest wallets' value='—' loading />
                     <ConsoleMetric
                       label='Tickets in wallets'
                       value='—'
@@ -744,10 +747,16 @@ export default function AdminDBClient({
                     }
                   >
                     <div className='p-4 sm:p-5'>
-                      <div className='grid gap-3 sm:grid-cols-2 xl:grid-cols-4'>
+                      <div className='grid gap-3 sm:grid-cols-2 xl:grid-cols-3'>
                         <ConsoleMetric
-                          label='Wallets'
-                          value={formatCount(arcadeStats.walletCount)}
+                          label='Account wallets'
+                          value={formatCount(arcadeStats.accountWalletCount)}
+                          detail='Wallets linked to registered accounts'
+                        />
+                        <ConsoleMetric
+                          label='Guest wallets'
+                          value={formatCount(arcadeStats.guestWalletCount)}
+                          detail='Browser guest identities, not unique people'
                         />
                         <ConsoleMetric
                           label='Tickets in wallets'
