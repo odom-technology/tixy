@@ -37,8 +37,7 @@ const ACCOUNT_FLOW_PREFIXES = [
   '/settings',
   '/notifications',
   '/friends',
-  '/privacy',
-  '/terms',
+  '/legal',
   '/feedback',
 ];
 

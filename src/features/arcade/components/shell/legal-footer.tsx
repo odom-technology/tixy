@@ -4,8 +4,7 @@ import Link from 'next/link';
 
 const FOOTER_LINKS = [
   { href: '/developers', label: 'Build for Tixy' },
-  { href: '/privacy', label: 'Privacy' },
-  { href: '/terms', label: 'Terms' },
+  { href: '/legal', label: 'Privacy & Terms' },
   { href: '/feedback', label: 'Feedback' },
 ];
 
@@ -25,30 +24,14 @@ export function LegalFooter() {
         </p>
         <nav aria-label='Site links and support' className='flex flex-wrap items-center gap-3'>
           {FOOTER_LINKS.map((link) => (
-            link.href === '/privacy' ? (
-              <a
-                key={link.href}
-                href={link.href}
-                className='font-semibold transition-colors hover:text-strong'
-              >
-                {link.label}
-              </a>
-            ) : (
-              <Link
-                key={link.href}
-                href={link.href}
-                className='font-semibold transition-colors hover:text-strong'
-              >
-                {link.label}
-              </Link>
-            )
+            <Link
+              key={link.href}
+              href={link.href}
+              className='font-semibold transition-colors hover:text-strong'
+            >
+              {link.label}
+            </Link>
           ))}
-          <a
-            href='https://github.com/odom-technology/tixy'
-            className='font-semibold transition-colors hover:text-strong'
-          >
-            Source
-          </a>
           <a
             href='https://buymeacoffee.com/andrewodom18'
             className='inline-flex min-h-11 items-center justify-center rounded-lg border border-soft bg-raised px-3 py-2 font-semibold text-strong transition-colors hover:bg-well focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring'
