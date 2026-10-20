@@ -49,6 +49,12 @@ export function LegalFooter() {
           >
             Source
           </a>
+          <a
+            href='https://buymeacoffee.com/andrewodom18'
+            className='inline-flex min-h-11 items-center justify-center rounded-lg border border-soft bg-raised px-3 py-2 font-semibold text-strong transition-colors hover:bg-well focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring'
+          >
+            Support the dev
+          </a>
         </nav>
       </div>
     </footer>
