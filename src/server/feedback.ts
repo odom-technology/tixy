@@ -1,6 +1,6 @@
 import crypto from 'node:crypto';
 
-import { query, queryOne } from '@/server/db/client';
+import { query, queryOne, withTransaction } from '@/server/db/client';
 
 export type FeedbackCategory =
   | 'bug'
@@ -31,6 +31,57 @@ export type FeedbackEntry = {
   createdAt: number;
   updatedAt: number;
 };
+
+/** Safe ticket fields returned to players, without account/contact metadata. */
+export type FeedbackTicketEntry = Pick<FeedbackEntry,
+  'id' | 'category' | 'rating' | 'message' | 'pagePath' | 'status' |
+  'adminNote' | 'createdAt' | 'updatedAt'>;
+
+export type FeedbackComment = {
+  id: string;
+  authorName: string;
+  authorRole: 'player' | 'admin';
+  message: string;
+  createdAt: number;
+};
+
+export type FeedbackViewer = { userId: string; isAdmin: boolean };
+
+export class FeedbackError extends Error {
+  constructor(message: string, public status: number) {
+    super(message);
+    this.name = 'FeedbackError';
+  }
+}
+
+export function toFeedbackTicketEntry(entry: FeedbackEntry): FeedbackTicketEntry {
+  return {
+    id: entry.id, category: entry.category, rating: entry.rating,
+    message: entry.message, pagePath: entry.pagePath, status: entry.status,
+    adminNote: entry.adminNote, createdAt: entry.createdAt, updatedAt: entry.updatedAt,
+  };
+}
+
+type FeedbackCommentRow = {
+  id: string;
+  author_name: string;
+  author_role: 'player' | 'admin';
+  message: string;
+  created_at: string | number;
+};
+
+const rowToComment = (row: FeedbackCommentRow): FeedbackComment => ({
+  id: row.id, authorName: row.author_name, authorRole: row.author_role,
+  message: row.message, createdAt: Number(row.created_at),
+});
+
+// Use the stored submission contact first, with account email for older tickets.
+const EFFECTIVE_EMAIL = `COALESCE(NULLIF(email, ''), (
+  SELECT NULLIF(a.email, '') FROM arcade_accounts a WHERE a.id = arcade_feedback.user_id
+))`;
+const FEEDBACK_SELECT = `id, date_key, user_id, user_name, ${EFFECTIVE_EMAIL} AS email,
+  category, rating, message, page_path, status, admin_note, status_updated_by,
+  status_updated_at, user_agent, created_at, updated_at`;
 
 type FeedbackRow = {
   id: string;
@@ -82,6 +133,9 @@ const toNumber = (value: string | number | null | undefined) => {
 };
 
 const clampText = (value: string | null | undefined, max: number) => {
+  if (value !== null && value !== undefined && typeof value !== 'string') {
+    throw new FeedbackError('Expected text.', 400);
+  }
   const trimmed = value?.trim();
   if (!trimmed) return null;
   return trimmed.slice(0, max);
@@ -139,6 +193,23 @@ async function ensureFeedbackSchema() {
 
     CREATE INDEX IF NOT EXISTS idx_arcade_feedback_user
       ON arcade_feedback(user_id, created_at DESC);
+
+    CREATE TABLE IF NOT EXISTS arcade_feedback_comments (
+      id TEXT PRIMARY KEY,
+      feedback_id TEXT NOT NULL REFERENCES arcade_feedback(id),
+      author_user_id TEXT NOT NULL,
+      author_name TEXT NOT NULL,
+      author_role TEXT NOT NULL CHECK (author_role IN ('player', 'admin')),
+      message TEXT NOT NULL CHECK (char_length(message) BETWEEN 1 AND 3000),
+      created_at BIGINT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_feedback_comments_ticket
+      ON arcade_feedback_comments(feedback_id, created_at, id);
+    CREATE INDEX IF NOT EXISTS idx_feedback_comments_author
+      ON arcade_feedback_comments(author_user_id, created_at);
+    CREATE INDEX IF NOT EXISTS idx_arcade_feedback_updated
+      ON arcade_feedback(updated_at DESC, id);
+
   `).then(() => undefined);
 
   await schemaReady;
@@ -163,7 +234,7 @@ function normalizeEmail(value: string | null | undefined) {
   const email = clampText(value, MAX_EMAIL_LENGTH);
   if (!email) return null;
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.toLowerCase())) {
-    throw new Error('Enter a valid contact email.');
+    throw new FeedbackError('Enter a valid contact email.', 400);
   }
   return email;
 }
@@ -182,15 +253,18 @@ export async function createFeedback(input: {
 }) {
   await ensureFeedbackSchema();
 
+  if (typeof input.message !== 'string' || input.message.trim().length > MAX_MESSAGE_LENGTH) {
+    throw new FeedbackError('Feedback must be 10 to 3000 characters.', 400);
+  }
   const message = clampText(input.message, MAX_MESSAGE_LENGTH);
   if (!message || message.length < 10) {
-    throw new Error('Feedback must be at least 10 characters.');
+    throw new FeedbackError('Feedback must be at least 10 characters.', 400);
   }
 
   const category = normalizeCategory(input.category);
   const email = normalizeEmail(input.email);
   if (!email && !input.userId && ['account', 'purchase', 'privacy'].includes(category)) {
-    throw new Error('Enter an email address so we can respond to this request.');
+    throw new FeedbackError('Enter an email address so we can respond to this request.', 400);
   }
 
   const now = Date.now();
@@ -239,10 +313,10 @@ export async function createFeedback(input: {
 export async function listFeedbackForUser(userId: string, limit = 10) {
   await ensureFeedbackSchema();
   const result = await query<FeedbackRow>(
-    `SELECT id, date_key, user_id, user_name, email, category, rating, message, page_path, status, admin_note, status_updated_by, status_updated_at, user_agent, created_at, updated_at
+    `SELECT ${FEEDBACK_SELECT}
      FROM arcade_feedback
      WHERE user_id = $1
-     ORDER BY created_at DESC
+     ORDER BY updated_at DESC, id
      LIMIT $2`,
     [userId, Math.max(1, Math.min(50, Math.trunc(limit)))],
   );
@@ -257,7 +331,7 @@ export async function listFeedback(input: {
 }) {
   await ensureFeedbackSchema();
 
-  const limit = Math.max(1, Math.min(200, Math.trunc(input.limit ?? 100)));
+  const limit = Math.max(1, Math.min(200, Number.isFinite(input.limit) ? Math.trunc(input.limit!) : 100));
   const status =
     input.status && input.status !== 'all' && isFeedbackStatus(input.status)
       ? input.status
@@ -270,7 +344,9 @@ export async function listFeedback(input: {
   const clauses: string[] = [];
   const args: unknown[] = [];
 
-  if (status) {
+  if (status === 'resolved') {
+    clauses.push(`status IN ('resolved', 'dismissed')`);
+  } else if (status) {
     args.push(status);
     clauses.push(`status = $${args.length}`);
   }
@@ -285,7 +361,7 @@ export async function listFeedback(input: {
     clauses.push(`(
       LOWER(message) LIKE $${start}
       OR LOWER(COALESCE(user_name, '')) LIKE $${start + 1}
-      OR LOWER(COALESCE(email, '')) LIKE $${start + 2}
+      OR LOWER(COALESCE(${EFFECTIVE_EMAIL}, '')) LIKE $${start + 2}
       OR LOWER(COALESCE(page_path, '')) LIKE $${start + 3}
       OR id = $${start + 4}
     )`);
@@ -293,10 +369,10 @@ export async function listFeedback(input: {
   args.push(limit);
 
   const result = await query<FeedbackRow>(
-    `SELECT id, date_key, user_id, user_name, email, category, rating, message, page_path, status, admin_note, status_updated_by, status_updated_at, user_agent, created_at, updated_at
+    `SELECT ${FEEDBACK_SELECT}
      FROM arcade_feedback
      ${clauses.length ? `WHERE ${clauses.join(' AND ')}` : ''}
-     ORDER BY created_at DESC
+     ORDER BY updated_at DESC, id
      LIMIT $${args.length}`,
     args,
   );
@@ -309,13 +385,111 @@ export async function getFeedbackById(id: string) {
   if (!trimmedId) return null;
 
   const result = await query<FeedbackRow>(
-    `SELECT id, date_key, user_id, user_name, email, category, rating, message, page_path, status, admin_note, status_updated_by, status_updated_at, user_agent, created_at, updated_at
+    `SELECT ${FEEDBACK_SELECT}
      FROM arcade_feedback
      WHERE id = $1
      LIMIT 1`,
     [trimmedId],
   );
   return result.rows[0] ? rowToFeedback(result.rows[0]) : null;
+}
+
+/** Internal comment reader; HTTP/server consumers must authorize the ticket first. */
+export async function listFeedbackComments(id: string, limit = 200) {
+  await ensureFeedbackSchema();
+  const boundedLimit = Number.isFinite(limit) ? Math.max(1, Math.min(200, Math.trunc(limit))) : 200;
+  const result = await query<FeedbackCommentRow>(
+    `SELECT id, author_name, author_role, message, created_at
+     FROM arcade_feedback_comments WHERE feedback_id = $1
+     ORDER BY created_at DESC, id DESC LIMIT $2`, [id, boundedLimit + 1],
+  );
+  return {
+    comments: result.rows.slice(0, boundedLimit).reverse().map(rowToComment),
+    hasMore: result.rows.length > boundedLimit,
+  };
+}
+
+export async function getFeedbackConversation(id: string, viewer: FeedbackViewer) {
+  const entry = await getFeedbackById(id);
+  if (!entry || (!viewer.isAdmin && entry.userId !== viewer.userId)) {
+    throw new FeedbackError('Feedback not found.', 404);
+  }
+  return {
+    entry: toFeedbackTicketEntry(entry),
+    ...await listFeedbackComments(entry.id),
+    ...(viewer.isAdmin ? { contactEmail: entry.email } : {}),
+  };
+}
+
+export function validateFeedbackCommentBody(body: unknown): string {
+  if (!body || typeof body !== 'object' || Array.isArray(body)) {
+    throw new FeedbackError('A message is required.', 400);
+  }
+  const input = body as Record<string, unknown>;
+  if (Object.keys(input).some((key) => key !== 'message')) {
+    throw new FeedbackError('Only a message can be submitted.', 400);
+  }
+  if (typeof input.message !== 'string') {
+    throw new FeedbackError('A message is required.', 400);
+  }
+  const message = input.message.trim();
+  if (!message || message.length > MAX_MESSAGE_LENGTH) {
+    throw new FeedbackError('Replies must be 1 to 3000 characters.', 400);
+  }
+  return message;
+}
+
+export async function appendFeedbackComment(input: {
+  id: string;
+  userId: string;
+  userName?: string | null;
+  isAdmin: boolean;
+  message: string;
+}) {
+  await ensureFeedbackSchema();
+  const message = validateFeedbackCommentBody({ message: input.message });
+  return withTransaction(async (client) => {
+    // Status transitions take the same lock: a reply is either before closure or refused.
+    const locked = await client.query<FeedbackRow>(
+      `SELECT ${FEEDBACK_SELECT} FROM arcade_feedback WHERE id = $1 FOR UPDATE`, [input.id],
+    );
+    const row = locked.rows[0];
+    if (!row || (!input.isAdmin && row.user_id !== input.userId)) {
+      throw new FeedbackError('Feedback not found.', 404);
+    }
+    if (row.status !== 'open') {
+      throw new FeedbackError('This ticket is resolved. An admin must reopen it before another reply.', 409);
+    }
+    const now = Math.max(Date.now(), Number(row.updated_at) + 1);
+    if (!input.isAdmin) {
+      // Persisted per-ticket bound survives restarts; the route also limits all owner replies.
+      const recent = await client.query<{ count: string }>(
+        `SELECT COUNT(*)::text AS count FROM arcade_feedback_comments
+         WHERE feedback_id = $1 AND author_user_id = $2 AND created_at > $3`,
+        [input.id, input.userId, now - 60 * 60 * 1000],
+      );
+      if (Number(recent.rows[0].count) >= 20) {
+        throw new FeedbackError('Too many replies. Please try again later.', 429);
+      }
+    }
+    const comments = await client.query<FeedbackCommentRow>(
+      `INSERT INTO arcade_feedback_comments
+         (id, feedback_id, author_user_id, author_name, author_role, message, created_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
+       RETURNING id, author_name, author_role, message, created_at`,
+      [crypto.randomUUID(), row.id, input.userId,
+        input.isAdmin ? 'Tixy team' : (clampText(input.userName, MAX_NAME_LENGTH) || 'Player'),
+        input.isAdmin ? 'admin' : 'player', message, now],
+    );
+    const updated = await client.query<FeedbackRow>(
+      `UPDATE arcade_feedback SET updated_at = $1 WHERE id = $2 RETURNING *`, [now, row.id],
+    );
+    return {
+      entry: toFeedbackTicketEntry(rowToFeedback(updated.rows[0])),
+      comment: rowToComment(comments.rows[0]),
+      ownerUserId: row.user_id,
+    };
+  });
 }
 
 export async function updateFeedbackStatus(input: {
@@ -325,31 +499,39 @@ export async function updateFeedbackStatus(input: {
   actorUserId?: string | null;
 }) {
   await ensureFeedbackSchema();
-  if (!isFeedbackStatus(input.status)) {
-    throw new Error('Invalid feedback status.');
+  if (!isFeedbackStatus(input.status)) throw new FeedbackError('Invalid feedback status.', 400);
+  if (input.adminNote !== undefined && input.adminNote !== null &&
+      (typeof input.adminNote !== 'string' || input.adminNote.trim().length > MAX_ADMIN_NOTE_LENGTH)) {
+    throw new FeedbackError('Admin notes must be at most 1200 characters.', 400);
   }
-
-  const now = Date.now();
-  const result = await query<FeedbackRow>(
-    `UPDATE arcade_feedback
-     SET status = $1,
-         admin_note = $2,
-         status_updated_by = $3,
-         status_updated_at = $4,
-         updated_at = $5
-     WHERE id = $6
-     RETURNING id, date_key, user_id, user_name, email, category, rating, message, page_path, status, admin_note, status_updated_by, status_updated_at, user_agent, created_at, updated_at`,
-    [
-      input.status,
-      clampText(input.adminNote, MAX_ADMIN_NOTE_LENGTH),
-      clampText(input.actorUserId, 80),
-      now,
-      now,
-      input.id.trim(),
-    ],
-  );
-  if (!result.rows[0]) throw new Error('Feedback not found.');
-  return rowToFeedback(result.rows[0]);
+  return withTransaction(async (client) => {
+    const previous = await client.query<FeedbackRow>(
+      `SELECT ${FEEDBACK_SELECT} FROM arcade_feedback WHERE id = $1 FOR UPDATE`, [input.id.trim()],
+    );
+    const row = previous.rows[0];
+    if (!row) throw new FeedbackError('Feedback not found.', 404);
+    const now = Math.max(Date.now(), Number(row.updated_at) + 1);
+    const note = clampText(input.adminNote, MAX_ADMIN_NOTE_LENGTH);
+    // Legacy responses remain visible; replacement notes become additional messages.
+    if (note && note !== row.admin_note) {
+      if (row.status !== 'open') {
+        throw new FeedbackError('This ticket is resolved. Reopen it before adding a reply.', 409);
+      }
+      await client.query(
+        `INSERT INTO arcade_feedback_comments
+           (id, feedback_id, author_user_id, author_name, author_role, message, created_at)
+         VALUES ($1, $2, $3, 'Tixy team', 'admin', $4, $5)`,
+        [crypto.randomUUID(), row.id, input.actorUserId || 'legacy-admin', note, now],
+      );
+    }
+    const result = await client.query<FeedbackRow>(
+      `UPDATE arcade_feedback
+       SET status = $1, status_updated_by = $2, status_updated_at = $3, updated_at = $3
+       WHERE id = $4 RETURNING *`,
+      [input.status, clampText(input.actorUserId, 80), now, row.id],
+    );
+    return { ...rowToFeedback(result.rows[0]), email: row.email };
+  });
 }
 
 export async function getFeedbackLogs(requestedDateKey?: string) {
@@ -368,7 +550,7 @@ export async function getFeedbackLogs(requestedDateKey?: string) {
 
   const [entriesResult, availableDatesResult] = await Promise.all([
     query<FeedbackRow>(
-      `SELECT id, date_key, user_id, user_name, email, category, rating, message, page_path, status, admin_note, status_updated_by, status_updated_at, user_agent, created_at, updated_at
+      `SELECT ${FEEDBACK_SELECT}
        FROM arcade_feedback
        WHERE date_key = $1
        ORDER BY created_at DESC`,

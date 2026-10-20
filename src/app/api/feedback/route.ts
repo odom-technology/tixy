@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import { getAccountById } from '@/server/accounts';
 import { requireIdentity } from '@/server/auth';
 import { getClientIp } from '@/server/auth/auth-rate-limit';
-import { createFeedback, listFeedbackForUser } from '@/server/feedback';
+import { createFeedback, FeedbackError, listFeedbackForUser, toFeedbackTicketEntry } from '@/server/feedback';
 
 export const dynamic = 'force-dynamic';
 
@@ -42,7 +42,7 @@ export async function GET() {
   }
 
   return NextResponse.json({
-    entries: await listFeedbackForUser(identity.userId, 10),
+    entries: (await listFeedbackForUser(identity.userId, 50)).map(toFeedbackTicketEntry),
   });
 }
 
@@ -77,8 +77,23 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Invalid JSON.' }, { status: 400 });
   }
 
-  if (!body || typeof body !== 'object' || body.website) {
+  if (!body || typeof body !== 'object' || Array.isArray(body) || body.website) {
     return NextResponse.json({ error: 'Unable to submit message.' }, { status: 400 });
+  }
+
+  const allowedFields = new Set(['category', 'rating', 'message', 'pagePath', 'contactEmail', 'website']);
+  if (Object.keys(body).some((key) => !allowedFields.has(key)) ||
+      typeof body.message !== 'string' ||
+      (body.category !== undefined && typeof body.category !== 'string') ||
+      (body.pagePath !== undefined && body.pagePath !== null && typeof body.pagePath !== 'string') ||
+      (body.contactEmail !== undefined && body.contactEmail !== null && typeof body.contactEmail !== 'string') ||
+      (body.website !== undefined && body.website !== null && typeof body.website !== 'string') ||
+      (body.rating !== undefined && body.rating !== null &&
+        (typeof body.rating !== 'number' || !Number.isInteger(body.rating) || body.rating < 1 || body.rating > 5))) {
+    return NextResponse.json({ error: 'Invalid feedback fields.' }, { status: 400 });
+  }
+  if ((body.pagePath?.length ?? 0) > 300 || (body.contactEmail?.length ?? 0) > 254) {
+    return NextResponse.json({ error: 'Page or contact email is too long.' }, { status: 400 });
   }
 
   try {
@@ -93,11 +108,12 @@ export async function POST(request: Request) {
       userAgent: request.headers.get('user-agent'),
     });
     recordFeedbackSubmission(limitKey);
-    return NextResponse.json({ entry }, { status: 201 });
+    return NextResponse.json({ entry: toFeedbackTicketEntry(entry) }, { status: 201 });
   } catch (error) {
-    return NextResponse.json(
-      { error: (error as Error).message || 'Unable to submit feedback.' },
-      { status: 400 },
-    );
+    if (error instanceof FeedbackError) {
+      return NextResponse.json({ error: error.message }, { status: error.status });
+    }
+    console.error('[feedback] submission failed');
+    return NextResponse.json({ error: 'Unable to submit feedback.' }, { status: 500 });
   }
 }

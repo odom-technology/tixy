@@ -315,6 +315,16 @@ export const arcadeFeedback = pgTable('arcade_feedback', {
   updatedAt: ts('updated_at').notNull(),
 }) as any;
 
+export const arcadeFeedbackComments = pgTable('arcade_feedback_comments', {
+  id: text('id').primaryKey(),
+  feedbackId: text('feedback_id').notNull().references(() => arcadeFeedback.id),
+  authorUserId: text('author_user_id').notNull(),
+  authorName: text('author_name').notNull(),
+  authorRole: text('author_role').notNull(),
+  message: text('message').notNull(),
+  createdAt: ts('created_at').notNull(),
+}) as any;
+
 export const arcadeNotifications = pgTable('arcade_notifications', {
   id: text('id').primaryKey(),
   userId: text('user_id').notNull(),

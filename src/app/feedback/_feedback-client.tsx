@@ -2,7 +2,7 @@
 
 import { FormEvent, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { MessageSquare, Send } from 'lucide-react';
+import { MessageSquare, RefreshCw, Send } from 'lucide-react';
 
 import {
   ArcadeButton,
@@ -11,23 +11,13 @@ import {
 } from '@/features/arcade/components/ui/arcade-ui';
 import { AppPageFrame } from '@/features/arcade/components/shell/page-frame';
 import { feedbackCategories as categories } from '@/features/arcade/lib/feedback-categories';
-import type { FeedbackCategory } from '@/server/feedback';
+import type { FeedbackCategory, FeedbackTicketEntry } from '@/server/feedback';
 
-type FeedbackEntry = {
-  id: string;
-  category: FeedbackCategory;
-  rating: number | null;
-  message: string;
-  pagePath: string | null;
-  status: 'open' | 'resolved' | 'dismissed';
-  createdAt: number;
-  updatedAt: number;
-};
+type FeedbackEntry = FeedbackTicketEntry;
 
 type FeedbackClientProps = {
   account: {
     username: string | null;
-    email: string;
   } | null;
   initialEntries: FeedbackEntry[];
   initialCategory?: FeedbackCategory;
@@ -63,6 +53,22 @@ export function FeedbackClient({
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [website, setWebsite] = useState('');
+  const [submittedId, setSubmittedId] = useState<string | null>(null);
+  const [historyBusy, setHistoryBusy] = useState(false);
+
+  async function refreshTickets() {
+    if (busy || historyBusy) return;
+    setHistoryBusy(true);
+    setError(null);
+    try {
+      const response = await fetch('/api/feedback', { cache: 'no-store' });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error || 'Unable to load your tickets.');
+      setEntries(payload.entries);
+    } catch (caught) {
+      setError((caught as Error).message);
+    } finally { setHistoryBusy(false); }
+  }
 
   const remaining = useMemo(() => 3000 - message.length, [message.length]);
   const selectedCategory = categories.find((item) => item.value === category) ?? categories[0];
@@ -95,10 +101,11 @@ export function FeedbackClient({
       if (!response.ok || !payload.entry) {
         throw new Error(payload.error || 'Unable to submit feedback.');
       }
-      setEntries((current) => [payload.entry!, ...current].slice(0, 10));
+      setEntries((current) => [payload.entry!, ...current].slice(0, 50));
+      setSubmittedId(payload.entry.id);
       setMessage('');
       setPagePath('');
-      setNotice('Your message was sent. Thank you for reaching out.');
+      setNotice(account ? 'Your ticket is open. Continue the conversation and read replies here in Tixy.' : 'Your message was sent. If you included an email, the team can use it to follow up.');
     } catch (caught) {
       setError((caught as Error).message);
     } finally {
@@ -115,12 +122,15 @@ export function FeedbackClient({
           Feedback
         </span>
       }
-      subtitle='Ask a question, get help, report a problem, or suggest a game. Choose a reason to tailor your message.'
+      subtitle='Ask a question, report a problem, or suggest a game. Signed-in players can follow up and read replies on their private tickets.'
       contentClassName='space-y-6'
     >
         <div className={account ? 'grid items-start gap-5 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]' : 'mx-auto max-w-3xl'}>
           <section className={panelClass}>
+            <h2 className='mb-4 text-lg font-semibold'>Open a ticket</h2>
+            {!account ? <p className='mb-5 text-sm leading-6 text-faint'><Link href='/signin?next=/feedback' className='arcade-link'>Sign in</Link> for a private conversation with the Tixy team and in-app reply notifications. You can also submit as a guest and leave an email for follow-up.</p> : null}
             <form onSubmit={submit} className='space-y-4'>
+              <fieldset disabled={busy || historyBusy} className='min-w-0 space-y-4'>
               <label className='block'>
                 <span className='text-sm font-medium text-faint'>What is this about?</span>
                 <select
@@ -170,7 +180,7 @@ export function FeedbackClient({
                     className={inputClass}
                   />
                 </label>
-              ) : <p className='text-sm text-faint'>We can reply using your account email.</p>}
+              ) : <p className='text-sm text-faint'>Replies appear on your ticket in Tixy. We’ll notify you in-app when the team responds, if feedback notifications are enabled.</p>}
 
               {selectedCategory.pageLabel ? <label className='block'>
                 <span className='text-sm font-medium text-faint'>{selectedCategory.pageLabel} (optional)</span>
@@ -210,25 +220,29 @@ export function FeedbackClient({
                 <ArcadeButton
                   type='submit'
                   tone='primary'
-                  disabled={busy}
+                  disabled={busy || historyBusy}
                 >
                   <Send size={16} />
-                  {busy ? 'Sending...' : 'Send message'}
+                  {busy ? 'Sending...' : 'Submit ticket'}
                 </ArcadeButton>
               </div>
-              {notice ? <div role='status'><ArcadeNotice tone='success'>{notice}</ArcadeNotice></div> : null}
+              {notice ? <div role='status'><ArcadeNotice tone='success'>{notice}{account && submittedId ? <Link className='arcade-link ml-2' href={`/feedback/${encodeURIComponent(submittedId)}`}>Open your ticket</Link> : null}</ArcadeNotice></div> : null}
               {error ? <div role='alert'><ArcadeNotice tone='danger'>{error}</ArcadeNotice></div> : null}
+              </fieldset>
             </form>
           </section>
 
           {account ? (
             <aside className={panelClass}>
-              <h2 className='text-lg font-semibold'>Your recent messages</h2>
-              <p className='mt-1 text-sm text-faint'>Your latest 10 messages and their status.</p>
+              <div className='flex flex-wrap items-center justify-between gap-3'>
+                <h2 className='text-lg font-semibold'>Your tickets</h2>
+                <ArcadeButton type='button' size='sm' disabled={busy || historyBusy} onClick={() => void refreshTickets()}><RefreshCw size={16} />{historyBusy ? 'Refreshing…' : 'Refresh tickets'}</ArcadeButton>
+              </div>
+              <p className='mt-2 text-sm text-faint'>Your latest 50 tickets, most recently updated first. Open one to read replies or add more details.</p>
               <div className='mt-4 space-y-3'>
                 {entries.length === 0 ? (
                   <p className='arcade-card-inset px-4 py-6 text-center text-sm text-faint'>
-                    You haven’t sent any messages yet.
+                    You haven’t opened any tickets yet.
                   </p>
                 ) : (
                   entries.map((entry) => (
@@ -241,14 +255,14 @@ export function FeedbackClient({
                         <ArcadeChip tone='primary'>
                           {categoryLabels.get(entry.category) ?? entry.category.replaceAll('_', ' ')}
                         </ArcadeChip>
-                        <span>{entry.status}</span>
-                        <span>{formatDate(entry.createdAt)}</span>
+                        <span>{entry.status === 'open' ? 'Open' : 'Resolved'}</span>
+                        <span>Updated {formatDate(entry.updatedAt)}</span>
                       </div>
                       <p className='mt-2 line-clamp-3 text-sm text-strong'>
                         {entry.message}
                       </p>
                       <p className='mt-2 text-xs font-semibold text-primary-text'>
-                        Open details
+                        Open conversation
                       </p>
                     </Link>
                   ))
