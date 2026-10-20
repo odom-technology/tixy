@@ -1,0 +1,101 @@
+.lights-out .lights-out-play {
+  display: flex;
+  height: 100%;
+  min-height: 0;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.65rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: clamp(1rem, 3vw, 2rem);
+  background: var(--surface-panel);
+  color: var(--text-body);
+  text-align: center;
+  touch-action: pan-y;
+}
+
+.lights-out-play h2,
+.lights-out-board h2 {
+  font-size: clamp(1.25rem, 4vw, 1.8rem);
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.lights-out-eyebrow,
+.lights-out-hint {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.lights-out-announcement {
+  min-height: 1.5em;
+  font-weight: 600;
+}
+
+.lights-out-intro,
+.lights-out-round,
+.lights-out-result,
+.lights-out-error {
+  display: flex;
+  width: 100%;
+  max-width: 32rem;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.lights-out-grid {
+  display: grid;
+  width: min(100%, 19rem);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+
+.lights-out-grid .lights-out-cell {
+  min-width: 0;
+  min-height: 4.5rem;
+  height: auto;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.5rem;
+}
+
+.lights-out-grid .lights-out-cell[aria-pressed='true'] {
+  background: var(--enamel-tickets);
+  color: var(--enamel-tickets-on);
+}
+
+.lights-out-board {
+  width: min(100%, 38rem);
+  margin: 1.5rem auto;
+  padding: 1rem;
+  color: var(--text-body);
+}
+
+.lights-out-board p { margin-block: 0.75rem; }
+.lights-out-scores { counter-reset: lights-out-rank; list-style: none; padding-left: 0; }
+.lights-out-scores li {
+  counter-increment: lights-out-rank;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.65rem 0.25rem;
+  border-bottom: 1px solid var(--border-control);
+}
+.lights-out-scores li::before { content: counter(lights-out-rank) '.'; }
+.lights-out-scores li > span { min-width: 0; overflow-wrap: anywhere; }
+.lights-out-scores strong { white-space: nowrap; }
+
+.lights-out :is(button, a, h2):focus-visible {
+  outline: 3px solid currentColor;
+  outline-offset: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lights-out *, .lights-out *::before, .lights-out *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -240,26 +240,31 @@ function HeadLine({ state, signedIn }: { state: CounterState | null; signedIn: b
   );
 }
 
-export function PrizeCounter() {
+export function PrizeCounter({
+  rewardedAds,
+}: {
+  rewardedAds: { enabled: boolean; ticketsAmount: number; dailyAttemptLimit: number; cooldownSeconds: number };
+}) {
   const { ticketBundlesEnabled } = useSiteAvailability();
   const [state, setState] = useState<CounterState | null>(null);
   const [packs, setPacks] = useState<TicketPack[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [refreshAfterCheckout, setRefreshAfterCheckout] = useState(false);
   const [busy, setBusy] = useState<Busy>(null);
   const [busyPack, setBusyPack] = useState<string | null>(null);
   const [justBought, setJustBought] = useState<string | null>(null);
   const [openId, setOpenId] = useState<string | null>(null);
   const [group, setGroup] = useState<string>('all');
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (signal?: AbortSignal) => {
     try {
-      const res = await fetch('/api/store', { cache: 'no-store' });
+      const res = await fetch('/api/store', { cache: 'no-store', signal });
       const payload = await res.json();
       if (!res.ok) throw new Error(payload.error || 'The counter did not load.');
-      setState(payload as CounterState);
+      if (!signal?.aborted) setState(payload as CounterState);
     } catch (err) {
-      setError((err as Error).message);
+      if (!signal?.aborted) setError((err as Error).message);
     }
   }, []);
 
@@ -290,7 +295,7 @@ export function PrizeCounter() {
     const purchase = params.get('ticket_purchase');
     if (purchase === 'success') {
       setNotice('Your tickets are on the way. The balance updates when Stripe confirms the payment.');
-      void load();
+      setRefreshAfterCheckout(true);
     } else if (purchase === 'cancelled') {
       setNotice('Checkout cancelled. Nothing was charged.');
     }
@@ -301,6 +306,30 @@ export function PrizeCounter() {
       window.history.replaceState(null, '', `${window.location.pathname}${next ? `?${next}` : ''}${window.location.hash}`);
     }
   }, [load]);
+
+  // Checkout can return before its webhook grants tickets. Refresh briefly while
+  // confirmation arrives, with one request at a time and no work after unmount.
+  useEffect(() => {
+    if (!refreshAfterCheckout) return;
+    const controller = new AbortController();
+    let refreshTimer: ReturnType<typeof setTimeout>;
+    const refresh = async () => {
+      await load(controller.signal);
+      if (!controller.signal.aborted) {
+        refreshTimer = setTimeout(() => void refresh(), 2000);
+      }
+    };
+    refreshTimer = setTimeout(() => void refresh(), 2000);
+    const stopTimer = setTimeout(() => {
+      controller.abort();
+      clearTimeout(refreshTimer);
+    }, 60000);
+    return () => {
+      controller.abort();
+      clearTimeout(refreshTimer);
+      clearTimeout(stopTimer);
+    };
+  }, [load, refreshAfterCheckout]);
 
   const signedIn = Boolean(state && !state.isGuest);
   const { account } = useAccountSummary();
@@ -581,22 +610,39 @@ export function PrizeCounter() {
         </section>
       ) : null}
 
-      {/* The rewarded ad stays whether or not ticket packs are on sale. */}
-      <section className='pc-packs pc-ad' aria-labelledby='pc-ad-title'>
-        <div className='pc-ad-copy'>
-          <h2 id='pc-ad-title'>optional ad reward</h2>
-          <p>Watch a rewarded ad for tickets you spend at the counter.</p>
-        </div>
-        <RewardedAdButton
-          rewardType='store_tickets'
-          onReward={() => {
-            setNotice('Tickets added.');
-            void load();
-          }}
-        >
-          watch ad
-        </RewardedAdButton>
-      </section>
+      {rewardedAds.enabled ? (
+        <section className='pc-packs pc-ad' aria-labelledby='pc-ad-title'>
+          <div className='pc-ad-copy'>
+            <h2 id='pc-ad-title'>optional ad reward</h2>
+            <p>
+              Complete an optional rewarded ad for{' '}
+              {rewardedAds.ticketsAmount.toLocaleString('en-US')} Store Tickets
+              you spend at the counter.
+            </p>
+            <p>
+              Up to {rewardedAds.dailyAttemptLimit.toLocaleString('en-US')} ad attempts
+              per account every 24 hours, with {rewardedAds.cooldownSeconds.toLocaleString('en-US')}{' '}
+              seconds between attempts. Closed or unavailable ads count toward this limit.
+            </p>
+          </div>
+          {signedIn ? (
+            <RewardedAdButton
+              enabled={rewardedAds.enabled}
+              rewardType='store_tickets'
+              onReward={() => {
+                setNotice('Tickets added.');
+                void load();
+              }}
+            >
+              {`watch ad for ${rewardedAds.ticketsAmount.toLocaleString('en-US')} tickets`}
+            </RewardedAdButton>
+          ) : (
+            <a className='pc-btn' href='/signin?next=%2Fstore'>
+              sign in for ad rewards
+            </a>
+          )}
+        </section>
+      ) : null}
 
       {openEntry ? (
         <PrizePreview

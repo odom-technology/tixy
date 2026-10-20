@@ -5,7 +5,7 @@ import { checkScoreSubmitLimit } from '@/server/arcade/game-rate-limit';
 import { addAntiCheatLog } from '@/server/arcade/anti-cheat-logs';
 import type { ActionEntry, EnvFingerprint } from '@/server/arcade/anti-cheat';
 
-type GameType = 'snake' | 'flappy-bird' | 'reaction-time' | 'typing-test' | '8-ball' | 'tetris' | '2048' | 'stack' | 'sequence' | 'breakout' | 'tumbler' | 'gopher' | 'ricochet' | 'swerve' | 'sudoku' | 'math' | 'bubble-shooter' | 'gem-swap' | 'sky-climber' | 'minesweeper' | 'log-splitter' | 'knife-booth' | 'melon-chop' | 'tin-duck' | 'boardwalk-hop' | 'punch-card' | 'freecell' | 'blitz-tactics' | 'high-striker' | 'skee-ball' | 'gunrush' | 'ticket-stop' | 'stack-cabinet' | 'ring-toss' | 'mini-golf';
+type GameType = 'snake' | 'flappy-bird' | 'reaction-time' | 'typing-test' | '8-ball' | 'tetris' | '2048' | 'stack' | 'sequence' | 'breakout' | 'tumbler' | 'gopher' | 'ricochet' | 'swerve' | 'sudoku' | 'math' | 'bubble-shooter' | 'gem-swap' | 'sky-climber' | 'minesweeper' | 'log-splitter' | 'knife-booth' | 'melon-chop' | 'tin-duck' | 'boardwalk-hop' | 'punch-card' | 'freecell' | 'blitz-tactics' | 'high-striker' | 'skee-ball' | 'gunrush' | 'ticket-stop' | 'stack-cabinet' | 'ring-toss' | 'mini-golf' | 'starter-match' | 'lights-out';
 
 export type BaseScorePayload = {
   score?: number;

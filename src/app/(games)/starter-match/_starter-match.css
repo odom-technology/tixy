@@ -1,0 +1,121 @@
+.starter-match .starter-match-play {
+  display: flex;
+  height: 100%;
+  min-height: 0;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: clamp(1rem, 3vw, 2rem);
+  background: var(--surface-panel);
+  color: var(--text-body);
+  text-align: center;
+  touch-action: pan-y;
+}
+
+.starter-match-play h2,
+.starter-match-board h2 {
+  font-size: clamp(1.25rem, 4vw, 1.8rem);
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.starter-match-eyebrow {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.starter-match-announcement {
+  min-height: 1.5em;
+  max-width: 36rem;
+  font-weight: 600;
+}
+
+.starter-match-intro,
+.starter-match-round,
+.starter-match-result,
+.starter-match-error,
+.starter-match-target {
+  display: flex;
+  width: 100%;
+  max-width: 32rem;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.starter-match-choices {
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.starter-match-choices .arc-key {
+  min-height: 3.5rem;
+  padding-inline: 0.5rem;
+}
+
+.starter-match-board {
+  width: min(100%, 38rem);
+  margin: 1.5rem auto;
+  padding: 1rem;
+  color: var(--text-body);
+}
+
+.starter-match-board p {
+  margin-block: 0.75rem;
+}
+
+.starter-match-scores {
+  counter-reset: starter-match-rank;
+  list-style: none;
+  padding-left: 0;
+}
+
+.starter-match-scores li {
+  counter-increment: starter-match-rank;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.65rem 0.25rem;
+  border-bottom: 1px solid var(--border-control);
+}
+
+.starter-match-scores li > span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.starter-match-scores li > span::before {
+  content: counter(starter-match-rank) '. ';
+}
+
+.starter-match-scores strong {
+  white-space: nowrap;
+}
+
+.starter-match :is(button, a, h2):focus-visible {
+  outline: 3px solid currentColor;
+  outline-offset: 4px;
+}
+
+@media (max-width: 22rem) {
+  .starter-match-choices .arc-key {
+    flex-direction: column;
+    padding-block: 0.6rem;
+    height: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .starter-match *,
+  .starter-match *::before,
+  .starter-match *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

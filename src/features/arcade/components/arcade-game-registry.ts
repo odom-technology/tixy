@@ -25,6 +25,7 @@ import {
   Hexagon,
   Keyboard,
   LayoutGrid,
+  Lightbulb,
   Layers,
   LineSquiggle,
   LockKeyhole,
@@ -33,6 +34,7 @@ import {
   Rabbit,
   Rocket,
   Spade,
+  Shapes,
   Sparkles,
   Target,
   Ticket,
@@ -179,6 +181,17 @@ export const ARCADE_WAGER_SUBSECTION_META: Record<
 };
 
 const RAW_ARCADE_GAMES: ArcadeGameEntry[] = [
+  {
+    slug: 'starter-match',
+    title: 'Pattern Match',
+    description: 'Match eight symbols. A score-only starter for game contributors.',
+    href: '/starter-match',
+    sectionId: 'casual',
+    icon: Shapes,
+    routeLabel: 'Pattern Match',
+    mobileRouteLabel: 'Patterns',
+    placement: { status: 'reserve', group: 'quick-play' },
+  },
   {
     slug: 'typing-duel',
     title: 'Typing Duel',
@@ -1064,6 +1077,17 @@ const RAW_ARCADE_GAMES: ArcadeGameEntry[] = [
     mobileRouteLabel: 'Hockey',
     placement: { status: 'reserve', group: 'with-friends' },
   },
+  {
+    slug: 'lights-out',
+    title: 'Lights Out',
+    description: 'Switch every light off in 24 moves. Fewer moves score more points.',
+    href: '/lights-out',
+    sectionId: 'casual',
+    icon: Lightbulb,
+    routeLabel: 'Lights Out',
+    mobileRouteLabel: 'Lights Out',
+    placement: { status: 'reserve', group: 'quick-play' },
+  },
 ];
 
 /* The games as players see them. While the rename map is off this is the raw
@@ -1134,6 +1158,7 @@ export const RESERVE_ON_FLOOR = false;
 
 /* The reserve list behind "more games", in PLAN.md's reserve order. */
 const RESERVE_ORDER: readonly string[] = [
+  'starter-match',
   'crash',
   'typing-test',
   'typing-duel',
@@ -1152,6 +1177,7 @@ const RESERVE_ORDER: readonly string[] = [
   'dice',
   'coin-flip',
   'prize-wheel',
+  'lights-out',
 ];
 
 function entriesFor(slugs: readonly string[]): ArcadeGameEntry[] {

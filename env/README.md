@@ -148,19 +148,54 @@ Maintenance redirects and public banners are stored in Postgres and managed from
 
 `NEXT_PUBLIC_GAM_REWARDED_AD_UNIT_PATH`
 : Google Ad Manager rewarded ad unit path used by explicit opt-in reward
-  buttons for signed-in users.
+  buttons for signed-in users. Read at runtime by the server; leave unset to
+  hide the offer until real inventory is ready.
 
 `AD_REWARD_STORE_TICKETS`
 : Store-only Tickets granted by a rewarded ad. Defaults to `25`.
 
 `AD_REWARD_DAILY_LIMIT`
-: Maximum rewarded ad intents per user per 24 hours. Defaults to `10`.
+: Maximum claimed rewards per user in a rolling 24 hours. Defaults to `10`.
+  Failed or unfilled ad requests do not consume this allowance.
+
+`AD_REWARD_DAILY_ATTEMPT_LIMIT`
+: Maximum rewarded ad starts per user in a rolling 24 hours. Defaults to `10`.
+  Every intent request counts, including closed, unfilled, or abandoned ads.
+  This separate cap prevents repeated viewing without claiming a reward.
 
 `AD_REWARD_COOLDOWN_MS`
-: Minimum time between rewarded ad intent requests. Defaults to `60000`.
+: Minimum time between rewarded ad intent requests, including unfilled
+  attempts. Defaults to `60000`.
 
 `AD_REWARD_INTENT_TTL_MS`
 : Reward intent expiry window. Defaults to `600000`.
+
+Before enabling rewarded ads:
+
+1. Finish AdSense account approval, then sign in to Google Ad Manager with that
+   same publisher account. AdSense review can block Ad Manager signup.
+2. Create a dedicated rewarded web ad unit and configure its reward to match
+   `AD_REWARD_STORE_TICKETS` Store Tickets. Configure eligible demand or line
+   items; creating an ad unit alone does not provide paid ads. Follow Google's
+   [rewarded web setup](https://support.google.com/admanager/answer/9116812).
+3. Configure the Google-certified consent message for the Ad Manager publisher
+   and relevant regions. Verify the message, ad-request consent, and GPT content
+   security policy compatibility before serving production inventory.
+4. Validate playback with isolated mocks or official test inventory, never real
+   ad clicks. Confirm no-fill recovery, early close, reward grant, and close
+   after grant. Web rewarded ads do not support Google's app-only server-side
+   verification; grants rely on GPT's browser event with server-enforced limits.
+5. Set the actual ad unit path in the host's private runtime environment and
+   recreate the app. Never use Google's sample path as production inventory.
+
+Store rewards are optional, nontransferable cosmetic-store currency. They must
+not become cash, transferable prizes, or a reward for clicking ordinary ads.
+
+Run `npm run test:rewarded-ad-lifecycle` for mocked GPT lifecycle checks. Run
+`npm run test:rewarded-ads` with `REWARDED_AD_TEST_DATABASE_URL` targeting a
+fresh local disposable database named `arcade_rewarded_ad_regression` for
+PostgreSQL concurrency and reward checks. These scripts do not load `.env` or
+contact ad providers, and CI runs both suites.
 
 ## Stripe
 

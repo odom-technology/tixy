@@ -220,14 +220,16 @@ async function runHttpPolicy() {
     });
     const storeWithBundlesOff = await expectStatus('store remains open without ticket bundles', await request('/store'), 200);
     const storeHtml = await storeWithBundlesOff.text();
-    assert.match(storeHtml, /Optional ad reward/i, 'store should render its non-bundle state');
-    assert.doesNotMatch(storeHtml, />Ticket bundles</i, 'bundle purchase section should be absent');
+    assert.match(storeHtml, /<h1\b[^>]*\bid=["']pc-title["'][^>]*>prize counter<\/h1>/i, 'prize counter should remain visible without ticket bundles');
+    assert.doesNotMatch(storeHtml, /\bid=["']pc-packs-title["']/i, 'ticket pack purchase section should be absent');
     await expectStatus('ticket pack list hidden', await request('/api/store/ticket-packs'), 503);
     await expectStatus('ticket checkout blocked before Stripe', await request('/api/store/ticket-packs/checkout', jsonBody({})), 503);
 
     current = await patchAvailability(adminCookie, current, {
       ...current.config, ticketBundlesEnabled: true, registrationEnabled: false,
     });
+    const storeWithBundlesOn = await expectStatus('store remains open with ticket bundles', await request('/store'), 200);
+    assert.match(await storeWithBundlesOn.text(), /\bid=["']pc-packs-title["']/i, 'ticket pack purchase section should return when enabled');
     const signup = await expectStatus('closed signup page still explains status', await request('/signup'), 200);
     assert.match(await signup.text(), /registration is temporarily unavailable/i);
     await expectStatus('registration API blocked', await request('/api/account/register', jsonBody({})), 503);

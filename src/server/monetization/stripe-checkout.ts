@@ -130,6 +130,7 @@ export async function createTicketPackCheckoutSession({
   };
   const session = await stripe.checkout.sessions.create({
     mode: 'payment',
+    payment_method_types: ['card', 'link'],
     client_reference_id: userId,
     customer_email: email ?? undefined,
     success_url: `${baseUrl}/store?ticket_purchase=success&session_id={CHECKOUT_SESSION_ID}`,

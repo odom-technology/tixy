@@ -3,6 +3,7 @@ import { requireIdentity } from '@/server/auth';
 import {
   type FeedbackCategory,
   listFeedbackForUser,
+  toFeedbackTicketEntry,
 } from '@/server/feedback';
 
 import { FeedbackClient } from './_feedback-client';
@@ -24,7 +25,7 @@ export async function FeedbackPageContent({
   const [account, entries] = identity
     ? await Promise.all([
         getAccountById(identity.userId),
-        listFeedbackForUser(identity.userId, 10),
+        listFeedbackForUser(identity.userId, 50),
       ])
     : [null, []];
 
@@ -35,11 +36,10 @@ export async function FeedbackPageContent({
         account
           ? {
               username: account.username,
-              email: account.email,
             }
           : null
       }
-      initialEntries={entries}
+      initialEntries={entries.map(toFeedbackTicketEntry)}
       initialCategory={initialCategory}
     />
   );

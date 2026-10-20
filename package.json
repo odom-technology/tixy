@@ -27,8 +27,11 @@
     "test:admin-metrics": "tsx scripts/verify-admin-metrics.ts",
     "test:smoke": "node scripts/smoke.mjs",
     "test:admin-routes": "tsx scripts/verify-admin-routes.ts",
+    "test:feedback-conversations": "node scripts/verify-feedback-conversations.mjs",
     "test:site-availability": "tsx scripts/verify-site-availability.ts",
     "test:stripe-payments": "tsx scripts/verify-stripe-payments.ts",
+    "test:rewarded-ads": "tsx scripts/verify-rewarded-ads.ts",
+    "test:rewarded-ad-lifecycle": "tsx scripts/verify-rewarded-ad-lifecycle.ts",
     "test:store-hiding": "tsx scripts/verify-store-hiding.ts",
     "test:counter": "tsx scripts/verify-counter.ts",
     "test:bet-presets": "tsx scripts/verify-bet-presets.ts",
@@ -93,7 +96,13 @@
     "art:build": "tsx scripts/brand/build-art-kit.tsx",
     "art:check": "tsx scripts/check-art-kit.ts",
     "art:badges": "tsx scripts/brand/badge-sheet.tsx",
-    "test:sha256": "tsx scripts/verify-sha256.ts"
+    "test:sha256": "tsx scripts/verify-sha256.ts",
+    "test:starter-game": "tsx scripts/verify-starter-game.ts",
+    "test:starter-game-integration": "tsx scripts/verify-starter-game-integration.ts",
+    "test:starter-game-browser": "node scripts/verify-starter-game-browser.mjs",
+    "test:lights-out": "tsx scripts/verify-lights-out.ts",
+    "test:lights-out-integration": "tsx scripts/verify-lights-out-integration.ts",
+    "test:lights-out-browser": "node scripts/verify-lights-out-browser.mjs"
   },
   "dependencies": {
     "chess.js": "1.4.0",

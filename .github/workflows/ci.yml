@@ -16,9 +16,32 @@ jobs:
   verify:
     if: ${{ github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}
     runs-on: ubuntu-latest
+    env:
+      CI_BASE_SHA: ${{ github.event.before }}
+      FLOOR_REGISTRY_REQUIRE_BASE: '1'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # The full push range must exist locally for stored-key protection
+          # and changed-game selection.
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Resolve comparison base
+        shell: bash
+        run: |
+          if [[ -n "$CI_BASE_SHA" && ! "$CI_BASE_SHA" =~ ^0+$ ]] && git cat-file -e "${CI_BASE_SHA}^{commit}"; then
+            echo "FLOOR_REGISTRY_BASE_REF=$CI_BASE_SHA" >> "$GITHUB_ENV"
+            echo "GAME_INVARIANT_BASE_SHA=$CI_BASE_SHA" >> "$GITHUB_ENV"
+            echo "GAME_INVARIANT_MODE=changed" >> "$GITHUB_ENV"
+          else
+            # A newly created branch has no before SHA. Exercise every game;
+            # still compare stored keys to its parent when one exists.
+            base=$(git rev-parse --verify HEAD^ 2>/dev/null || git rev-parse HEAD)
+            echo "FLOOR_REGISTRY_BASE_REF=$base" >> "$GITHUB_ENV"
+            echo "GAME_INVARIANT_MODE=all" >> "$GITHUB_ENV"
+          fi
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -35,8 +58,26 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Rewarded ad lifecycle regressions
+        run: npm run test:rewarded-ad-lifecycle
+
       - name: Game availability regression checks
         run: npx tsx scripts/verify-game-availability.ts
+
+      - name: Floor registry and stored game keys
+        run: npm run test:floor-registry
+
+      - name: Starter game regressions
+        run: npm run test:starter-game
+
+      - name: Relevant game invariants
+        shell: bash
+        run: |
+          if [[ "$GAME_INVARIANT_MODE" == 'all' ]]; then
+            npm run test:game-invariants
+          else
+            npm run test:game-invariants:changed
+          fi
 
   smoke:
     if: ${{ github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}
@@ -68,10 +109,14 @@ jobs:
       QA_SMOKE_EMAIL: qa-cards@example.com
       QA_SMOKE_PASSWORD: QaPass!2026
       QA_BASE_URL: http://127.0.0.1:3000
+      # Match the HTTP test origin so API requests receive usable session cookies.
+      NEXT_PUBLIC_APP_URL: http://127.0.0.1:3000
       ARCADE_ADMIN_EMAILS: qa-cards@example.com
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -89,12 +134,33 @@ jobs:
           node --input-type=module -e "import pg from 'pg'; const pool = new pg.Pool({connectionString: process.env.DATABASE_URL}); await pool.query('CREATE DATABASE arcade_payment_regression'); await pool.end();"
           npm run test:stripe-payments
 
+      - name: Rewarded ad server regressions
+        env:
+          REWARDED_AD_TEST_DATABASE_URL: postgres://arcade:arcade@localhost:5432/arcade_rewarded_ad_regression
+        run: |
+          node --input-type=module -e "import pg from 'pg'; const pool = new pg.Pool({connectionString: process.env.DATABASE_URL}); await pool.query('CREATE DATABASE arcade_rewarded_ad_regression'); await pool.end();"
+          npm run test:rewarded-ads
+
       - name: Leaderboard identity regressions
         env:
           LEADERBOARD_TEST_DATABASE_URL: postgres://arcade:arcade@localhost:5432/arcade_leaderboard_test
         run: |
           node --input-type=module -e "import pg from 'pg'; const pool = new pg.Pool({connectionString: process.env.DATABASE_URL}); await pool.query('CREATE DATABASE arcade_leaderboard_test'); await pool.end();"
           npm run test:leaderboard-identities
+
+      - name: Starter game server regressions
+        env:
+          STARTER_GAME_TEST_DATABASE_URL: postgres://arcade:arcade@localhost:5432/arcade_starter_game_test
+        run: |
+          node --input-type=module -e "import pg from 'pg'; const pool = new pg.Pool({connectionString: process.env.DATABASE_URL}); await pool.query('CREATE DATABASE arcade_starter_game_test'); await pool.end();"
+          npm run test:starter-game-integration
+
+      - name: Lights Out server regressions
+        env:
+          LIGHTS_OUT_TEST_DATABASE_URL: postgres://arcade:arcade@localhost:5432/arcade_lights_out_test
+        run: |
+          node --input-type=module -e "import pg from 'pg'; const pool = new pg.Pool({connectionString: process.env.DATABASE_URL}); await pool.query('CREATE DATABASE arcade_lights_out_test'); await pool.end();"
+          npm run test:lights-out-integration
 
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium
@@ -140,6 +206,12 @@ jobs:
             -H 'content-type: application/json' \
             -d '{"email":"qa-cards@example.com","username":"qa-cards","password":"QaPass!2026"}' \
             || echo "register returned non-2xx (account may already exist) - continuing"
+
+      - name: Starter game browser regressions
+        run: npm run test:starter-game-browser
+
+      - name: Lights Out browser pilot
+        run: npm run test:lights-out-browser
 
       - name: Seed QA player account
         run: |

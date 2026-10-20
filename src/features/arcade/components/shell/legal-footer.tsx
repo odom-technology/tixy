@@ -2,9 +2,9 @@
 
 import Link from 'next/link';
 
-const LEGAL_LINKS = [
-  { href: '/privacy', label: 'Privacy' },
-  { href: '/terms', label: 'Terms' },
+const FOOTER_LINKS = [
+  { href: '/developers', label: 'Build for Tixy' },
+  { href: '/legal', label: 'Privacy & Terms' },
   { href: '/feedback', label: 'Feedback' },
 ];
 
@@ -22,31 +22,21 @@ export function LegalFooter() {
           </a>{' '}
           product
         </p>
-        <nav aria-label='Legal and support' className='flex flex-wrap items-center gap-3'>
-          {LEGAL_LINKS.map((link) => (
-            link.href === '/privacy' ? (
-              <a
-                key={link.href}
-                href={link.href}
-                className='font-semibold transition-colors hover:text-strong'
-              >
-                {link.label}
-              </a>
-            ) : (
-              <Link
-                key={link.href}
-                href={link.href}
-                className='font-semibold transition-colors hover:text-strong'
-              >
-                {link.label}
-              </Link>
-            )
+        <nav aria-label='Site links and support' className='flex flex-wrap items-center gap-3'>
+          {FOOTER_LINKS.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className='font-semibold transition-colors hover:text-strong'
+            >
+              {link.label}
+            </Link>
           ))}
           <a
-            href='https://github.com/odom-technology/tixy'
-            className='font-semibold transition-colors hover:text-strong'
+            href='https://buymeacoffee.com/andrewodom18'
+            className='inline-flex min-h-11 items-center justify-center rounded-lg border border-soft bg-raised px-3 py-2 font-semibold text-strong transition-colors hover:bg-well focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring'
           >
-            Source
+            Support the dev
           </a>
           <a
             href='https://buymeacoffee.com/odomtech'

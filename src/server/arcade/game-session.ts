@@ -111,7 +111,9 @@ export type GameType =
   | 'stack-cabinet'
   // Ring toss
   | 'ring-toss'
-  | 'mini-golf';
+  | 'mini-golf'
+  | 'starter-match'
+  | 'lights-out';
 
 /** The game whose availability switch covers a game type. Stacker's
  *  cabinet mode is part of stack: turning stack off turns both off. */
