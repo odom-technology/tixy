@@ -3,6 +3,7 @@ name: CI
 on:
   push:
     branches: [main]
+  workflow_dispatch:
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
@@ -13,6 +14,7 @@ permissions:
 
 jobs:
   verify:
+    if: ${{ github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -37,6 +39,7 @@ jobs:
         run: npx tsx scripts/verify-game-availability.ts
 
   smoke:
+    if: ${{ github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}
     name: Smoke test game routes
     runs-on: ubuntu-latest
     timeout-minutes: 20
