@@ -33,12 +33,6 @@ export function LegalFooter() {
             </Link>
           ))}
           <a
-            href='https://github.com/odom-technology/tixy'
-            className='inline-flex min-h-11 items-center justify-center rounded-lg border border-soft bg-raised px-3 py-2 font-semibold text-strong transition-colors hover:bg-well focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring'
-          >
-            Source
-          </a>
-          <a
             href='https://buymeacoffee.com/odomtech'
             className='inline-flex min-h-11 items-center justify-center rounded-lg border border-soft bg-raised px-3 py-2 font-semibold text-strong transition-colors hover:bg-well focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring'
           >
